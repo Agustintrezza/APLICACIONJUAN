@@ -1,0 +1,54 @@
+/* Importa Flowbite */
+@import 'flowbite';
+
+/* src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.texto-tabla {
+    font-size: 13px!important;
+}
+.texto-descripcion-card {
+    font-size: 12px!important;
+}
+.texto-categoria {
+    font-size: 14px;
+}
+.contenedor-buttons-dashboard-sticky {
+    position: sticky; /* Usa sticky para mantener la posición */
+    top: 10px; /* Ajusta la distancia desde la parte superior */
+    z-index: 10;
+}
+.button-limpiar-filtros {
+    padding: 6px 7px!important;
+    font-size: 15px;
+}
+/* .iconos-sidebar:hover {
+    color: red!important
+} */
+.select-filters-container-custom {
+    position: sticky!important;
+    top: -16px;
+    z-index: 1;
+    background-color: rgb(238, 237, 237);
+}
+.input-search-table-main {
+
+        position: sticky;
+        top: 0; /* Ajusta según el espacio deseado desde la parte superior */
+        z-index: 10;
+        background-color: rgb(235, 235, 235); /* Fondo blanco para que el sticky se vea claro */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra opcional para darle separación visual */
+        padding: 10px 0; /* Espaciado adicional */
+        /* background-color: red; */
+        
+}
+
+.contenedor-custom {
+    display: grid!important;
+    grid-template-columns: 100%!important;
+    width: 100%!important;
+    margin: auto;
+}
