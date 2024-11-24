@@ -60,24 +60,27 @@ const PaisSelect = ({ formData, setFormData }) => {
   };
 
   const handleZonaChange = (e) => {
+    const selectedZona = e.target.value;
     setFormData({
       ...formData,
-      zona: e.target.value,
+      zona: selectedZona,
       localidad: "",
     });
   };
 
   const handleLocalidadChange = (e) => {
+    const selectedLocalidad = e.target.value;
     setFormData({
       ...formData,
-      localidad: e.target.value,
+      localidad: selectedLocalidad,
     });
   };
 
   const handleUbicacionManualChange = (e) => {
+    const manualLocation = e.target.value;
     setFormData({
       ...formData,
-      ubicacionManual: e.target.value,
+      ubicacionManual: manualLocation,
     });
   };
 
@@ -102,7 +105,7 @@ const PaisSelect = ({ formData, setFormData }) => {
         </select>
       </div>
 
-      {/* Campo Provincia (sólo si se selecciona Argentina) */}
+      {/* Campo Provincia */}
       {formData.pais === "Argentina" && (
         <div className="mt-2">
           <label htmlFor="provincia" className="block mb-2 text-sm font-medium text-gray-900">Provincia</label>
@@ -121,7 +124,7 @@ const PaisSelect = ({ formData, setFormData }) => {
         </div>
       )}
 
-      {/* Campo Zona (sólo si se selecciona Buenos Aires) */}
+      {/* Campo Zona */}
       {formData.provincia === "Buenos Aires" && (
         <div className="mt-2">
           <label htmlFor="zona" className="block mb-2 text-sm font-medium text-gray-900">Zona</label>
@@ -140,7 +143,7 @@ const PaisSelect = ({ formData, setFormData }) => {
         </div>
       )}
 
-      {/* Campo Localidad (sólo si se selecciona una zona específica en Buenos Aires) */}
+      {/* Campo Localidad */}
       {formData.zona && ZONAS_LOCALIDADES[formData.zona] && (
         <div className="mt-2">
           <label htmlFor="localidad" className="block mb-2 text-sm font-medium text-gray-900">Localidad</label>
@@ -159,7 +162,7 @@ const PaisSelect = ({ formData, setFormData }) => {
         </div>
       )}
 
-      {/* Campo Ubicación Manual (si no es Buenos Aires o Argentina) */}
+      {/* Campo Ubicación Manual */}
       {(formData.pais !== "Argentina" || formData.provincia !== "Buenos Aires") && (
         <div className="mt-2">
           <label htmlFor="ubicacionManual" className="block mb-2 text-sm font-medium text-gray-900">Ubicación Manual</label>

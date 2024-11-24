@@ -12,11 +12,16 @@ const CurriculumSchema = new mongoose.Schema({
   provincia: { type: String, default: 'Buenos Aires', required: true },
   zona: { type: String, default: '' },
   localidad: { type: String, default: '' },
-  ubicacionManual: { type: String, default: '' }, // Campo para ubicaciones manuales
+  ubicacionManual: { type: String, default: '' },
+  calificacion: { 
+    type: String, 
+    enum: ['1- Muy bueno', '2- Bueno', '3- Regular'], 
+    required: true 
+  },
   nivelEstudios: { type: String, default: '' },
   experiencia: { type: String, default: '' },
   idiomas: { type: [String], default: [] },
-  imagen: { type: String, required: true },
+  imagen: { type: String, required: true }, // URL de la imagen en Cloudinary
   comentarios: { type: String, default: '' },
 }, { timestamps: true });
 
