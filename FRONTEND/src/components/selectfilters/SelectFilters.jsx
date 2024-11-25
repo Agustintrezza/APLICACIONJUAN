@@ -1,8 +1,14 @@
-// src/components/selectfilters/SelectFilters.jsx
 import PropTypes from 'prop-types';
 import { FaSearch } from 'react-icons/fa';
 
-const SelectFilters = ({ searchTerm, setSearchTerm, handleResetSearch, hasSearchTerm, handleResetFilters, hasCategoryFilters }) => {
+const SelectFilters = ({
+  searchTerm,
+  setSearchTerm,
+  handleResetSearch,
+  handleResetFilters,
+  hasSearchTerm,
+  hasCategoryFilters,
+}) => {
   return (
     <div className="flex space-x-4 mb-4 select-filters-container-custom shadow-lg">
       <div className="flex-1 border border-blue-300 bg-[#e9f0ff] rounded-lg p-2 shadow-md">
@@ -46,8 +52,10 @@ SelectFilters.propTypes = {
   searchTerm: PropTypes.string.isRequired,
   setSearchTerm: PropTypes.func.isRequired,
   handleResetSearch: PropTypes.func.isRequired,
-  hasSearchTerm: PropTypes.bool.isRequired,
+  filters: PropTypes.object.isRequired,
+  setFilters: PropTypes.func.isRequired,
   handleResetFilters: PropTypes.func.isRequired,
+  hasSearchTerm: PropTypes.bool.isRequired,
   hasCategoryFilters: PropTypes.bool.isRequired,
 };
 

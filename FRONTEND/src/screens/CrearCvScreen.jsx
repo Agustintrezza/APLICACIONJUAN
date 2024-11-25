@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import * as Yup from "yup";
 import FormularioCv from "../components/formulariocv/FormularioCv";
 
@@ -16,6 +16,7 @@ const CrearCvScreen = () => {
     telefonoFijo: "",
     celular: "",
     email: "",
+    calificacion: "",
     nivelEstudios: "",
     experiencia: "",
     idiomas: [],
@@ -25,6 +26,8 @@ const CrearCvScreen = () => {
 
   const [errors, setErrors] = useState({});
   const [alertMessage, setAlertMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false); // Spinner control
+  const fileInputRef = useRef(null);
 
   // Esquema de validación
   const validationSchema = Yup.object().shape({
@@ -36,27 +39,28 @@ const CrearCvScreen = () => {
       .required("El apellido es obligatorio"),
     genero: Yup.string().oneOf(["Masculino", "Femenino", ""], "Opción inválida"),
     edad: Yup.number()
+      .transform((value, originalValue) =>
+        originalValue.trim() === "" ? null : value
+      )
       .nullable()
-      .test(
-        "is-optional-or-valid",
-        "Debe ser mayor de 18 años si se ingresa",
-        (value) => !value || value >= 18
-      ),
+      .typeError("Debe ingresar un número válido")
+      .min(18, "Debe ser mayor o igual a 18 años")
+      .max(100, "Debe ser menor o igual a 100 años"),
     celular: Yup.string().required("El teléfono celular es obligatorio"),
     pais: Yup.string().required("El país es obligatorio"),
     provincia: Yup.string().required("La provincia es obligatoria"),
-    imagen: Yup.mixed().required("La imagen o archivo es obligatorio"),
+    calificacion: Yup.string()
+      .oneOf(["1- Muy bueno", "2- Bueno", "3- Regular"], "Opción inválida")
+      .required("La calificación es obligatoria"),
+    imagen: Yup.mixed()
+      .test(
+        "fileType",
+        "El archivo debe ser una imagen JPG, JPEG, PNG o un PDF",
+        (value) =>
+          !value || ["image/jpeg", "image/jpg", "image/png", "application/pdf"].includes(value.type)
+      )
+      .required("La imagen o archivo es obligatorio"),
   });
-
-  // Función para convertir archivos a Base64
-  const convertirBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (error) => reject(error);
-    });
-  };
 
   // Manejar cambios en los campos del formulario
   const handleChange = async (e) => {
@@ -72,10 +76,12 @@ const CrearCvScreen = () => {
   };
 
   // Manejar cambio de archivo
-  const handleFileChange = async (e) => {
+  const handleFileChange = (e) => {
     const file = e.target.files[0];
 
     if (!file) {
+      // El usuario canceló la selección de archivo
+      setFormData((prevData) => ({ ...prevData, imagen: null }));
       setErrors((prevErrors) => ({
         ...prevErrors,
         imagen: "La imagen o archivo es obligatorio.",
@@ -96,27 +102,22 @@ const CrearCvScreen = () => {
     if (!allowedFormats.includes(file.type)) {
       setErrors((prevErrors) => ({
         ...prevErrors,
-        imagen: "Formato de archivo no permitido. Solo se permiten PDF, JPG y PNG.",
+        imagen: "Formato de archivo no permitido. Solo JPG, JPEG, PNG y PDF.",
       }));
       return;
     }
 
-    try {
-      const base64Image = await convertirBase64(file);
-      setFormData((prevData) => ({ ...prevData, imagen: base64Image }));
-      setErrors((prevErrors) => ({ ...prevErrors, imagen: "" }));
-    } catch (error) {
-      console.error("Error al convertir archivo a base64:", error);
-    }
+    setFormData((prevData) => ({ ...prevData, imagen: file }));
+    setErrors((prevErrors) => ({ ...prevErrors, imagen: "" }));
   };
 
-  // Manejar cambio de checkbox para idiomas
+  // Manejar cambios en los checkboxes
   const handleCheckboxChange = (language) => {
     setFormData((prevData) => {
-      const idiomas = prevData.idiomas.includes(language)
-        ? prevData.idiomas.filter((lang) => lang !== language)
+      const updatedIdiomas = prevData.idiomas.includes(language)
+        ? prevData.idiomas.filter((idioma) => idioma !== language)
         : [...prevData.idiomas, language];
-      return { ...prevData, idiomas };
+      return { ...prevData, idiomas: updatedIdiomas };
     });
   };
 
@@ -124,15 +125,23 @@ const CrearCvScreen = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    setIsSubmitting(true); // Activar spinner
     try {
+      // Validar todo el esquema de validación, incluidos los errores acumulativos
       await validationSchema.validate(formData, { abortEarly: false });
+
+      const formDataToSend = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key === "imagen" && value instanceof File) {
+          formDataToSend.append("imagen", value);
+        } else {
+          formDataToSend.append(key, value || "");
+        }
+      });
 
       const response = await fetch("http://localhost:5000/api/curriculums", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+        body: formDataToSend,
       });
 
       if (!response.ok) {
@@ -140,16 +149,7 @@ const CrearCvScreen = () => {
         throw new Error(errorData.error || "Error desconocido");
       }
 
-      const data = await response.json();
-      console.log("Respuesta de la API:", data);
-
-      // Mostrar el mensaje de éxito
-      setAlertMessage("¡Se creó el Registro correctamente!");
-
-      // Mover la vista al tope de la pantalla
-      window.scrollTo({ top: 0, behavior: "smooth" });
-
-      // Resetear formulario
+      setAlertMessage("Se creó el registro exitosamente.");
       setFormData({
         nombre: "",
         apellido: "",
@@ -163,6 +163,7 @@ const CrearCvScreen = () => {
         telefonoFijo: "",
         celular: "",
         email: "",
+        calificacion: "",
         nivelEstudios: "",
         experiencia: "",
         idiomas: [],
@@ -170,6 +171,7 @@ const CrearCvScreen = () => {
         comentarios: "",
       });
       setErrors({});
+      fileInputRef.current.value = ""; // Resetear el input de archivo
     } catch (error) {
       if (error.name === "ValidationError") {
         const validationErrors = {};
@@ -180,19 +182,16 @@ const CrearCvScreen = () => {
       } else {
         setAlertMessage("Error al crear el CV. Por favor, intente de nuevo.");
       }
-      window.scrollTo({ top: 0, behavior: "smooth" });
+    } finally {
+      setIsSubmitting(false); // Desactivar spinner
     }
   };
 
-  // Ocultar alerta al hacer clic fuera de ella
-  const handleOutsideClick = () => {
-    setAlertMessage("");
-  };
+  const handleOutsideClick = () => setAlertMessage("");
 
   return (
     <div onClick={handleOutsideClick}>
       <h2 className="text-2xl font-bold text-gray-800 mt-1">Ingresar CV</h2>
-      {/* Mensaje de alerta */}
       {alertMessage && (
         <div
           className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-md shadow-lg z-50"
@@ -201,15 +200,21 @@ const CrearCvScreen = () => {
           {alertMessage}
         </div>
       )}
+      {isSubmitting && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-25 z-50">
+          <div className="w-12 h-12 border-4 border-[#293e68] border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
       <div className="flex bg-gray-100 py-4">
         <FormularioCv
           formData={formData}
+          setFormData={setFormData}
           errors={errors}
           handleChange={handleChange}
           handleFileChange={handleFileChange}
           handleCheckboxChange={handleCheckboxChange}
           handleSubmit={handleSubmit}
-          setFormData={setFormData}
+          fileInputRef={fileInputRef}
         />
       </div>
     </div>
