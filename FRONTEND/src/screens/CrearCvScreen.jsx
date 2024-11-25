@@ -80,6 +80,8 @@ const CrearCvScreen = () => {
     const file = e.target.files[0];
 
     if (!file) {
+      // El usuario canceló la selección de archivo
+      setFormData((prevData) => ({ ...prevData, imagen: null }));
       setErrors((prevErrors) => ({
         ...prevErrors,
         imagen: "La imagen o archivo es obligatorio.",
@@ -109,12 +111,23 @@ const CrearCvScreen = () => {
     setErrors((prevErrors) => ({ ...prevErrors, imagen: "" }));
   };
 
+  // Manejar cambios en los checkboxes
+  const handleCheckboxChange = (language) => {
+    setFormData((prevData) => {
+      const updatedIdiomas = prevData.idiomas.includes(language)
+        ? prevData.idiomas.filter((idioma) => idioma !== language)
+        : [...prevData.idiomas, language];
+      return { ...prevData, idiomas: updatedIdiomas };
+    });
+  };
+
   // Manejar envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
+    setIsSubmitting(true); // Activar spinner
     try {
+      // Validar todo el esquema de validación, incluidos los errores acumulativos
       await validationSchema.validate(formData, { abortEarly: false });
 
       const formDataToSend = new FormData();
@@ -170,7 +183,7 @@ const CrearCvScreen = () => {
         setAlertMessage("Error al crear el CV. Por favor, intente de nuevo.");
       }
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false); // Desactivar spinner
     }
   };
 
@@ -199,6 +212,7 @@ const CrearCvScreen = () => {
           errors={errors}
           handleChange={handleChange}
           handleFileChange={handleFileChange}
+          handleCheckboxChange={handleCheckboxChange}
           handleSubmit={handleSubmit}
           fileInputRef={fileInputRef}
         />

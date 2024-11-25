@@ -18,6 +18,16 @@ cloudinary.config({
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
+// Ruta para obtener todos los curriculums
+router.get('/', async (req, res) => {
+  try {
+    const curriculums = await Curriculum.find();
+    res.status(200).json(curriculums);
+  } catch (error) {
+    res.status(500).json({ error: "Ocurrió un error al obtener los curriculums." });
+  }
+});
+
 // Ruta para crear un nuevo Curriculum
 router.post('/', upload.single('imagen'), async (req, res) => {
   try {

@@ -216,7 +216,7 @@ const FormularioCv = ({
               name="imagen"
               ref={fileInputRef}
               onChange={handleFileChange}
-              className="w-full p-2 border text-sm rounded-lg"
+              className="w-full p-2 border text-sm rounded-lg border-blue-300 bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {errors.imagen && <p className="text-red-500 text-sm mt-1">{errors.imagen}</p>}
           </div>
