@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 
 const PublicRoute = ({ children }) => {
   const { isAuthenticated } = useContext(AppContext);
+  console.log('Prueba')
 
   return isAuthenticated ? <Navigate to="/" /> : children;
 };
