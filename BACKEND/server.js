@@ -6,11 +6,24 @@ require('dotenv').config();
 const app = express();
 
 // Middleware de CORS
-app.use(cors({
-  origin: 'http://localhost:5173',
+const allowedOrigins = [
+  'http://localhost:5173', // Dominio para desarrollo
+  'https://aplicacionjuan-1.onrender.com', // Dominio del frontend en producción
+];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true); // Permitir el acceso
+    } else {
+      callback(new Error('Not allowed by CORS')); // Bloquear otros orígenes
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+};
+
+app.use(cors(corsOptions));
 
 // Middleware para analizar JSON
 app.use(express.json({ limit: '10mb' }));
