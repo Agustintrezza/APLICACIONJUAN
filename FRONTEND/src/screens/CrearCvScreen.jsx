@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import * as Yup from "yup";
 import FormularioCv from "../components/formulariocv/FormularioCv";
+import { API_URL } from '../config'
 
 const CrearCvScreen = () => {
   const [formData, setFormData] = useState({
@@ -139,7 +140,7 @@ const CrearCvScreen = () => {
         }
       });
 
-      const response = await fetch("http://localhost:5000/api/curriculums", {
+      const response = await fetch(`${API_URL}/api/curriculums`, {
         method: "POST",
         body: formDataToSend,
       });

@@ -4,6 +4,7 @@ import { FaPlus, FaHeart } from 'react-icons/fa';
 import { MdEdit, MdDelete } from 'react-icons/md';
 import SelectFilters from '../selectfilters/SelectFilters';
 import Categories from '../../components/categories/Categories';
+import { API_URL } from '../../config'
 
 const removeAccents = (text) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 const limitText = (text, limit) => (text.length > limit ? `${text.slice(0, limit)}...` : text);
@@ -29,7 +30,7 @@ const TableMain = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/curriculums');
+        const response = await fetch(`${API_URL}/api/curriculums`);
         if (!response.ok) throw new Error('Failed to fetch data');
         const data = await response.json();
         setCvData(data);
