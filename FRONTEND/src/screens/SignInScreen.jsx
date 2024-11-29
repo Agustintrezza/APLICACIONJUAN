@@ -1,19 +1,18 @@
-// src/components/SignInScreen.jsx
-import { useState, useContext } from 'react';
-import { AppContext } from '../context/AppContext';
-import { useNavigate, Link } from 'react-router-dom';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import * as Yup from 'yup';
+import { useState, useContext } from 'react'
+import { AppContext } from '../context/AppContext'
+import { useNavigate, Link } from 'react-router-dom'
+import { FaEye, FaEyeSlash } from 'react-icons/fa'
+import * as Yup from 'yup'
+import { API_URL } from '../config' // Importa la URL base
 
 const SignInScreen = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState({});
-  const [showPassword, setShowPassword] = useState(false);
-  const { login } = useContext(AppContext);
-  const navigate = useNavigate();
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [errors, setErrors] = useState({})
+  const [showPassword, setShowPassword] = useState(false)
+  const { login } = useContext(AppContext)
+  const navigate = useNavigate()
 
-  // Esquema de validación con Yup
   const validationSchema = Yup.object().shape({
     email: Yup.string()
       .email('Debe ser un correo electrónico válido')
@@ -22,50 +21,47 @@ const SignInScreen = () => {
       .min(4, 'La contraseña debe tener al menos 4 caracteres')
       .max(15, 'La contraseña no debe superar los 15 caracteres')
       .required('La contraseña es obligatoria'),
-  });
+  })
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
     try {
-      // Validar los datos del formulario
-      await validationSchema.validate({ email, password }, { abortEarly: false });
-      
-      const response = await fetch('/api/auth/signin', {
+      await validationSchema.validate({ email, password }, { abortEarly: false })
+
+      const response = await fetch(`${API_URL}/api/auth/signin`, { // Usa la URL base
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
-      });
+      })
 
       if (!response.ok) {
-        throw new Error('Error en las credenciales');
+        throw new Error('Error en las credenciales')
       }
 
-      const data = await response.json();
-      login(data.user);
-      navigate('/');
+      const data = await response.json()
+      login(data.user)
+      navigate('/')
     } catch (error) {
       if (error.name === 'ValidationError') {
-        // Manejar errores de validación
-        const validationErrors = {};
+        const validationErrors = {}
         error.inner.forEach((err) => {
-          validationErrors[err.path] = err.message;
-        });
-        setErrors(validationErrors);
+          validationErrors[err.path] = err.message
+        })
+        setErrors(validationErrors)
 
-        // Ocultar los mensajes de error después de 4 segundos
         setTimeout(() => {
-          setErrors({});
-        }, 4000);
+          setErrors({})
+        }, 4000)
       } else {
-        alert(error.message);
+        alert(error.message)
       }
     }
-  };
+  }
 
   const togglePasswordVisibility = () => {
-    setShowPassword((prevShowPassword) => !prevShowPassword);
-  };
+    setShowPassword((prevShowPassword) => !prevShowPassword)
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
@@ -132,7 +128,7 @@ const SignInScreen = () => {
         </div>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default SignInScreen;
+export default SignInScreen
