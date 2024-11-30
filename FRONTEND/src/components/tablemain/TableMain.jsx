@@ -145,7 +145,8 @@ const TableMain = () => {
                   <div
                     key={user._id}
                     className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300 relative"
-                  >
+                  > 
+                    <Link to={`/ver-cv/${user._id}`} className="block">
                     <div className="p-4">
                       <h3 className="text-lg font-bold text-[#293e68]">
                         {user.nombre} {user.apellido}, {user.edad}
@@ -154,6 +155,7 @@ const TableMain = () => {
                         {limitText(user.comentarios, 70)}
                       </p>
                     </div>
+                    </Link>
                     <div className="flex justify-between items-center bg-gray-100 px-4 py-2">
                       <div className="flex gap-2">
                         <button className="text-[#293e68] hover:text-blue-600">

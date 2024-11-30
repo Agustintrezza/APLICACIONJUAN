@@ -10,6 +10,7 @@ import CrearCvScreen from './screens/CrearCvScreen'
 import PerfilScreen from './screens/PerfilScreen'
 import ComunicacionesScreen from './screens/ComunicacionesScreen'
 import FavoritosScreen from './screens/FavoritosScreen';
+import VerCvScreen from './screens/VerCvScreen'
 
 function AppContent() {
   return (
@@ -28,6 +29,7 @@ function AppContent() {
         <Route path="/" element={<Home />} />
         <Route path="/crear-cv" element={<CrearCvScreen/>} />
         <Route path="/perfil" element={<PerfilScreen/>} />
+        <Route path="/ver-cv/:id" element={<VerCvScreen />} />
         <Route path="/comunicaciones" element={<ComunicacionesScreen/>} />
         <Route path="/favoritos" element={<FavoritosScreen/>} />
       </Route>
