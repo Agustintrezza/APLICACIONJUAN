@@ -1,17 +1,20 @@
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const ZONAS_LOCALIDADES = {
   "Zona Norte": [
     "San Isidro", "Vicente López", "San Martín", "San Fernando", "Tigre",
-    "Escobar", "Pilar", "José C. Paz", "Malvinas Argentinas", "San Miguel"
+    "Escobar", "Pilar", "José C. Paz", "Malvinas Argentinas", "San Miguel",
   ],
   "Zona Sur": [
     "Almirante Brown", "Avellaneda", "Berazategui", "Esteban Echeverría",
-    "Ezeiza", "Florencio Varela", "Lanús", "Lomas de Zamora", "Quilmes", "San Vicente"
+    "Ezeiza", "Florencio Varela", "Lanús", "Lomas de Zamora", "Quilmes", "San Vicente",
   ],
   "Zona Oeste": [
     "La Matanza", "Tres de Febrero", "Hurlingham", "Morón", "Ituzaingó",
-    "Merlo", "Moreno", "General Rodríguez", "Marcos Paz"
+    "Merlo", "Moreno", "General Rodríguez", "Marcos Paz",
   ],
   CABA: [
     "Agronomía", "Almagro", "Balvanera", "Barracas", "Belgrano", "Boedo",
@@ -23,8 +26,8 @@ const ZONAS_LOCALIDADES = {
     "San Nicolás", "San Telmo", "Vélez Sársfield", "Versalles", "Villa Crespo",
     "Villa del Parque", "Villa Devoto", "Villa General Mitre", "Villa Lugano",
     "Villa Luro", "Villa Ortúzar", "Villa Pueyrredón", "Villa Real",
-    "Villa Riachuelo", "Villa Santa Rita", "Villa Soldati", "Villa Urquiza"
-  ]
+    "Villa Riachuelo", "Villa Santa Rita", "Villa Soldati", "Villa Urquiza",
+  ],
 };
 
 const PROVINCIAS_ARGENTINA = [
@@ -32,10 +35,20 @@ const PROVINCIAS_ARGENTINA = [
   "Corrientes", "Entre Ríos", "Formosa", "Jujuy", "La Pampa",
   "La Rioja", "Mendoza", "Misiones", "Neuquén", "Río Negro",
   "Salta", "San Juan", "San Luis", "Santa Cruz", "Santa Fe",
-  "Santiago del Estero", "Tierra del Fuego", "Tucumán", "CABA"
+  "Santiago del Estero", "Tierra del Fuego", "Tucumán", "CABA",
 ];
 
 const PaisSelect = ({ formData, setFormData }) => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setIsLoading(false);
+    }, 200);
+
+    return () => clearTimeout(timeout);
+  }, []);
+
   const handleCountryChange = (e) => {
     const selectedCountry = e.target.value;
     setFormData({
@@ -84,11 +97,23 @@ const PaisSelect = ({ formData, setFormData }) => {
     });
   };
 
+  if (isLoading) {
+    return (
+      <div>
+        <Skeleton height={40} className="mb-2" />
+        <Skeleton height={40} className="mb-2" />
+        <Skeleton height={40} className="mb-2" />
+      </div>
+    );
+  }
+
   return (
     <div>
       {/* Campo País */}
       <div>
-        <label htmlFor="pais" className="block mb-2 text-sm font-medium text-gray-900">País</label>
+        <label htmlFor="pais" className="block mb-2 text-sm font-medium text-gray-900">
+          País
+        </label>
         <select
           id="pais"
           name="pais"
@@ -108,7 +133,9 @@ const PaisSelect = ({ formData, setFormData }) => {
       {/* Campo Provincia */}
       {formData.pais === "Argentina" && (
         <div className="mt-2">
-          <label htmlFor="provincia" className="block mb-2 text-sm font-medium text-gray-900">Provincia</label>
+          <label htmlFor="provincia" className="block mb-2 text-sm font-medium text-gray-900">
+            Provincia
+          </label>
           <select
             id="provincia"
             name="provincia"
@@ -118,7 +145,9 @@ const PaisSelect = ({ formData, setFormData }) => {
           >
             <option value="">Seleccione una provincia</option>
             {PROVINCIAS_ARGENTINA.map((provincia) => (
-              <option key={provincia} value={provincia}>{provincia}</option>
+              <option key={provincia} value={provincia}>
+                {provincia}
+              </option>
             ))}
           </select>
         </div>
@@ -127,7 +156,9 @@ const PaisSelect = ({ formData, setFormData }) => {
       {/* Campo Zona */}
       {formData.provincia === "Buenos Aires" && (
         <div className="mt-2">
-          <label htmlFor="zona" className="block mb-2 text-sm font-medium text-gray-900">Zona</label>
+          <label htmlFor="zona" className="block mb-2 text-sm font-medium text-gray-900">
+            Zona
+          </label>
           <select
             id="zona"
             name="zona"
@@ -137,7 +168,9 @@ const PaisSelect = ({ formData, setFormData }) => {
           >
             <option value="">Seleccione una zona</option>
             {Object.keys(ZONAS_LOCALIDADES).map((zona) => (
-              <option key={zona} value={zona}>{zona}</option>
+              <option key={zona} value={zona}>
+                {zona}
+              </option>
             ))}
           </select>
         </div>
@@ -146,7 +179,9 @@ const PaisSelect = ({ formData, setFormData }) => {
       {/* Campo Localidad */}
       {formData.zona && ZONAS_LOCALIDADES[formData.zona] && (
         <div className="mt-2">
-          <label htmlFor="localidad" className="block mb-2 text-sm font-medium text-gray-900">Localidad</label>
+          <label htmlFor="localidad" className="block mb-2 text-sm font-medium text-gray-900">
+            Localidad
+          </label>
           <select
             id="localidad"
             name="localidad"
@@ -156,7 +191,9 @@ const PaisSelect = ({ formData, setFormData }) => {
           >
             <option value="">Seleccione una localidad</option>
             {ZONAS_LOCALIDADES[formData.zona].map((localidad) => (
-              <option key={localidad} value={localidad}>{localidad}</option>
+              <option key={localidad} value={localidad}>
+                {localidad}
+              </option>
             ))}
           </select>
         </div>
@@ -165,7 +202,9 @@ const PaisSelect = ({ formData, setFormData }) => {
       {/* Campo Ubicación Manual */}
       {(formData.pais !== "Argentina" || formData.provincia !== "Buenos Aires") && (
         <div className="mt-2">
-          <label htmlFor="ubicacionManual" className="block mb-2 text-sm font-medium text-gray-900">Ubicación Manual</label>
+          <label htmlFor="ubicacionManual" className="block mb-2 text-sm font-medium text-gray-900">
+            Ubicación Manual
+          </label>
           <input
             type="text"
             id="ubicacionManual"
