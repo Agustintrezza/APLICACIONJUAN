@@ -28,6 +28,18 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/:id', async (req, res) => {
+  try {
+    const curriculum = await Curriculum.findById(req.params.id)
+    if (!curriculum) {
+      return res.status(404).json({ error: 'Curriculum no encontrado' })
+    }
+    res.status(200).json(curriculum)
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener el curriculum' })
+  }
+})
+
 // Ruta para crear un nuevo Curriculum
 router.post('/', upload.single('imagen'), async (req, res) => {
   try {
