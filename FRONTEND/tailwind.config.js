@@ -8,7 +8,11 @@ export default {
     "node_modules/flowbite/**/*.js" // Incluye los archivos de Flowbite
   ],
   theme: {
-    extend: {},
+    extend: {
+      screens: {
+        xl: '1300px', // Cambia el breakpoint 'xl' a 1350px
+      },
+    },
   },
   plugins: [flowbite], // Agrega Flowbite como plugin
 };

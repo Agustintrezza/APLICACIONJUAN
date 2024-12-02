@@ -11,6 +11,8 @@ import PerfilScreen from './screens/PerfilScreen'
 import ComunicacionesScreen from './screens/ComunicacionesScreen'
 import FavoritosScreen from './screens/FavoritosScreen';
 import VerCvScreen from './screens/VerCvScreen'
+import EditarCvScreen from "./screens/EditarCvScreen";
+import ListasScreen from './screens/ListasScreen';
 
 function AppContent() {
   return (
@@ -28,6 +30,8 @@ function AppContent() {
       <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         <Route path="/" element={<Home />} />
         <Route path="/crear-cv" element={<CrearCvScreen/>} />
+        <Route path="/editar-cv/:id" element={<EditarCvScreen />} />
+        <Route path="/listas" element={<ListasScreen />} />
         <Route path="/perfil" element={<PerfilScreen/>} />
         <Route path="/ver-cv/:id" element={<VerCvScreen />} />
         <Route path="/comunicaciones" element={<ComunicacionesScreen/>} />

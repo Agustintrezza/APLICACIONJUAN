@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose'); // Agregar esta línea
 
 const CurriculumSchema = new mongoose.Schema({
   nombre: { type: String, required: true, minlength: 3 },
@@ -9,20 +9,30 @@ const CurriculumSchema = new mongoose.Schema({
   celular: { type: String, required: true },
   email: { type: String, default: '' },
   pais: { type: String, default: 'Argentina', required: true },
-  provincia: { type: String, default: 'Buenos Aires', required: true },
+  provincia: {
+    type: String,
+    default: '',
+    validate: {
+      validator: function (value) {
+        return this.pais !== 'Argentina' || (value && value.trim().length > 0);
+      },
+      message: 'La provincia es obligatoria si el país es Argentina.',
+    },
+  },
   zona: { type: String, default: '' },
   localidad: { type: String, default: '' },
   ubicacionManual: { type: String, default: '' },
-  calificacion: { 
-    type: String, 
-    enum: ['1- Muy bueno', '2- Bueno', '3- Regular'], 
-    required: true 
+  calificacion: {
+    type: String,
+    enum: ['1- Muy bueno', '2- Bueno', '3- Regular'],
+    required: true,
   },
   nivelEstudios: { type: String, default: '' },
   experiencia: { type: String, default: '' },
   idiomas: { type: [String], default: [] },
-  imagen: { type: String, required: true }, // URL de la imagen en Cloudinary
+  imagen: { type: String, required: true },
   comentarios: { type: String, default: '' },
-}, { timestamps: true });
+  listas: [{ type: mongoose.Schema.Types.ObjectId, ref: "Lista" }],
+}, { timestamps: true, versionKey: false });
 
-module.exports = mongoose.model('Curriculum', CurriculumSchema);
+module.exports = mongoose.model("Curriculum", CurriculumSchema);

@@ -39,6 +39,7 @@ app.get('/', (req, res) => {
 // Rutas de la aplicación
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/curriculums', require('./routes/curriculums'));
+app.use('/api/listas', require('./routes/listas'));
 
 // Iniciar el servidor
 const PORT = process.env.PORT || 5000;

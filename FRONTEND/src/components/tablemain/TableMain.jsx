@@ -138,7 +138,7 @@ const TableMain = () => {
 
           {isLoading ? (
             <div className="grid gap-4 mt-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {Array.from({ length: 18 }).map((_, index) => (
+              {Array.from({ length: 11 }).map((_, index) => (
                 <div
                   key={index}
                   className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300 p-4"

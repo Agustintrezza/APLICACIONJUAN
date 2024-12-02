@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { API_URL } from '../config'
 import CvDetail from '../components/cvs/CvDetail'
 import Asignaciones from '../components/cvs/Asignaciones'
-import { FaArrowLeft } from 'react-icons/fa'
+// import { FaArrowLeft } from 'react-icons/fa'
 
 const VerCvScreen = () => {
-  const { id } = useParams()
-  const navigate = useNavigate()
+  const { id } = useParams() // El ID del CV
+  // const navigate = useNavigate()
   const [cv, setCv] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1026)
@@ -35,9 +35,17 @@ const VerCvScreen = () => {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
+  // Función para actualizar las listas en tiempo real
+  const handleUpdateCvLists = (updatedLists) => {
+    setCv((prevCv) => ({
+      ...prevCv,
+      listas: updatedLists,
+    }))
+  }
+
   return (
     <div className="w-full mx-auto space-y-4 relative">
-      <div className="flex items-center space-x-4">
+      {/* <div className="flex items-center space-x-4">
         <button
           onClick={() => navigate('/')}
           className="text-[#293e68] hover:text-blue-600 text-xl"
@@ -46,7 +54,7 @@ const VerCvScreen = () => {
           <FaArrowLeft />
         </button>
         <h2 className="text-2xl font-bold text-gray-800">Curriculum</h2>
-      </div>
+      </div> */}
 
       <div className="flex flex-row space-x-4">
         <div className={`${isDesktop ? 'w-4/5' : 'w-full'}`}>
@@ -58,7 +66,12 @@ const VerCvScreen = () => {
             <CvDetail cv={cv} />
           )}
         </div>
-        {isDesktop && <Asignaciones />}
+        {isDesktop && cv && (
+          <Asignaciones
+            curriculumId={cv._id}
+            onUpdateCvLists={handleUpdateCvLists} // Pasamos la función
+          />
+        )}
       </div>
     </div>
   )
