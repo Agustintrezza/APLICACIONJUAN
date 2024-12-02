@@ -43,6 +43,7 @@ const Sidebar = () => {
       <nav className="space-y-6 w-full mt-4">
         <SidebarLink to="/" icon={<FaHome />} label="Curriculums" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} />
         <SidebarLink to="/crear-cv" icon={<FaPlus />} label="Ingresar CV" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} />
+        <SidebarLink to="/listas" icon={<FaPlus />} label="Listas" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} />
         <SidebarLink to="/perfil" icon={<FaUser />} label="Mi Perfil" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} />
         <SidebarLink to="/comunicaciones" icon={<FaEnvelope />} label="Comunicaciones" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} />
         <SidebarLink to="/favoritos" icon={<FaHeart />} label="Favoritos" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} showCount={2} />

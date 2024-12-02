@@ -13,6 +13,7 @@ const FormularioCv = ({
   handleCheckboxChange,
   handleSubmit,
   fileInputRef, // Indicador para activar el Skeleton
+  isEditMode= false
 }) => {
   const [isLoading, setIsLoading] = useState(true);
 
@@ -92,7 +93,9 @@ const FormularioCv = ({
             </div>
             {errors.genero && <p className="text-red-500 text-sm mt-1">{errors.genero}</p>}
           </div>
+          
 
+          <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="edad" className="block mb-2 text-sm font-medium text-gray-900">
               Edad
@@ -104,7 +107,7 @@ const FormularioCv = ({
                 type="number"
                 id="edad"
                 name="edad"
-                value={formData.edad}
+                value={formData.edad || ""}
                 onChange={handleChange}
                 className={`w-full p-2 border text-sm rounded-lg ${
                   errors.edad ? "border-red-500" : "border-gray-300"
@@ -114,6 +117,29 @@ const FormularioCv = ({
               />
             )}
             {errors.edad && <p className="text-red-500 text-sm mt-1">{errors.edad}</p>}
+          </div>
+
+          <div>
+            <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900">
+              Email
+            </label>
+            {isLoading ? (
+              <Skeleton height={40} />
+            ) : (
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email || ""}
+                onChange={handleChange}
+                className={`w-full p-2 border text-sm rounded-lg ${
+                  errors.email ? "border-red-500" : "border-gray-300"
+                }`}
+              />
+            )}
+            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+          </div>
+
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -300,7 +326,7 @@ const FormularioCv = ({
         type="submit"
         className="w-full mt-6 text-white bg-[#293e68] hover:bg-[#1f2d4b] font-medium rounded-lg text-sm px-5 py-2.5 text-center"
       >
-        Crear CV
+        {isEditMode ? "Actualizar CV" : "Crear CV"}
       </button>
     </form>
   );
@@ -316,6 +342,7 @@ FormularioCv.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   fileInputRef: PropTypes.object.isRequired,
   isLoading: PropTypes.bool,
+  isEditMode: PropTypes.bool, // Nueva propiedad para determinar el texto del botón
 };
 
 export default FormularioCv;
