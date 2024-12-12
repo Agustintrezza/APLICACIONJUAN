@@ -12,7 +12,7 @@ import ComunicacionesScreen from './screens/ComunicacionesScreen'
 import FavoritosScreen from './screens/FavoritosScreen';
 import VerCvScreen from './screens/VerCvScreen'
 import EditarCvScreen from "./screens/EditarCvScreen";
-import ListasScreen from './screens/ListasScreen';
+import ListasScreen from './screens/ListasContainerScreen';
 
 function AppContent() {
   return (
