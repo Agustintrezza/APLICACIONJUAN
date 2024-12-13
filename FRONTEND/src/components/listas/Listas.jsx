@@ -1,7 +1,7 @@
 import PropTypes from "prop-types"
-import { Skeleton, Button } from "@chakra-ui/react"
+import { Skeleton } from "@chakra-ui/react"
 
-const Listas = ({ listas, onEdit, onDelete, isLoading, onSelectLista }) => {
+const Listas = ({ listas, isLoading, onSelectLista }) => {
   if (isLoading) {
     return (
       <div className="grid grid-cols-2 gap-4">
@@ -30,6 +30,7 @@ const Listas = ({ listas, onEdit, onDelete, isLoading, onSelectLista }) => {
             className="bg-white rounded-lg shadow-lg p-4 flex flex-col items-start cursor-pointer"
             onClick={() => onSelectLista(lista)}
           >
+            {/* Título de la lista */}
             <div className="flex items-center space-x-2 mb-4">
               <h4 className="text-md font-semibold text-[#293e68]">{lista.cliente}</h4>
               <div
@@ -41,32 +42,28 @@ const Listas = ({ listas, onEdit, onDelete, isLoading, onSelectLista }) => {
                 }}
               ></div>
             </div>
-            <p className="text-sm text-gray-600 mb-4">{lista.comentario}</p>
-            <div className="flex space-x-2 w-full">
-              <Button
-                size="sm"
-                bg="#293e68"
-                color="white"
-                _hover={{ bg: "#1f2d4b" }}
-                className="w-full"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onEdit(lista)
-                }}
-              >
-                Editar
-              </Button>
-              <Button
-                size="sm"
-                colorScheme="red"
-                className="w-full"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onDelete(lista._id)
-                }}
-              >
-                Eliminar
-              </Button>
+
+            {/* Detalles de la lista */}
+            <div className="text-sm text-gray-600 mb-2">
+              <p>
+                <strong>Posición:</strong> {lista.posicion || "Sin posición"}
+              </p>
+              <p>
+                <strong>Fecha de creación:</strong>{" "}
+                {new Date(lista.fechaDeCreacion).toLocaleDateString()}
+              </p>
+              <p>
+                <strong>Fecha límite:</strong>{" "}
+                {lista.fechaLimite
+                  ? new Date(lista.fechaLimite).toLocaleDateString()
+                  : "Sin fecha límite"}
+              </p>
+              <p>
+                <strong>Postulantes:</strong> {lista.curriculums.length}
+              </p>
+              <p>
+                <strong>Comentario:</strong> {lista.comentario || "Sin comentario"}
+              </p>
             </div>
           </div>
         ))}
@@ -76,9 +73,22 @@ const Listas = ({ listas, onEdit, onDelete, isLoading, onSelectLista }) => {
 }
 
 Listas.propTypes = {
-  listas: PropTypes.array.isRequired,
-  onEdit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
+  listas: PropTypes.arrayOf(
+    PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+      cliente: PropTypes.string.isRequired,
+      posicion: PropTypes.string,
+      comentario: PropTypes.string,
+      color: PropTypes.string,
+      fechaDeCreacion: PropTypes.string.isRequired,
+      fechaLimite: PropTypes.string,
+      curriculums: PropTypes.arrayOf(
+        PropTypes.shape({
+          _id: PropTypes.string.isRequired,
+        })
+      ).isRequired,
+    })
+  ).isRequired,
   isLoading: PropTypes.bool.isRequired,
   onSelectLista: PropTypes.func.isRequired,
 }

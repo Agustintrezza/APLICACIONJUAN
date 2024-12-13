@@ -57,4 +57,17 @@ router.delete('/:id', async (req, res) => {
   }
 })
 
+// Ruta para obtener una lista específica por ID
+router.get('/:id', async (req, res) => {
+  try {
+    const lista = await Lista.findById(req.params.id).populate('curriculums')
+    if (!lista) {
+      return res.status(404).json({ error: 'Lista no encontrada' })
+    }
+    res.status(200).json(lista)
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener la lista' })
+  }
+})
+
 module.exports = router

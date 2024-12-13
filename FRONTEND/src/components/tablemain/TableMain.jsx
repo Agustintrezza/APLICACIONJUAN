@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FaPlus, FaHeart } from 'react-icons/fa'
-import { MdEdit, MdDelete } from 'react-icons/md'
 import SelectFilters from '../selectfilters/SelectFilters'
 import Categories from '../../components/categories/Categories'
 import Skeleton from 'react-loading-skeleton'
@@ -9,7 +8,7 @@ import 'react-loading-skeleton/dist/skeleton.css'
 import { API_URL } from '../../config'
 
 const removeAccents = (text) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-const limitText = (text, limit) => (text.length > limit ? `${text.slice(0, limit)}...` : text)
+// const limitText = (text, limit) => (text.length > limit ? `${text.slice(0, limit)}...` : text)
 
 const TableMain = () => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -25,7 +24,7 @@ const TableMain = () => {
     experienciaAnios: '',
   })
   const [cvData, setCvData] = useState([])
-  const [isLoading, setIsLoading] = useState(true) // Skeleton control
+  const [isLoading, setIsLoading] = useState(true)
   const [favoriteIds, setFavoriteIds] = useState([])
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1026)
 
@@ -39,7 +38,7 @@ const TableMain = () => {
       } catch (error) {
         console.error('Error fetching data:', error)
       } finally {
-        setIsLoading(false) // Skeleton stops when data is loaded or an error occurs
+        setIsLoading(false)
       }
     }
 
@@ -137,7 +136,7 @@ const TableMain = () => {
           )}
 
           {isLoading ? (
-            <div className="grid gap-4 mt-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            <div className="grid gap-4 mt-4 grid-cols-3">
               {Array.from({ length: 11 }).map((_, index) => (
                 <div
                   key={index}
@@ -153,7 +152,7 @@ const TableMain = () => {
               ))}
             </div>
           ) : (
-            <div className="grid gap-4 mt-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            <div className="grid gap-4 mt-4 grid-cols-3">
               {filteredData.length > 0 ? (
                 filteredData.map((user) => (
                   <div
@@ -163,31 +162,27 @@ const TableMain = () => {
                     <Link to={`/ver-cv/${user._id}`} className="block">
                       <div className="p-4">
                         <h3 className="text-lg font-bold text-[#293e68]">
-                          {user.nombre} {user.apellido}, {user.edad}
+                          {user.nombre} {user.apellido}
                         </h3>
-                        <p className="text-sm text-gray-600">{limitText(user.comentarios, 70)}</p>
+                        <p className="text-lg font-bold text-[#293e68]">{user.edad}</p>
+                        {/* <p className="text-sm text-gray-600">{limitText(user.comentarios, 70)}</p> */}
+                        <ul className="text-sm text-gray-800 list-inside list-disc">
+                          {user.listas?.length > 0 ? (
+                            user.listas.map((lista) => <li key={lista._id}>{lista.cliente}</li>)
+                          ) : (
+                            <li>No asociado a ningún proyecto</li>
+                          )}
+                        </ul>
                       </div>
                     </Link>
-                    <div className="flex justify-between items-center bg-gray-100 px-4 py-2">
-                      <div className="flex gap-2">
-                        <button className="text-[#293e68] hover:text-blue-600">
-                          <MdEdit />
-                        </button>
-                        <button className="text-red-600 hover:text-red-800">
-                          <MdDelete />
-                        </button>
-                      </div>
-                      <button
-                        onClick={() => toggleFavorite(user._id)}
-                        className={`${
-                          favoriteIds.includes(user._id)
-                            ? 'text-red-500'
-                            : 'text-gray-500'
-                        } hover:text-red-600`}
-                      >
-                        <FaHeart />
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => toggleFavorite(user._id)}
+                      className={`absolute top-4 right-4 p-2 bg-white rounded-full ${
+                        favoriteIds.includes(user._id) ? 'text-red-500' : 'text-gray-500'
+                      } hover:text-red-600`}
+                    >
+                      <FaHeart />
+                    </button>
                   </div>
                 ))
               ) : (

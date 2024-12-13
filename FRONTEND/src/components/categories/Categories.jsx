@@ -9,23 +9,23 @@ const Categories = ({ filters, setFilters }) => {
   };
 
   return (
-    <div className="w-1/5" style={{ position: 'sticky', top: '-16px', maxHeight: '100vh', overflowY: 'auto' }}>
+    <div className="w-2/5" style={{ position: 'sticky', top: '-16px', maxHeight: '100vh', overflowY: 'auto' }}>
       <div 
         className="border border-blue-300 bg-[#e9f0ff] rounded-lg p-4 shadow-lg"
         style={{
           boxShadow: '4px 4px 8px rgba(0, 0, 0, 0.1)',
         }}
       >
-        <h3 className="text-lg font-semibold mb-4 text-[#293e68]">Filtros</h3>
-        <div className="space-y-4">
+        <h3 className="text-lg font-semibold mb-4 text-[#293e68]">Buscar Curriculums</h3>
+        <div className="space-y-2">
           {/* Calificación */}
           <div>
-            <label htmlFor="calificacion" className="text-xs text-gray-600 block mb-1">Calificación</label>
+            <label htmlFor="calificacion" className="text-md text-[#293e68] mb-1">Calificación</label>
             <select
               id="calificacion"
               value={filters.calificacion}
               onChange={(e) => handleFilterChange(e, "calificacion")}
-              className="form-select rounded p-1 text-sm w-full"
+              className="form-select rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
             >
               <option value="">Seleccionar</option>
               <option value="1- Muy bueno">1- Muy bueno</option>
@@ -36,12 +36,12 @@ const Categories = ({ filters, setFilters }) => {
 
           {/* Nivel de Educación */}
           <div>
-            <label htmlFor="nivelEducacion" className="text-xs text-gray-600 block mb-1">Nivel de Educación</label>
+            <label htmlFor="nivelEducacion" className="text-md text-[#293e68] mb-1">Nivel de Educación</label>
             <select
               id="nivelEducacion"
               value={filters.nivelEducacion}
               onChange={(e) => handleFilterChange(e, "nivelEducacion")}
-              className="form-select rounded p-1 text-sm w-full"
+              className="form-select rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
             >
               <option value="">Seleccionar</option>
               <option value="Primario">Primario</option>
@@ -53,12 +53,12 @@ const Categories = ({ filters, setFilters }) => {
 
           {/* Años de Experiencia */}
           <div>
-            <label htmlFor="experienciaAnios" className="text-xs text-gray-600 block mb-1">Años de Experiencia</label>
+            <label htmlFor="experienciaAnios" className="text-md text-[#293e68] mb-1">Años de Experiencia</label>
             <select
               id="experienciaAnios"
               value={filters.experienciaAnios}
               onChange={(e) => handleFilterChange(e, "experienciaAnios")}
-              className="form-select rounded p-1 text-sm w-full"
+              className="form-select rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
             >
               <option value="">Seleccionar</option>
               <option value="Menos de un año">Menos de un año</option>
@@ -71,12 +71,12 @@ const Categories = ({ filters, setFilters }) => {
 
           {/* Género */}
           <div>
-            <label htmlFor="genero" className="text-xs text-gray-600 block mb-1">Género</label>
+            <label htmlFor="genero" className="text-md text-[#293e68] mb-1">Género</label>
             <select
               id="genero"
               value={filters.genero}
               onChange={(e) => handleFilterChange(e, "genero")}
-              className="form-select rounded p-1 text-sm w-full"
+              className="form-select rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
             >
               <option value="">Seleccionar</option>
               <option value="Masculino">Masculino</option>
@@ -86,12 +86,12 @@ const Categories = ({ filters, setFilters }) => {
 
           {/* Edad */}
           <div>
-            <label htmlFor="edad" className="text-xs text-gray-600 block mb-1">Edad</label>
+            <label htmlFor="edad" className="text-md text-[#293e68] mb-1">Edad</label>
             <select
               id="edad"
               value={filters.edad}
               onChange={(e) => handleFilterChange(e, "edad")}
-              className="form-select rounded p-1 text-sm w-full"
+              className="form-select rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
             >
               <option value="">Seleccionar</option>
               <option value="18">Más de 18</option>
@@ -103,12 +103,12 @@ const Categories = ({ filters, setFilters }) => {
 
           {/* País */}
           <div>
-            <label htmlFor="pais" className="text-xs text-gray-600 block mb-1">País</label>
+            <label htmlFor="pais" className="text-md text-[#293e68] mb-1">País</label>
             <select
               id="pais"
               value={filters.pais}
               onChange={(e) => handleFilterChange(e, "pais")}
-              className="form-select rounded p-1 text-sm w-full"
+              className="form-select rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
             >
               <option value="">Seleccionar</option>
               <option value="Argentina">Argentina</option>
@@ -120,12 +120,12 @@ const Categories = ({ filters, setFilters }) => {
 
           {/* Provincia */}
           <div>
-            <label htmlFor="provincia" className="text-xs text-gray-600 block mb-1">Provincia</label>
+            <label htmlFor="provincia" className="text-md text-[#293e68] mb-1">Provincia</label>
             <select
               id="provincia"
               value={filters.provincia}
               onChange={(e) => handleFilterChange(e, "provincia")}
-              className="form-select rounded p-1 text-sm w-full"
+              className="form-select rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
             >
               <option value="">Seleccionar</option>
               <option value="Buenos Aires">Buenos Aires</option>
@@ -136,24 +136,24 @@ const Categories = ({ filters, setFilters }) => {
 
           {/* Localidad */}
           <div>
-            <label htmlFor="localidad" className="text-xs text-gray-600 block mb-1">Localidad</label>
+            <label htmlFor="localidad" className="text-md text-[#293e68] mb-1">Localidad</label>
             <input
               id="localidad"
               value={filters.localidad}
               onChange={(e) => handleFilterChange(e, "localidad")}
-              className="form-input rounded p-1 text-sm w-full border-gray-300"
+              className="form-input rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
               placeholder="Ingrese localidad"
             />
           </div>
 
           {/* Idioma */}
           <div>
-            <label htmlFor="idioma" className="text-xs text-gray-600 block mb-1">Idioma</label>
+            <label htmlFor="idioma" className="text-md text-[#293e68] mb-1">Idioma</label>
             <select
               id="idioma"
               value={filters.idioma}
               onChange={(e) => handleFilterChange(e, "idioma")}
-              className="form-select rounded p-1 text-sm w-full"
+              className="form-select rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
             >
               <option value="">Seleccionar</option>
               <option value="Español">Español</option>

@@ -59,26 +59,31 @@ const ListasContainerScreen = () => {
   }
 
   return (
-    <div className="flex space-x-2">
-      <div className="w-4/5">
-        {selectedLista ? (
-          <ListaDetail lista={selectedLista} onBack={handleBackToList} />
-        ) : (
-          <Listas
-            listas={listas}
-            onEdit={handleSelectLista}
-            onDelete={handleDelete}
-            isLoading={isLoading}
-            onSelectLista={handleSelectLista}
-          />
-        )}
+    <div className="space-y-4">
+      <div>
+        <h2 className="text-2xl font-bold text-gray-800 mt-1">Listas</h2>
       </div>
-      <div className="w-2/5">
-        <FormularioListas
-          onCreate={handleCreate}
-          listaToEdit={selectedLista || null} // Pasar null cuando no hay lista seleccionada
-          onUpdate={handleUpdate}
-        />
+      <div className="flex space-x-2">
+        <div className="w-4/5">
+          {selectedLista ? (
+            <ListaDetail lista={selectedLista} onBack={handleBackToList} />
+          ) : (
+            <Listas
+              listas={listas}
+              onEdit={handleSelectLista}
+              onDelete={handleDelete}
+              isLoading={isLoading}
+              onSelectLista={handleSelectLista}
+            />
+          )}
+        </div>
+        <div className="w-2/5">
+          <FormularioListas
+            onCreate={handleCreate}
+            listaToEdit={selectedLista || null} // Pasar null cuando no hay lista seleccionada
+            onUpdate={handleUpdate}
+          />
+        </div>
       </div>
     </div>
   )

@@ -8,14 +8,14 @@ const ListaDetail = ({ lista, onBack }) => {
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-2xl font-bold text-[#293e68]">{lista.cliente}</h3>
         <Button
-          leftIcon={<FaArrowLeft />}
-          onClick={onBack}
-          bg="#293e68"
-          color="white"
-          _hover={{ bg: "#1f2d4b" }}
-        >
-          Volver
-        </Button>
+            leftIcon={<FaArrowLeft />}
+            onClick={onBack}
+            bg="#293e68"
+            color="white"
+            _hover={{ bg: "#1f2d4b" }}
+            >
+            Volver
+            </Button>
       </div>
 
       <div className="space-y-4">
