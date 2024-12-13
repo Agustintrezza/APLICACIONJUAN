@@ -90,16 +90,16 @@ const FormularioListas = ({ onCreate, listaToEdit, onUpdate }) => {
 
   return (
     <div
-      className="w-5/5 xl:w-1/5"
+      className="w-5/5 xl:w-5/5"
       style={{ position: "sticky", top: "0px", maxHeight: "100vh", overflowY: "auto" }}
     >
       <div className="border border-blue-300 bg-[#e9f0ff] rounded-lg p-4 shadow-lg">
         <h3 className="text-lg font-semibold mb-4 text-[#293e68]">
           {listaToEdit ? "Editar Lista" : "Crear nueva Lista"}
         </h3>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3">
           <div>
-            <FormLabel>Posición</FormLabel>
+            <FormLabel className="text-sm text-[#293e68]">Posición</FormLabel>
             <Input
               placeholder="Posición"
               value={formData.posicion}
@@ -111,7 +111,7 @@ const FormularioListas = ({ onCreate, listaToEdit, onUpdate }) => {
             />
           </div>
           <div>
-            <FormLabel>Cliente</FormLabel>
+            <FormLabel className="text-sm text-[#293e68]">Cliente</FormLabel>
             <Input
               placeholder="Cliente"
               value={formData.cliente}
@@ -123,7 +123,7 @@ const FormularioListas = ({ onCreate, listaToEdit, onUpdate }) => {
             />
           </div>
           <div>
-            <FormLabel>Comentario</FormLabel>
+            <FormLabel className="text-sm text-[#293e68]">Comentario</FormLabel>
             <Textarea
               placeholder="Comentario"
               value={formData.comentario}
@@ -135,7 +135,7 @@ const FormularioListas = ({ onCreate, listaToEdit, onUpdate }) => {
             />
           </div>
           <div>
-            <FormLabel>Fecha Límite</FormLabel>
+            <FormLabel className="text-sm text-[#293e68]">Fecha Límite</FormLabel>
             <Input
               type="date"
               value={formData.fechaLimite}
@@ -147,7 +147,7 @@ const FormularioListas = ({ onCreate, listaToEdit, onUpdate }) => {
             />
           </div>
           <div>
-            <FormLabel>Color</FormLabel>
+            <FormLabel className="text-sm text-[#293e68]">Color</FormLabel>
             <div className="flex space-x-2">
               {colors.map((color) => (
                 <div

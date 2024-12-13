@@ -1,20 +1,19 @@
-import PropTypes from 'prop-types';
-import { useContext } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { AppContext } from '../../context/AppContext';
-import { FaHome, FaPlus, FaUser, FaEnvelope, FaHeart, FaChevronLeft, FaChevronRight, FaPowerOff } from 'react-icons/fa';
-import { Tooltip as ReactTooltip } from 'react-tooltip';
-import avatarImg from '../../assets/imagenes/avatarimg.webp';
+import PropTypes from 'prop-types'
+import { useContext } from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import { AppContext } from '../../context/AppContext'
+import { FaPlus, FaUser, FaHeart, FaChevronLeft, FaChevronRight, FaPowerOff, FaFileAlt } from 'react-icons/fa'
+import avatarImg from '../../assets/imagenes/avatarimg.webp'
 
 const Sidebar = () => {
-  const { isAuthenticated, logout, isSidebarExpanded, toggleSidebar, user } = useContext(AppContext);
-  const location = useLocation();
+  const { isAuthenticated, logout, isSidebarExpanded, toggleSidebar, user } = useContext(AppContext)
+  const location = useLocation()
 
-  if (!isAuthenticated) return null;
+  if (!isAuthenticated) return null
 
   return (
     <div
-      className={`h-screen ${isSidebarExpanded ? 'w-48' : 'w-16'} text-white flex flex-col py-4 transition-all duration-150 font-sans`}
+      className={`h-screen ${isSidebarExpanded ? 'w-56' : 'w-16'} text-white flex flex-col py-4 transition-all duration-150 font-sans`}
       style={{
         alignItems: isSidebarExpanded ? 'flex-start' : 'center',
         backgroundColor: '#293e68',
@@ -41,12 +40,11 @@ const Sidebar = () => {
       )}
 
       <nav className="space-y-6 w-full mt-4">
-        <SidebarLink to="/" icon={<FaHome />} label="Curriculums" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} />
-        <SidebarLink to="/crear-cv" icon={<FaPlus />} label="Ingresar CV" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} />
-        <SidebarLink to="/listas" icon={<FaPlus />} label="Listas" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} />
-        <SidebarLink to="/perfil" icon={<FaUser />} label="Mi Perfil" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} />
-        <SidebarLink to="/comunicaciones" icon={<FaEnvelope />} label="Comunicaciones" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} />
+        <SidebarLink to="/listas" icon={<FaPlus />} label="Crear Proyecto" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} />
+        <SidebarLink to="/" icon={<FaUser />} label="Curriculums/Postulantes" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} />
+        <SidebarLink to="/crear-cv" icon={<FaFileAlt />} label="Ingresar un CV" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} />
         <SidebarLink to="/favoritos" icon={<FaHeart />} label="Favoritos" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} showCount={2} />
+        <SidebarLink to="/perfil" icon={<FaUser />} label="Perfil" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} />
       </nav>
 
       <button
@@ -56,15 +54,13 @@ const Sidebar = () => {
         <FaPowerOff className="text-2xl" />
         {isSidebarExpanded && <span className="text-sm">Cerrar Sesión</span>}
       </button>
-
-      {!isSidebarExpanded && <ReactTooltip place="right" effect="solid" />}
     </div>
-  );
-};
+  )
+}
 
 const SidebarLink = ({ to, icon, label, isSidebarExpanded, currentPath, showCount }) => {
-  const isActive = currentPath === to;
-  const iconSize = isSidebarExpanded ? 'text-xl' : 'text-3xl';
+  const isActive = currentPath === to
+  const iconSize = isSidebarExpanded ? 'text-xl' : 'text-3xl'
 
   return (
     <Link
@@ -72,8 +68,6 @@ const SidebarLink = ({ to, icon, label, isSidebarExpanded, currentPath, showCoun
       className={`flex items-center space-x-3 px-4 py-2 w-full relative transition-all duration-150 ${
         isActive ? 'bg-blue-100 text-[#293e68]' : 'hover:bg-blue-100 hover:text-[#293e68]'
       }`}
-      data-tooltip-id={!isSidebarExpanded ? `tooltip-${label}` : undefined}
-      data-tooltip-content={!isSidebarExpanded ? label : undefined}
     >
       <span className={`relative ${iconSize} transition-colors duration-150`} style={{ color: 'inherit' }}>
         {icon}
@@ -85,8 +79,8 @@ const SidebarLink = ({ to, icon, label, isSidebarExpanded, currentPath, showCoun
       </span>
       {isSidebarExpanded && <span className="whitespace-nowrap text-sm">{label}</span>}
     </Link>
-  );
-};
+  )
+}
 
 Sidebar.propTypes = {
   isAuthenticated: PropTypes.bool.isRequired,
@@ -96,7 +90,7 @@ Sidebar.propTypes = {
   user: PropTypes.shape({
     email: PropTypes.string,
   }),
-};
+}
 
 SidebarLink.propTypes = {
   to: PropTypes.string.isRequired,
@@ -105,6 +99,6 @@ SidebarLink.propTypes = {
   isSidebarExpanded: PropTypes.bool.isRequired,
   currentPath: PropTypes.string.isRequired,
   showCount: PropTypes.number,
-};
+}
 
-export default Sidebar;
+export default Sidebar

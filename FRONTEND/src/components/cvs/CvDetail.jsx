@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import PropTypes from "prop-types"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
+import { FaArrowLeft } from "react-icons/fa"
 import {
   Button,
   useToast,
@@ -46,6 +47,10 @@ const CvDetail = ({ cv }) => {
     return null
   }
 
+  const onBack = () => {
+    navigate("/curriculums") // Navega a la ruta '/curriculums'
+  }
+
   const handleDeleteCv = async () => {
     setIsDeleting(true)
     try {
@@ -82,6 +87,10 @@ const CvDetail = ({ cv }) => {
     }
   }
 
+  const handleListTagClick = (listId) => {
+    navigate(`/listas/${listId}`, { state: { from: `/ver-cv/${cv._id}` } })
+  }
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-4 border border-gray-300 w-5/5">
       {/* Encabezado con título y botones */}
@@ -98,9 +107,20 @@ const CvDetail = ({ cv }) => {
             <>
               <Skeleton width={100} height={40} />
               <Skeleton width={100} height={40} />
+              <Skeleton width={100} height={40} /> {/* Esqueleto para el botón Volver */}
             </>
           ) : (
             <>
+              <Button
+                leftIcon={<FaArrowLeft />}
+                onClick={onBack}
+                bg="#293e68"
+                color="white"
+                _hover={{ bg: "#1f2d4b" }}
+                className="px-4 py-2 text-sm rounded-lg shadow hover:bg-[#1f2d4b]"
+              >
+                Volver
+              </Button>
               <button
                 className="px-4 py-2 bg-[#293e68] text-white text-sm rounded-lg shadow hover:bg-[#1f2d4b]"
                 onClick={() => navigate(`/editar-cv/${cv._id}`)}
@@ -133,7 +153,8 @@ const CvDetail = ({ cv }) => {
                   bg={list.color}
                   color="white"
                   borderRadius="full"
-                  className="flex items-center"
+                  className="flex items-center cursor-pointer"
+                  onClick={() => handleListTagClick(list._id)}
                 >
                   <TagLabel>{list.cliente || "Sin nombre"}</TagLabel>
                 </Tag>
