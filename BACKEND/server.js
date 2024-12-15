@@ -29,7 +29,7 @@ app.use(cors(corsOptions));
 // Middleware para analizar JSON
 app.use(express.json({ limit: '10mb' }));
 
-// Conectar a MongoDB
+// Conectar a MongoDb
 connectDB();
 
 // Rutas de la API
