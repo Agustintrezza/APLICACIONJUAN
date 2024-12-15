@@ -15,10 +15,10 @@ const allowedOrigins = [
 const corsOptions = {
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
-      console.log(`CORS allowed for origin: ${origin}`)
+      console.log(`CORS allowed for origin: ${origin || 'undefined (no origin)'}`)
       callback(null, true) // Permitir el acceso
     } else {
-      console.log(`CORS blocked for origin: ${origin}`)
+      console.log(`CORS denied for origin: ${origin}`)
       callback(new Error('Not allowed by CORS')) // Bloquear otros orígenes
     }
   },
@@ -44,16 +44,20 @@ if (process.env.NODE_ENV === 'production') {
   const staticPath = path.join(__dirname, '../FRONTEND', 'dist')
   console.log(`Serving static files from: ${staticPath}`)
 
-  app.use(express.static(staticPath)) // Servir los archivos estáticos del frontend
+  app.use(express.static(path.join(__dirname, '../FRONTEND', 'dist'), {
+    setHeaders: (res, path) => {
+      console.log(`[DEBUG] Serving static file: ${path}`)
+    }
+  }))
 
   // Redirigir todas las rutas desconocidas al index.html
   app.get('*', (req, res) => {
-    console.log(`Request for: ${req.originalUrl}`)
     const indexPath = path.join(__dirname, '../FRONTEND', 'dist', 'index.html')
+    console.log(`[DEBUG] Redirigiendo a index.html para la ruta: ${req.originalUrl}`)
     res.sendFile(indexPath, (err) => {
       if (err) {
-        console.error(`Error serving index.html: ${err.message}`)
-        res.status(500).send('Error serving the application')
+        console.error(`[ERROR] No se pudo servir index.html: ${err.message}`)
+        res.status(500).send('Error al servir la aplicación')
       }
     })
   })
