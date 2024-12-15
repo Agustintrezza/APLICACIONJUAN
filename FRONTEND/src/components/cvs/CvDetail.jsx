@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import PropTypes from "prop-types"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
-import { FaArrowLeft } from "react-icons/fa"
+import { FaArrowLeft, FaShareAlt } from "react-icons/fa"
 import {
   Button,
   useToast,
@@ -91,6 +91,36 @@ const CvDetail = ({ cv }) => {
     navigate(`/listas/${listId}`, { state: { from: `/ver-cv/${cv._id}` } })
   }
 
+  const formatWhatsappMessage = () => {
+        const message = `
+    🚀 *Curriculum Vitae* 🚀
+    *Nombre:* ${getValueOrDefault(cv.nombre)} ${getValueOrDefault(cv.apellido)}
+    *Edad:* ${getValueOrDefault(cv.edad)}
+    *Género:* ${getValueOrDefault(cv.genero)}
+    *Teléfono Fijo:* ${getValueOrDefault(cv.telefonoFijo)}
+    *Celular:* ${getValueOrDefault(cv.celular)}
+    *Email:* ${getValueOrDefault(cv.email)}
+    *País:* ${getValueOrDefault(cv.pais)}
+    *Provincia:* ${getValueOrDefault(cv.provincia)}
+    *Localidad:* ${getValueOrDefault(cv.localidad)}
+    *Zona:* ${getValueOrDefault(cv.zona)}
+    *Calificación:* ${getValueOrDefault(cv.calificacion)}
+    *Nivel de Estudios:* ${getValueOrDefault(cv.nivelEstudios)}
+    *Experiencia:* ${getValueOrDefault(cv.experiencia)}
+    *Idiomas:* ${getValueOrDefault(cv.idiomas.filter((i) => i).join(", "))}
+    *Comentarios:* ${getValueOrDefault(cv.comentarios)}
+
+    🔗 *Ver más detalles aquí:* https://aplicacionjuan-1.onrender.com/ver-cv/${cv._id}
+        `
+        return encodeURIComponent(message.trim())
+      }
+
+      const handleWhatsappShare = () => {
+        const message = formatWhatsappMessage()
+        const whatsappUrl = `https://wa.me/1132368312?text=${message}`
+        window.open(whatsappUrl, "_blank")
+      }
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-4 border border-gray-300 w-5/5">
       {/* Encabezado con título y botones */}
@@ -132,6 +162,13 @@ const CvDetail = ({ cv }) => {
                 onClick={() => setIsDialogOpen(true)}
               >
                 Eliminar
+              </button>
+              <button
+                className="px-4 py-2 bg-green-500 text-white text-sm rounded-lg shadow hover:bg-green-600 flex items-center gap-2"
+                onClick={handleWhatsappShare}
+              >
+                <FaShareAlt />
+                WhatsApp
               </button>
             </>
           )}
