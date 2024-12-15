@@ -8,7 +8,6 @@ import 'react-loading-skeleton/dist/skeleton.css'
 import { API_URL } from '../../config'
 
 const removeAccents = (text) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-// const limitText = (text, limit) => (text.length > limit ? `${text.slice(0, limit)}...` : text)
 
 const TableMain = () => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -165,10 +164,17 @@ const TableMain = () => {
                           {user.nombre} {user.apellido}
                         </h3>
                         <p className="text-lg font-bold text-[#293e68]">{user.edad}</p>
-                        {/* <p className="text-sm text-gray-600">{limitText(user.comentarios, 70)}</p> */}
                         <ul className="text-sm text-gray-800 list-inside list-disc">
                           {user.listas?.length > 0 ? (
-                            user.listas.map((lista) => <li key={lista._id}>{lista.cliente}</li>)
+                            user.listas.map((lista) => (
+                              <li key={lista._id} className="flex items-center space-x-2">
+                                <span>{lista.cliente}</span>
+                                <span
+                                  className="inline-block w-3 h-3 rounded-full"
+                                  style={{ backgroundColor: lista.color || '#cccccc' }} // Default to gray if no color
+                                ></span>
+                              </li>
+                            ))
                           ) : (
                             <li>No asociado a ningún proyecto</li>
                           )}
