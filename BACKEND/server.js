@@ -6,7 +6,7 @@ require('dotenv').config();
 
 const app = express();
 
-// Middleware de CORS
+// Middleware de CORSSS
 const allowedOrigins = [
   'http://localhost:5173', // Dominio para desarrollo
   'https://aplicacionjuan-1.onrender.com', // Dominio del frontend en producción
@@ -39,15 +39,15 @@ app.use('/api/listas', require('./routes/listas'));
 
 // Servir el frontend en producción
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, 'frontend', 'dist'))); // Servir los archivos estáticos del frontend
+  app.use(express.static(path.join(__dirname, '../FRONTEND', 'dist'))); // Servir los archivos estáticos del frontend
 
   // Redirigir todas las rutas desconocidas al index.html
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
+    res.sendFile(path.join(__dirname, '../FRONTEND', 'dist', 'index.html'))
   });
 }
 
-// Ruta de prueba (puede eliminarse si no es necesaria)
+// Ruta de prueba (puede eliminarse si no es necesaria)-
 app.get('/', (req, res) => {
   res.send('API Running');
 });
