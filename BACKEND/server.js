@@ -14,6 +14,7 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: (origin, callback) => {
+    console.log(`[CORS] Origin: ${origin || 'undefined (no origin)'}`)
     if (!origin || allowedOrigins.includes(origin)) {
       console.log(`CORS allowed for origin: ${origin || 'undefined (no origin)'}`)
       callback(null, true) // Permitir el acceso
@@ -42,11 +43,11 @@ app.use('/api/listas', require('./routes/listas'))
 // Middleware para servir archivos estáticos en producción
 if (process.env.NODE_ENV === 'production') {
   const staticPath = path.join(__dirname, '../FRONTEND', 'dist')
-  console.log(`Serving static files from: ${staticPath}`)
+  console.log(`[DEBUG] Serving static files from: ${staticPath}`)
 
-  app.use(express.static(path.join(__dirname, '../FRONTEND', 'dist'), {
-    setHeaders: (res, path) => {
-      console.log(`[DEBUG] Serving static file: ${path}`)
+  app.use(express.static(staticPath, {
+    setHeaders: (res, filePath) => {
+      console.log(`[DEBUG] Serving static file: ${filePath}`)
     }
   }))
 
@@ -61,14 +62,32 @@ if (process.env.NODE_ENV === 'production') {
       }
     })
   })
+} else {
+  // En modo desarrollo, podemos agregar más logs sobre el servidor
+  console.log('[DEBUG] En modo desarrollo, sirviendo archivos desde /public')
+  app.use(express.static(path.join(__dirname, 'public')))
 }
 
 // Ruta de prueba (opcional)
 app.get('/', (req, res) => {
-  console.log('API root route accessed')
+  console.log('[DEBUG] API root route accessed')
   res.send('API Running')
+})
+
+// Ruta para obtener curriculums
+app.get('/api/curriculums/:id', (req, res) => {
+  console.log(`[DEBUG] Solicitud GET a /api/curriculums/${req.params.id}`)
+  // Aquí va la lógica para manejar la solicitud
+})
+
+// Ruta para obtener listas
+app.get('/api/listas/:id', (req, res) => {
+  console.log(`[DEBUG] Solicitud GET a /api/listas/${req.params.id}`)
+  // Aquí va la lógica para manejar la solicitud
 })
 
 // Iniciar el servidor
 const PORT = process.env.PORT || 5000
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+app.listen(PORT, () => {
+  console.log(`[DEBUG] Server running on port ${PORT}`)
+})
