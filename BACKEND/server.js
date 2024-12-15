@@ -38,7 +38,6 @@ app.use('/api/curriculums', require('./routes/curriculums'));
 app.use('/api/listas', require('./routes/listas'));
 
 // Servir el frontend en producción
-const __dirname = path.resolve(); // Obtener el directorio raíz
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'frontend', 'dist'))); // Servir los archivos estáticos del frontend
 
