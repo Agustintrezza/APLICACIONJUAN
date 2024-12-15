@@ -146,7 +146,7 @@ const Categories = ({ filters, setFilters }) => {
             />
           </div>
 
-          {/* Idiomas */}
+          {/* Idioma */}
           <div>
             <label htmlFor="idioma" className="text-md text-[#293e68] mb-1">Idioma</label>
             <select
