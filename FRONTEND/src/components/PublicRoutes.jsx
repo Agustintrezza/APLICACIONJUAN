@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 const PublicRoute = ({ children }) => {
   const { isAuthenticated } = useContext(AppContext);
   console.log(import.meta.env.VITE_API_URL);
+  console.log(isAuthenticated);
 
   return isAuthenticated ? <Navigate to="/" /> : children;
 };

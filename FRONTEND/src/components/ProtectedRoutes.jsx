@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useContext(AppContext);
+  console.log(isAuthenticated);
 
   return isAuthenticated ? children : <Navigate to="/signin" />;
 };
