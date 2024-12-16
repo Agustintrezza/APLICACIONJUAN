@@ -53,15 +53,15 @@ if (process.env.NODE_ENV === 'production') {
 
   // Redirigir todas las rutas desconocidas al index.html
   app.get('*', (req, res) => {
-    const indexPath = path.join(__dirname, '../FRONTEND', 'dist', 'index.html')
-    console.log(`[DEBUG] Redirigiendo a index.html para la ruta: ${req.originalUrl}`)
+    const indexPath = path.join(__dirname, '../FRONTEND', 'dist', 'index.html');
+    console.log(`[DEBUG] Redirigiendo a index.html para la ruta: ${req.originalUrl}`);
     res.sendFile(indexPath, (err) => {
       if (err) {
-        console.error(`[ERROR] No se pudo servir index.html: ${err.message}`)
-        res.status(500).send('Error al servir la aplicación')
+        console.error(`[ERROR] No se pudo servir index.html: ${err.message}`);
+        res.status(500).send('Error al servir la aplicación');
       }
-    })
-  })
+    });
+  });
 } else {
   // En modo desarrollo, podemos agregar más logs sobre el servidor
   console.log('[DEBUG] En modo desarrollo, sirviendo archivos desde /public')
@@ -90,4 +90,4 @@ app.get('/api/listas/:id', (req, res) => {
 const PORT = process.env.PORT || 5000
 app.listen(PORT, () => {
   console.log(`[DEBUG] Server running on port ${PORT}`)
-})
+});
