@@ -50,6 +50,7 @@ if (process.env.NODE_ENV === 'production') {
 
   // Redirigir todas las rutas desconocidas al index.html para manejar rutas SPA
   app.get('*', (req, res) => {
+    console.log(`Redirecting request for unknown route: ${req.originalUrl}`);
     res.sendFile(path.join(staticPath, 'index.html'), (err) => {
       if (err) {
         console.error(`[ERROR] No se pudo servir index.html: ${err.message}`);
