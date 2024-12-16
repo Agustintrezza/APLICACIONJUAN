@@ -8,7 +8,7 @@ const app = express();
 
 // Middleware de CORS
 const allowedOrigins = [
-  'http://localhost:5173', // Dominio para desarrollo
+  'http://localhost:3000', // Dominio para desarrollo
   'https://aplicacionjuan-1.onrender.com', // Dominio del frontend en producción
 ];
 
@@ -31,7 +31,7 @@ app.use(cors(corsOptions));
 // Middleware para analizar JSON
 app.use(express.json({ limit: '10mb' }));
 
-// Conectar a MongoDb
+// Conectar a MongoDB
 connectDB();
 
 // Rutas de la API
@@ -44,10 +44,10 @@ if (process.env.NODE_ENV === 'production') {
   const staticPath = path.join(__dirname, '../FRONTEND', 'dist');
   console.log(`Serving static files from: ${staticPath}`);
 
-  // Servir archivos estáticos
+  // Servir archivos estáticos (como index.html, JS, CSS, etc.)
   app.use(express.static(staticPath));
 
-  // Redirigir todas las rutas desconocidas al index.html
+  // Redirigir todas las rutas desconocidas al index.html para manejar rutas SPA
   app.get('*', (req, res) => {
     res.sendFile(path.join(staticPath, 'index.html'), (err) => {
       if (err) {
