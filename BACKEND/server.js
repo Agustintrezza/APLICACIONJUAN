@@ -14,11 +14,6 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: (origin, callback) => {
-    const allowedOrigins = [
-      'http://localhost:3000', // Desarrollo
-      'https://aplicacionjuan.onrender.com', // Producción
-    ];
-
     // Permitir solicitudes sin origen (por ejemplo, desde herramientas como Postman)
     if (!origin || allowedOrigins.includes(origin)) {
       console.log(`CORS allowed for origin: ${origin || 'undefined (no origin)'}`);
