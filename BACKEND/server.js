@@ -15,7 +15,8 @@ const allowedOrigins = [
 const corsOptions = {
   origin: (origin, callback) => {
     console.log(`[CORS] Origin: ${origin || 'undefined (no origin)'}`)
-    if (!origin || allowedOrigins.includes(origin)) {
+    // Permitir si el origen es nulo (undefined) o si está en la lista de orígenes permitidos
+    if (!origin || allowedOrigins.includes(origin) || origin === 'null') {
       console.log(`CORS allowed for origin: ${origin || 'undefined (no origin)'}`)
       callback(null, true) // Permitir el acceso
     } else {
