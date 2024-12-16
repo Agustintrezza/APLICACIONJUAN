@@ -55,7 +55,9 @@ if (process.env.NODE_ENV === 'production') {
   // Redirigir todas las rutas desconocidas al index.html
   app.get('*', (req, res) => {
     const indexPath = path.join(__dirname, '../FRONTEND', 'dist', 'index.html');
-    console.log(`[DEBUG] Redirigiendo a index.html para la ruta: ${req.originalUrl}`);
+    console.log(`[DEBUG] Recibida solicitud para: ${req.originalUrl}`);
+    console.log(`[DEBUG] Sirviendo archivo: ${indexPath}`);
+    
     res.sendFile(indexPath, (err) => {
       if (err) {
         console.error(`[ERROR] No se pudo servir index.html: ${err.message}`);
