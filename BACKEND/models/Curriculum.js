@@ -1,4 +1,4 @@
-const mongoose = require('mongoose'); // Agregar esta línea
+const mongoose = require('mongoose');
 
 const CurriculumSchema = new mongoose.Schema({
   nombre: { type: String, required: true, minlength: 3 },
@@ -33,6 +33,18 @@ const CurriculumSchema = new mongoose.Schema({
   imagen: { type: String, required: true },
   comentarios: { type: String, default: '' },
   listas: [{ type: mongoose.Schema.Types.ObjectId, ref: "Lista" }],
+  rubro: { type: String, required: true },
+  subrubro: {
+    type: String,
+    default: '',
+    validate: {
+      validator: function (value) {
+        return this.rubro !== 'Gastronomía' || (value && value.trim().length > 0);
+      },
+      message: 'El subrubro es obligatorio para el rubro Gastronomía.',
+    },
+  },
+  puesto: { type: String, required: true },
 }, { timestamps: true, versionKey: false });
 
 module.exports = mongoose.model("Curriculum", CurriculumSchema);
