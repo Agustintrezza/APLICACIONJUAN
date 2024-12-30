@@ -45,22 +45,29 @@ const CrearCvScreen = () => {
       .min(18, "Debe ser mayor o igual a 18 años")
       .max(100, "Debe ser menor o igual a 100 años"),
     celular: Yup.string().required("El teléfono celular es obligatorio"),
-    pais: Yup.string().required("El país es obligatorio"),
-    provincia: Yup.string().required("La provincia es obligatoria"),
+    pais: Yup.string()
+      .required("El país es obligatorio")
+      .oneOf(["Argentina", "Estados Unidos", "Chile", "Uruguay", "Brasil"], "Seleccione un país válido"),
     calificacion: Yup.string()
       .oneOf(["1- Muy bueno", "2- Bueno", "3- Regular"], "Opción inválida")
       .required("La calificación es obligatoria"),
     imagen: Yup.mixed()
       .test("fileType", "El archivo debe ser una imagen JPG, JPEG, PNG o un PDF", (value) =>
-        !value || ["image/jpeg", "image/jpg", "image/png", "application/pdf"].includes(value.type)
+        !value || ["image/jpeg", "image/jpg", "image/png", "application/pdf"].includes(value?.type)
       )
       .required("La imagen o archivo es obligatorio"),
-  })
+    rubro: Yup.string().required("El rubro es obligatorio"), // Solo Rubro es obligatorio
+    puesto: Yup.string().required("El puesto es obligatorio"),
+    subrubro: Yup.string(), // No requerido
+  });
 
   const handleChange = async (e) => {
     const { name, value } = e.target
-    setFormData((prevData) => ({ ...prevData, [name]: value }))
-
+    setFormData((prevData) => {
+      const newData = { ...prevData, [name]: value }
+      return newData
+    })
+  
     try {
       await validationSchema.validateAt(name, { ...formData, [name]: value })
       setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }))
@@ -115,10 +122,19 @@ const CrearCvScreen = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsSubmitting(true)
-
+  
+    // Validar que el subrubro esté seleccionado si el rubro es 'Gastronomía'
+    if (formData.rubro === "Gastronomía" && !formData.subrubro) {
+      alert("El subrubro es obligatorio para el rubro 'Gastronomía'.");
+      setIsSubmitting(false);
+      return;
+    }
+  
     try {
+      // Validación usando el esquema de Yup
       await validationSchema.validate(formData, { abortEarly: false })
-
+  
+      // Preparar los datos para el envío (incluyendo archivos)
       const formDataToSend = new FormData()
       Object.entries(formData).forEach(([key, value]) => {
         if (key === "imagen" && value instanceof File) {
@@ -127,17 +143,19 @@ const CrearCvScreen = () => {
           formDataToSend.append(key, value || "")
         }
       })
-
+  
+      // Enviar el formulario a la API
       const response = await fetch(`${API_URL}/api/curriculums`, {
         method: "POST",
         body: formDataToSend,
       })
-
+  
       if (!response.ok) {
         const errorData = await response.json()
         throw new Error(errorData.error || "Error desconocido")
       }
-
+  
+      // Mensaje de éxito
       toast({
         title: "Éxito",
         description: "Se creó el CV exitosamente.",
@@ -146,7 +164,8 @@ const CrearCvScreen = () => {
         position: "top-right",
         isClosable: true,
       })
-
+  
+      // Restablecer los campos del formulario después del envío
       setFormData({
         nombre: "",
         apellido: "",
@@ -171,6 +190,7 @@ const CrearCvScreen = () => {
       fileInputRef.current.value = ""
       navigate("/") 
     } catch (error) {
+      // Manejo de errores de validación
       if (error.name === "ValidationError") {
         const validationErrors = {}
         error.inner.forEach((err) => {
@@ -178,6 +198,7 @@ const CrearCvScreen = () => {
         })
         setErrors(validationErrors)
       } else {
+        // Error general
         toast({
           title: "Error",
           description: "Hubo un problema al crear el CV. Inténtelo nuevamente.",
@@ -190,6 +211,7 @@ const CrearCvScreen = () => {
       setIsSubmitting(false)
     }
   }
+  
 
   return (
     <div>

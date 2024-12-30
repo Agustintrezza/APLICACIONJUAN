@@ -50,44 +50,55 @@ router.get('/:id', async (req, res) => {
 // Crear un nuevo curriculum
 router.post('/', upload.single('imagen'), async (req, res) => {
   try {
-    const file = req.file
-    const { calificacion, ...otrosDatos } = req.body
+    const file = req.file;
+    const { pais, provincia, calificacion, ...otrosDatos } = req.body;
 
+    // Validación de lógica: Provincia requerida para Argentina
+    if (pais === "Argentina" && (!provincia || provincia.trim() === "")) {
+      return res.status(400).json({ error: "La provincia es obligatoria para Argentina." });
+    }
+
+    // Validación del archivo
     if (!file) {
-      return res.status(400).json({ error: 'La imagen o archivo es obligatorio.' })
+      return res.status(400).json({ error: 'La imagen o archivo es obligatorio.' });
     }
 
-    const allowedFormats = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf']
+    const allowedFormats = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
     if (!allowedFormats.includes(file.mimetype)) {
-      return res.status(400).json({ error: 'Formato de archivo no permitido.' })
+      return res.status(400).json({ error: 'Formato de archivo no permitido.' });
     }
 
-    let uploadedFile
+    // Subir el archivo a Cloudinary
+    let uploadedFile;
     await new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         { folder: 'curriculums' },
         (error, result) => {
-          if (error) return reject(error)
-          uploadedFile = result
-          resolve()
+          if (error) return reject(error);
+          uploadedFile = result;
+          resolve();
         }
-      )
-      streamifier.createReadStream(file.buffer).pipe(uploadStream)
-    })
+      );
+      streamifier.createReadStream(file.buffer).pipe(uploadStream);
+    });
 
-    const sanitizedData = sanitize({ ...otrosDatos, calificacion })
+    // Sanitizar los datos
+    const sanitizedData = sanitize({ ...otrosDatos, pais, provincia, calificacion });
+
+    // Crear y guardar el nuevo curriculum
     const newCurriculum = new Curriculum({
       ...sanitizedData,
       imagen: uploadedFile.secure_url,
-    })
+    });
 
-    const savedCurriculum = await newCurriculum.save()
-    res.status(201).json({ message: 'Curriculum creado exitosamente', curriculum: savedCurriculum })
+    const savedCurriculum = await newCurriculum.save();
+    res.status(201).json({ message: 'Curriculum creado exitosamente', curriculum: savedCurriculum });
   } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Ocurrió un error al procesar la solicitud.' })
+    console.error("Error al crear el currículum:", error);
+    res.status(500).json({ error: 'Ocurrió un error al procesar la solicitud.' });
   }
-})
+});
+
 
 // Actualizar un curriculum
 router.put('/:id', upload.single('imagen'), async (req, res) => {

@@ -94,23 +94,9 @@
     const formatWhatsappMessage = () => {
           const message = `
       🚀 *Curriculum Vitae* 🚀
-      *Nombre:* ${getValueOrDefault(cv.nombre)} ${getValueOrDefault(cv.apellido)}
-      *Edad:* ${getValueOrDefault(cv.edad)}
-      *Género:* ${getValueOrDefault(cv.genero)}
-      *Teléfono Fijo:* ${getValueOrDefault(cv.telefonoFijo)}
-      *Celular:* ${getValueOrDefault(cv.celular)}
-      *Email:* ${getValueOrDefault(cv.email)}
-      *País:* ${getValueOrDefault(cv.pais)}
-      *Provincia:* ${getValueOrDefault(cv.provincia)}
-      *Localidad:* ${getValueOrDefault(cv.localidad)}
-      *Zona:* ${getValueOrDefault(cv.zona)}
-      *Calificación:* ${getValueOrDefault(cv.calificacion)}
-      *Nivel de Estudios:* ${getValueOrDefault(cv.nivelEstudios)}
-      *Experiencia:* ${getValueOrDefault(cv.experiencia)}
-      *Idiomas:* ${getValueOrDefault(cv.idiomas.filter((i) => i).join(", "))}
-      *Comentarios:* ${getValueOrDefault(cv.comentarios)}
-
-      🔗 *Ver más detalles aquí:* https://aplicacionjuan-1.onrender.com/ver-cv/${cv._id}
+      ${getValueOrDefault(cv.nombre) }
+      ${getValueOrDefault(cv.apellido) }
+      ${getValueOrDefault(cv.imagen)}
           `
           return encodeURIComponent(message.trim())
         }
@@ -138,6 +124,7 @@
                 <Skeleton width={100} height={40} />
                 <Skeleton width={100} height={40} />
                 <Skeleton width={100} height={40} /> {/* Esqueleto para el botón Volver */}
+                <Skeleton width={100} height={40} /> {/* Esqueleto para el botón Whatsapp */}
               </>
             ) : (
               <>
@@ -230,6 +217,17 @@
                 </p>
                 <p className="text-sm text-gray-600">
                   <strong>Provincia:</strong> {getValueOrDefault(cv.provincia)}
+                </p>
+                <p className="text-sm text-gray-600">
+                  <strong>Rubro:</strong> {getValueOrDefault(cv.rubro)}
+                </p>
+                {cv.rubro === "Gastronomía" && cv.subrubro && (
+                  <p className="text-sm text-gray-600">
+                    <strong>Subrubro:</strong> {getValueOrDefault(cv.subrubro)}
+                  </p>
+                )}
+                <p className="text-sm text-gray-600">
+                  <strong>Puesto:</strong> {getValueOrDefault(cv.puesto)}
                 </p>
               </>
             )}

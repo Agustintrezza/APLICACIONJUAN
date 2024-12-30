@@ -8,7 +8,7 @@ const app = express();
 
 // Middleware de CORS
 const allowedOrigins = [
-  'http://localhost:3000', // Dominio para desarrollo
+  'http://localhost:5173', // Dominio para desarrollo
   'https://aplicacionjuan-1.onrender.com', // Dominio del frontend en producción
 ];
 
@@ -16,10 +16,8 @@ const corsOptions = {
   origin: (origin, callback) => {
     // Permitir solicitudes sin origen (por ejemplo, desde herramientas como Postman)
     if (!origin || allowedOrigins.includes(origin)) {
-      console.log(`CORS allowed for origin: ${origin || 'undefined (no origin)'}`);
       callback(null, true); // Permitir el acceso
     } else {
-      console.log(`CORS denied for origin: ${origin}`);
       callback(new Error('Not allowed by CORS')); // Bloquear otros orígenes
     }
   },

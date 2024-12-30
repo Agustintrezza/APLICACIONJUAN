@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import PaisSelect from "../paisselect/PaisSelect";
+import RubrosSelect from "../rubrosselect/RubrosSelect"
 import {useState, useEffect} from 'react';
 
 const FormularioCv = ({
@@ -30,6 +31,7 @@ const FormularioCv = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Columna 1 */}
         <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="nombre" className="block mb-2 text-sm font-medium text-gray-900">
               Nombre
@@ -70,6 +72,7 @@ const FormularioCv = ({
               />
             )}
             {errors.apellido && <p className="text-red-500 text-sm mt-1">{errors.apellido}</p>}
+          </div>
           </div>
 
           <div>
@@ -182,7 +185,15 @@ const FormularioCv = ({
             </div>
           </div>
 
-          <PaisSelect formData={formData} setFormData={setFormData} isLoading={isLoading} />
+          <RubrosSelect
+            formData={formData}
+            setFormData={setFormData}
+            errors={errors}
+            isLoading={isLoading}
+            handleChange={handleChange}
+          />
+        <PaisSelect formData={formData} setFormData={setFormData} isLoading={isLoading} />
+
         </div>
 
         {/* Columna 2 */}

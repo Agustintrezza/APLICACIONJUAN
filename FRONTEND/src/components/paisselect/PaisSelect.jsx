@@ -51,14 +51,14 @@ const PaisSelect = ({ formData, setFormData }) => {
 
   const handleCountryChange = (e) => {
     const selectedCountry = e.target.value;
-    setFormData({
-      ...formData,
+    setFormData((prevData) => ({
+      ...prevData,
       pais: selectedCountry,
-      provincia: "",
+      provincia: selectedCountry === "Argentina" ? prevData.provincia : "",
       zona: "",
       localidad: "",
       ubicacionManual: "",
-    });
+    }));
   };
 
   const handleProvinceChange = (e) => {
