@@ -25,13 +25,14 @@ const CrearCvScreen = () => {
     idiomas: [],
     imagen: null,
     comentarios: "",
+    lista: "", // Agregamos el campo para la lista seleccionada
   })
 
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false) // Spinner control
   const fileInputRef = useRef(null)
   const toast = useToast()
-  const navigate = useNavigate() // Inicializa useNavigate
+  const navigate = useNavigate()
 
   // Esquema de validación
   const validationSchema = Yup.object().shape({
@@ -56,9 +57,10 @@ const CrearCvScreen = () => {
         !value || ["image/jpeg", "image/jpg", "image/png", "application/pdf"].includes(value?.type)
       )
       .required("La imagen o archivo es obligatorio"),
-    rubro: Yup.string().required("El rubro es obligatorio"), // Solo Rubro es obligatorio
+    rubro: Yup.string().required("El rubro es obligatorio"),
     puesto: Yup.string().required("El puesto es obligatorio"),
-    subrubro: Yup.string(), // No requerido
+    subrubro: Yup.string(),
+    lista: Yup.string().required("Debe seleccionar una lista"), // Validamos que la lista sea seleccionada
   });
 
   const handleChange = async (e) => {
@@ -110,25 +112,9 @@ const CrearCvScreen = () => {
     setErrors((prevErrors) => ({ ...prevErrors, imagen: "" }))
   }
 
-  const handleCheckboxChange = (language) => {
-    setFormData((prevData) => {
-      const updatedIdiomas = prevData.idiomas.includes(language)
-        ? prevData.idiomas.filter((idioma) => idioma !== language)
-        : [...prevData.idiomas, language]
-      return { ...prevData, idiomas: updatedIdiomas }
-    })
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsSubmitting(true)
-  
-    // Validar que el subrubro esté seleccionado si el rubro es 'Gastronomía'
-    if (formData.rubro === "Gastronomía" && !formData.subrubro) {
-      alert("El subrubro es obligatorio para el rubro 'Gastronomía'.");
-      setIsSubmitting(false);
-      return;
-    }
   
     try {
       // Validación usando el esquema de Yup
@@ -185,6 +171,7 @@ const CrearCvScreen = () => {
         idiomas: [],
         imagen: null,
         comentarios: "",
+        lista: "", // Reiniciar la lista seleccionada
       })
       setErrors({})
       fileInputRef.current.value = ""
@@ -228,7 +215,6 @@ const CrearCvScreen = () => {
           errors={errors}
           handleChange={handleChange}
           handleFileChange={handleFileChange}
-          handleCheckboxChange={handleCheckboxChange}
           handleSubmit={handleSubmit}
           fileInputRef={fileInputRef}
         />

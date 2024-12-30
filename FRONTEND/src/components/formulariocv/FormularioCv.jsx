@@ -3,6 +3,7 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import PaisSelect from "../paisselect/PaisSelect";
 import RubrosSelect from "../rubrosselect/RubrosSelect"
+import ListasSelect from "../listasselect/ListasSelect";
 import {useState, useEffect} from 'react';
 
 const FormularioCv = ({
@@ -26,6 +27,13 @@ const FormularioCv = ({
 
     return () => clearTimeout(timeout); // Limpia el timeout al desmontar el componente
   }, []);
+
+
+  const [selectedLista, setSelectedLista] = useState("");
+
+  useEffect(() => {
+    setFormData((prevData) => ({ ...prevData, lista: selectedLista }));
+  }, [selectedLista]);
   return (
     <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md w-full">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -193,11 +201,11 @@ const FormularioCv = ({
             handleChange={handleChange}
           />
         <PaisSelect formData={formData} setFormData={setFormData} isLoading={isLoading} />
-
         </div>
 
         {/* Columna 2 */}
         <div className="space-y-4">
+          <ListasSelect selectedLista={selectedLista} setSelectedLista={setSelectedLista} />
           <div>
             <label htmlFor="calificacion" className="block mb-2 text-sm font-medium text-gray-900">
               Calificación
