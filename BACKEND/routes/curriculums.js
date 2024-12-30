@@ -51,7 +51,7 @@ router.get('/:id', async (req, res) => {
 router.post('/', upload.single('imagen'), async (req, res) => {
   try {
     const file = req.file;
-    const { pais, provincia, calificacion, ...otrosDatos } = req.body;
+    const { pais, provincia, calificacion, lista, ...otrosDatos } = req.body;
 
     // Validación de lógica: Provincia requerida para Argentina
     if (pais === "Argentina" && (!provincia || provincia.trim() === "")) {
@@ -82,16 +82,38 @@ router.post('/', upload.single('imagen'), async (req, res) => {
       streamifier.createReadStream(file.buffer).pipe(uploadStream);
     });
 
-    // Sanitizar los datos
+    // Validar y sanitizar los datos
     const sanitizedData = sanitize({ ...otrosDatos, pais, provincia, calificacion });
 
-    // Crear y guardar el nuevo curriculum
+    // Validar que el ID de la lista sea válido
+    if (lista && !mongoose.Types.ObjectId.isValid(lista)) {
+      return res.status(400).json({ error: "El ID de la lista no es válido." });
+    }
+
+    // Crear el nuevo curriculum
     const newCurriculum = new Curriculum({
       ...sanitizedData,
       imagen: uploadedFile.secure_url,
     });
 
+    // Si se especifica una lista, asociar el curriculum a esa lista
+    if (lista) {
+      const listaExistente = await Lista.findById(lista);
+      if (!listaExistente) {
+        return res.status(404).json({ error: "La lista seleccionada no existe." });
+      }
+
+      // Agregar el ID del curriculum a la lista
+      listaExistente.curriculums.push(newCurriculum._id);
+      await listaExistente.save();
+
+      // Agregar el ID de la lista al curriculum
+      newCurriculum.listas.push(listaExistente._id);
+    }
+
+    // Guardar el curriculum con la información de las listas
     const savedCurriculum = await newCurriculum.save();
+
     res.status(201).json({ message: 'Curriculum creado exitosamente', curriculum: savedCurriculum });
   } catch (error) {
     console.error("Error al crear el currículum:", error);
