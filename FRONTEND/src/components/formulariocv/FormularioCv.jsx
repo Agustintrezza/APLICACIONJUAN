@@ -12,7 +12,6 @@ const FormularioCv = ({
   errors,
   handleChange,
   handleFileChange,
-  handleCheckboxChange,
   handleSubmit,
   fileInputRef, // Indicador para activar el Skeleton
   isEditMode= false
@@ -34,6 +33,15 @@ const FormularioCv = ({
   useEffect(() => {
     setFormData((prevData) => ({ ...prevData, lista: selectedLista }));
   }, [selectedLista]);
+
+  const handleCheckboxChange = (language) => {
+    setFormData((prevData) => {
+      const updatedIdiomas = prevData.idiomas.includes(language)
+        ? prevData.idiomas.filter((idioma) => idioma !== language) // Elimina si ya está seleccionado
+        : [...prevData.idiomas, language] // Agrega si no está seleccionado
+      return { ...prevData, idiomas: updatedIdiomas }
+    })
+  }
   return (
     <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md w-full">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

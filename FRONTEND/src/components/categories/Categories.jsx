@@ -262,6 +262,7 @@ const Categories = ({ filters, setFilters }) => {
               <option value="Inglés">Inglés</option>
               <option value="Francés">Francés</option>
               <option value="Portugués">Portugués</option>
+              <option value="Italiano">Italiano</option>
             </select>
           </div>
         </div>

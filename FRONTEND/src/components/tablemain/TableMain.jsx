@@ -88,7 +88,7 @@ const TableMain = () => {
         (filters.pais === '' || user.pais === filters.pais) &&
         (filters.provincia === '' || user.provincia === filters.provincia) &&
         (filters.localidad === '' || user.localidad === filters.localidad) &&
-        (filters.idioma === '' || user.idiomas.includes(filters.idioma)) &&
+        filters.idioma === '' || user.idiomas.some((idioma) => idioma.toLowerCase() === filters.idioma.toLowerCase()) &&
         (filters.calificacion === '' || user.calificacion === filters.calificacion) &&
         (filters.nivelEducacion === '' || user.nivelEstudios === filters.nivelEducacion) &&
         (filters.experienciaAnios === '' || user.experiencia === filters.experienciaAnios) &&
