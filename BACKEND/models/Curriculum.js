@@ -2,11 +2,11 @@ const mongoose = require('mongoose');
 
 const CurriculumSchema = new mongoose.Schema({
   nombre: { type: String, required: true, minlength: 3 },
-  apellido: { type: String, required: true, minlength: 2 },
+  apellido: { type: String, required: true, minlength: 2, index: true }, // Índice para búsquedas rápidas
   genero: { type: String, enum: ['Masculino', 'Femenino', ''], default: '' },
   edad: { type: Number, min: 18 },
   telefonoFijo: { type: String, default: '' },
-  celular: { type: String, required: true },
+  celular: { type: String, required: true, unique: true }, // Campo único para evitar duplicados
   email: { type: String, default: '' },
   pais: { type: String, default: 'Argentina', required: true },
   provincia: {
@@ -46,5 +46,8 @@ const CurriculumSchema = new mongoose.Schema({
   },
   puesto: { type: String, required: true },
 }, { timestamps: true, versionKey: false });
+
+// Crear un índice compuesto para nombre y apellido (combinado, no único)
+CurriculumSchema.index({ nombre: 1, apellido: 1 });
 
 module.exports = mongoose.model("Curriculum", CurriculumSchema);

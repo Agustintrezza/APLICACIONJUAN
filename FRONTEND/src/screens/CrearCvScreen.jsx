@@ -1,9 +1,9 @@
-import { useState, useRef } from "react"
-import { useNavigate } from "react-router-dom" 
-import * as Yup from "yup"
-import FormularioCv from "../components/formulariocv/FormularioCv"
-import { API_URL } from "../config"
-import { Spinner, useToast } from "@chakra-ui/react"
+import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import * as Yup from "yup";
+import FormularioCv from "../components/formulariocv/FormularioCv";
+import { API_URL } from "../config";
+import { Spinner, useToast } from "@chakra-ui/react";
 
 const CrearCvScreen = () => {
   const [formData, setFormData] = useState({
@@ -25,19 +25,57 @@ const CrearCvScreen = () => {
     idiomas: [],
     imagen: null,
     comentarios: "",
-    lista: "", // Agregamos el campo para la lista seleccionada
-  })
+    lista: "",
+  });
 
-  const [errors, setErrors] = useState({})
-  const [isSubmitting, setIsSubmitting] = useState(false) // Spinner control
-  const fileInputRef = useRef(null)
-  const toast = useToast()
-  const navigate = useNavigate()
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const fileInputRef = useRef(null);
+  const toast = useToast();
+  const navigate = useNavigate();
 
-  // Esquema de validación
+  // Validación de duplicados en el backend
+  const validateDuplicate = async (field, value) => {
+    try {
+      const response = await fetch(`${API_URL}/api/curriculums/validate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ [field]: value }),
+      });
+
+      if (!response.ok) {
+        const result = await response.json();
+        if (result.error === "Duplicado") {
+          return `${field === "apellido" ? "Apellido" : "Celular"} ya está registrado.`;
+        }
+      }
+      return true;
+    } catch (error) {
+      console.error("Error al validar duplicados:", error); // Log del error
+      return "Error al validar duplicados.";
+    }
+  };
+
+  // Esquema de validación con Yup
   const validationSchema = Yup.object().shape({
     nombre: Yup.string().min(3, "Debe tener al menos 3 caracteres").required("El nombre es obligatorio"),
-    apellido: Yup.string().min(2, "Debe tener al menos 2 caracteres").required("El apellido es obligatorio"),
+    apellido: Yup.string()
+      .min(2, "Debe tener al menos 2 caracteres")
+      .required("El apellido es obligatorio")
+      .test("check-duplicate", "Apellido ya está registrado.", async (value) => {
+        const result = await validateDuplicate("apellido", value);
+        return result === true;
+      }),
+    celular: Yup.string()
+      .required("El teléfono celular es obligatorio")
+      .test("check-duplicate", "Celular ya está registrado.", async (value) => {
+        const result = await validateDuplicate("celular", value);
+        return result === true;
+      }),
+      email: Yup.string()
+      .email("Debe ser un email válido")
+      .nullable(true) // Permitir que el campo exista aunque esté vacío
+      .notRequired(), // No es obligatorio si así lo prefieres
     genero: Yup.string().oneOf(["Masculino", "Femenino", ""], "Opción inválida"),
     edad: Yup.number()
       .transform((value, originalValue) => (originalValue.trim() === "" ? null : value))
@@ -45,7 +83,6 @@ const CrearCvScreen = () => {
       .typeError("Debe ingresar un número válido")
       .min(18, "Debe ser mayor o igual a 18 años")
       .max(100, "Debe ser menor o igual a 100 años"),
-    celular: Yup.string().required("El teléfono celular es obligatorio"),
     pais: Yup.string()
       .required("El país es obligatorio")
       .oneOf(["Argentina", "Estados Unidos", "Chile", "Uruguay", "Brasil"], "Seleccione un país válido"),
@@ -60,98 +97,72 @@ const CrearCvScreen = () => {
     rubro: Yup.string().required("El rubro es obligatorio"),
     puesto: Yup.string().required("El puesto es obligatorio"),
     subrubro: Yup.string(),
-    lista: Yup.string().required("Debe seleccionar una lista"), // Validamos que la lista sea seleccionada
+    lista: Yup.string().required("Debe seleccionar una lista"),
   });
 
   const handleChange = async (e) => {
-    const { name, value } = e.target
-    setFormData((prevData) => {
-      const newData = { ...prevData, [name]: value }
-      return newData
-    })
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value || "", // Asegurarte de que el valor nunca sea undefined
+    }));
   
     try {
-      await validationSchema.validateAt(name, { ...formData, [name]: value })
-      setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }))
+      await validationSchema.validateAt(name, { ...formData, [name]: value });
+      setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
     } catch (error) {
-      setErrors((prevErrors) => ({ ...prevErrors, [name]: error.message }))
+      setErrors((prevErrors) => ({ ...prevErrors, [name]: error.message }));
     }
-  }
+  };
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0]
-
+    const file = e.target.files[0];
     if (!file) {
-      setFormData((prevData) => ({ ...prevData, imagen: null }))
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        imagen: "La imagen o archivo es obligatorio.",
-      }))
-      return
+      setErrors((prevErrors) => ({ ...prevErrors, imagen: "La imagen o archivo es obligatorio." }));
+      return;
     }
 
-    const maxFileSize = 5 * 1024 * 1024 // 5 MB
-    if (file.size > maxFileSize) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        imagen: "El archivo es demasiado grande. Máximo 5 MB.",
-      }))
-      return
-    }
-
-    const allowedFormats = ["image/jpeg", "image/jpg", "image/png", "application/pdf"]
+    const allowedFormats = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
     if (!allowedFormats.includes(file.type)) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        imagen: "Formato de archivo no permitido. Solo JPG, JPEG, PNG y PDF.",
-      }))
-      return
+      setErrors((prevErrors) => ({ ...prevErrors, imagen: "Formato de archivo no permitido." }));
+      return;
     }
 
-    setFormData((prevData) => ({ ...prevData, imagen: file }))
-    setErrors((prevErrors) => ({ ...prevErrors, imagen: "" }))
-  }
+    setFormData((prevData) => ({ ...prevData, imagen: file }));
+    setErrors((prevErrors) => ({ ...prevErrors, imagen: "" }));
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-  
+    e.preventDefault();
+    setIsSubmitting(true);
+
     try {
-      // Validación usando el esquema de Yup
-      await validationSchema.validate(formData, { abortEarly: false })
-  
-      // Preparar los datos para el envío (incluyendo archivos)
-      const formDataToSend = new FormData()
+      await validationSchema.validate(formData, { abortEarly: false });
+
+      const formDataToSend = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
-        if (key === "imagen" && value instanceof File) {
-          formDataToSend.append("imagen", value)
-        } else {
-          formDataToSend.append(key, value || "")
-        }
-      })
-  
-      // Enviar el formulario a la API
+        formDataToSend.append(key, value || "");
+      });
+
       const response = await fetch(`${API_URL}/api/curriculums`, {
         method: "POST",
         body: formDataToSend,
-      })
-  
+      });
+
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || "Error desconocido")
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Error desconocido");
       }
-  
-      // Mensaje de éxito
+
       toast({
         title: "Éxito",
-        description: "Se creó el CV exitosamente.",
+        description: "CV creado exitosamente.",
         status: "success",
         duration: 5000,
         position: "top-right",
         isClosable: true,
-      })
-  
-      // Restablecer los campos del formulario después del envío
+      });
+
       setFormData({
         nombre: "",
         apellido: "",
@@ -171,34 +182,31 @@ const CrearCvScreen = () => {
         idiomas: [],
         imagen: null,
         comentarios: "",
-        lista: "", // Reiniciar la lista seleccionada
-      })
-      setErrors({})
-      fileInputRef.current.value = ""
-      navigate("/") 
+        lista: "",
+      });
+      fileInputRef.current.value = "";
+      navigate("/");
     } catch (error) {
-      // Manejo de errores de validación
       if (error.name === "ValidationError") {
-        const validationErrors = {}
+        const validationErrors = {};
         error.inner.forEach((err) => {
-          validationErrors[err.path] = err.message
-        })
-        setErrors(validationErrors)
+          validationErrors[err.path] = err.message;
+        });
+        setErrors(validationErrors);
       } else {
-        // Error general
         toast({
           title: "Error",
-          description: "Hubo un problema al crear el CV. Inténtelo nuevamente.",
+          description: "Error al crear el CV.",
           status: "error",
           duration: 5000,
+          position: "top-right",
           isClosable: true,
-        })
+        });
       }
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
-  
+  };
 
   return (
     <div>
@@ -220,7 +228,7 @@ const CrearCvScreen = () => {
         />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default CrearCvScreen
+export default CrearCvScreen;
