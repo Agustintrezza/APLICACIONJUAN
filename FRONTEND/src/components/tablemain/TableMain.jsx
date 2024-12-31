@@ -21,6 +21,7 @@ const TableMain = () => {
     calificacion: '',
     nivelEducacion: '',
     experienciaAnios: '',
+    lista: '', // Agregado filtro de listas
   })
   const [cvData, setCvData] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -68,6 +69,7 @@ const TableMain = () => {
       calificacion: '',
       nivelEducacion: '',
       experienciaAnios: '',
+      lista: '', // Reiniciar filtro de listas
     })
   }
 
@@ -86,10 +88,11 @@ const TableMain = () => {
         (filters.pais === '' || user.pais === filters.pais) &&
         (filters.provincia === '' || user.provincia === filters.provincia) &&
         (filters.localidad === '' || user.localidad === filters.localidad) &&
-        (filters.idioma === '' || user.idiomas.includes(filters.idioma)) &&
+        filters.idioma === '' || user.idiomas.some((idioma) => idioma.toLowerCase() === filters.idioma.toLowerCase()) &&
         (filters.calificacion === '' || user.calificacion === filters.calificacion) &&
         (filters.nivelEducacion === '' || user.nivelEstudios === filters.nivelEducacion) &&
-        (filters.experienciaAnios === '' || user.experiencia === filters.experienciaAnios)
+        (filters.experienciaAnios === '' || user.experiencia === filters.experienciaAnios) &&
+        (filters.lista === '' || user.listas.some((lista) => lista._id === filters.lista)) // Filtro por listas
       )
     })
 

@@ -1,16 +1,83 @@
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
+import { useEffect, useState } from 'react'
+import { API_URL } from '../../config'
+
+const ZONAS_LOCALIDADES = {
+  "Zona Norte": [
+    "San Isidro", "Vicente López", "San Martín", "San Fernando", "Tigre",
+    "Escobar", "Pilar", "José C. Paz", "Malvinas Argentinas", "San Miguel",
+  ],
+  "Zona Sur": [
+    "Almirante Brown", "Avellaneda", "Berazategui", "Esteban Echeverría",
+    "Ezeiza", "Florencio Varela", "Lanús", "Lomas de Zamora", "Quilmes", "San Vicente",
+  ],
+  "Zona Oeste": [
+    "La Matanza", "Tres de Febrero", "Hurlingham", "Morón", "Ituzaingó",
+    "Merlo", "Moreno", "General Rodríguez", "Marcos Paz",
+  ],
+  CABA: [
+    "Agronomía", "Almagro", "Balvanera", "Barracas", "Belgrano", "Boedo",
+    "Caballito", "Chacarita", "Coghlan", "Colegiales", "Constitución",
+    "Flores", "Floresta", "La Boca", "La Paternal", "Liniers", "Mataderos",
+    "Monte Castro", "Monserrat", "Nueva Pompeya", "Núñez", "Palermo",
+    "Parque Avellaneda", "Parque Chacabuco", "Parque Chas", "Parque Patricios",
+    "Puerto Madero", "Recoleta", "Retiro", "Saavedra", "San Cristóbal",
+    "San Nicolás", "San Telmo", "Vélez Sársfield", "Versalles", "Villa Crespo",
+    "Villa del Parque", "Villa Devoto", "Villa General Mitre", "Villa Lugano",
+    "Villa Luro", "Villa Ortúzar", "Villa Pueyrredón", "Villa Real",
+    "Villa Riachuelo", "Villa Santa Rita", "Villa Soldati", "Villa Urquiza",
+  ],
+}
+
+const PROVINCIAS_ARGENTINA = [
+  "Buenos Aires", "Catamarca", "Chaco", "Chubut", "Córdoba",
+  "Corrientes", "Entre Ríos", "Formosa", "Jujuy", "La Pampa",
+  "La Rioja", "Mendoza", "Misiones", "Neuquén", "Río Negro",
+  "Salta", "San Juan", "San Luis", "Santa Cruz", "Santa Fe",
+  "Santiago del Estero", "Tierra del Fuego", "Tucumán", "CABA",
+]
 
 const Categories = ({ filters, setFilters }) => {
+  const [listas, setListas] = useState([])
+
+  useEffect(() => {
+    const fetchListas = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/listas`)
+        if (!response.ok) throw new Error('Error al obtener listas')
+        const data = await response.json()
+        setListas(data)
+      } catch (error) {
+        console.error('Error al obtener listas:', error)
+      }
+    }
+
+    fetchListas()
+  }, [])
+
   const handleFilterChange = (e, filterType) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [filterType]: e.target.value,
-    }));
-  };
+    const value = e.target.value
+    setFilters((prevFilters) => {
+      const newFilters = { ...prevFilters, [filterType]: value }
+
+      // Reiniciar valores dependientes
+      if (filterType === 'pais') {
+        newFilters.provincia = ''
+        newFilters.localidad = ''
+      } else if (filterType === 'provincia') {
+        newFilters.localidad = ''
+      }
+
+      return newFilters
+    })
+  }
 
   return (
-    <div className="w-2/5" style={{ position: 'sticky', top: '-16px', maxHeight: '100vh', overflowY: 'auto' }}>
-      <div 
+    <div
+      className="w-2/5"
+      style={{ position: 'sticky', top: '-16px', maxHeight: '100vh', overflowY: 'auto' }}
+    >
+      <div
         className="border border-blue-300 bg-[#e9f0ff] rounded-lg p-4 shadow-lg"
         style={{
           boxShadow: '4px 4px 8px rgba(0, 0, 0, 0.1)',
@@ -18,6 +85,86 @@ const Categories = ({ filters, setFilters }) => {
       >
         <h3 className="text-lg font-semibold mb-4 text-[#293e68]">Buscar Curriculums</h3>
         <div className="space-y-2">
+          {/* Listas */}
+          <div>
+            <label htmlFor="listas" className="text-md text-[#293e68] mb-1">
+              Lista
+            </label>
+            <select
+              id="listas"
+              value={filters.lista}
+              onChange={(e) => handleFilterChange(e, 'lista')}
+              className="form-select rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
+            >
+              <option value="">Seleccionar</option>
+              {listas.map((lista) => (
+                <option key={lista._id} value={lista._id}>
+                  {lista.cliente}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* País */}
+          <div className="space-y-2">
+          {/* País */}
+          <div>
+            <label htmlFor="pais" className="text-md text-[#293e68] mb-1">País</label>
+            <select
+              id="pais"
+              value={filters.pais}
+              onChange={(e) => handleFilterChange(e, "pais")}
+              className="form-select rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
+            >
+              <option value="">Seleccionar</option>
+              <option value="Argentina">Argentina</option>
+              <option value="Estados Unidos">Estados Unidos</option>
+              <option value="Chile">Chile</option>
+              <option value="Brasil">Brasil</option>
+              <option value="Perú">Perú</option>
+            </select>
+          </div>
+
+          {/* Provincia */}
+          {filters.pais === "Argentina" && (
+            <div>
+              <label htmlFor="provincia" className="text-md text-[#293e68] mb-1">Provincia</label>
+              <select
+                id="provincia"
+                value={filters.provincia}
+                onChange={(e) => handleFilterChange(e, "provincia")}
+                className="form-select rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
+              >
+                <option value="">Seleccionar</option>
+                {PROVINCIAS_ARGENTINA.map(provincia => (
+                  <option key={provincia} value={provincia}>{provincia}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Localidad */}
+          {filters.pais === "Argentina" && filters.provincia === "Buenos Aires" && (
+            <div>
+              <label htmlFor="localidad" className="text-md text-[#293e68] mb-1">Localidad</label>
+              <select
+                id="localidad"
+                value={filters.localidad}
+                onChange={(e) => handleFilterChange(e, "localidad")}
+                className="form-select rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
+              >
+                <option value="">Seleccionar</option>
+                {Object.entries(ZONAS_LOCALIDADES).flatMap(([zona, localidades]) =>
+                  localidades.map(localidad => (
+                    <option key={localidad} value={localidad}>{`${zona} - ${localidad}`}</option>
+                  ))
+                )}
+              </select>
+            </div>
+          )}
+        </div>
+
+
           {/* Calificación */}
           <div>
             <label htmlFor="calificacion" className="text-md text-[#293e68] mb-1">Calificación</label>
@@ -99,54 +246,9 @@ const Categories = ({ filters, setFilters }) => {
               <option value="40">Más de 40</option>
               <option value="50">Más de 50</option>
             </select>
-          </div>
+          </div>      
 
-          {/* País */}
-          <div>
-            <label htmlFor="pais" className="text-md text-[#293e68] mb-1">País</label>
-            <select
-              id="pais"
-              value={filters.pais}
-              onChange={(e) => handleFilterChange(e, "pais")}
-              className="form-select rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
-            >
-              <option value="">Seleccionar</option>
-              <option value="Argentina">Argentina</option>
-              <option value="Chile">Chile</option>
-              <option value="Brasil">Brasil</option>
-              <option value="Perú">Perú</option>
-            </select>
-          </div>
-
-          {/* Provincia */}
-          <div>
-            <label htmlFor="provincia" className="text-md text-[#293e68] mb-1">Provincia</label>
-            <select
-              id="provincia"
-              value={filters.provincia}
-              onChange={(e) => handleFilterChange(e, "provincia")}
-              className="form-select rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
-            >
-              <option value="">Seleccionar</option>
-              <option value="Buenos Aires">Buenos Aires</option>
-              <option value="Córdoba">Córdoba</option>
-              <option value="Santa Fe">Santa Fe</option>
-            </select>
-          </div>
-
-          {/* Localidad */}
-          <div>
-            <label htmlFor="localidad" className="text-md text-[#293e68] mb-1">Localidad</label>
-            <input
-              id="localidad"
-              value={filters.localidad}
-              onChange={(e) => handleFilterChange(e, "localidad")}
-              className="form-input rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
-              placeholder="Ingrese localidad"
-            />
-          </div>
-
-          {/* Idioma */}
+          {/* Idiomas */}
           <div>
             <label htmlFor="idioma" className="text-md text-[#293e68] mb-1">Idioma</label>
             <select
@@ -159,17 +261,19 @@ const Categories = ({ filters, setFilters }) => {
               <option value="Español">Español</option>
               <option value="Inglés">Inglés</option>
               <option value="Francés">Francés</option>
+              <option value="Portugués">Portugués</option>
+              <option value="Italiano">Italiano</option>
             </select>
           </div>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
 Categories.propTypes = {
   filters: PropTypes.object.isRequired,
   setFilters: PropTypes.func.isRequired,
-};
+}
 
-export default Categories;
+export default Categories

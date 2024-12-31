@@ -77,7 +77,12 @@ router.get('/:id', async (req, res) => {
 router.post('/', upload.single('imagen'), async (req, res) => {
   try {
     const file = req.file
-    const { apellido, celular, pais, provincia, calificacion, lista, ...otrosDatos } = req.body
+    const { idiomas, apellido, celular, pais, provincia, calificacion, lista, ...otrosDatos } = req.body
+
+    // Validación de idiomas: Asegúrate de que sean un array
+    const parsedIdiomas = Array.isArray(idiomas)
+      ? idiomas
+      : idiomas.split(',').map((idioma) => idioma.trim())
 
     // Validación: Duplicados por apellido o celular
     const existingCv = await Curriculum.findOne({
@@ -125,14 +130,10 @@ router.post('/', upload.single('imagen'), async (req, res) => {
     // Validar y sanitizar los datos
     const sanitizedData = sanitize({ apellido, celular, ...otrosDatos, pais, provincia, calificacion })
 
-    // Validar que el ID de la lista sea válido si está presente
-    if (lista && !mongoose.Types.ObjectId.isValid(lista)) {
-      return res.status(400).json({ error: 'El ID de la lista no es válido.' })
-    }
-
     // Crear el nuevo curriculum
     const newCurriculum = new Curriculum({
       ...sanitizedData,
+      idiomas: parsedIdiomas, // Asegurarse de que idiomas sea un array
       imagen: uploadedFile.secure_url,
     })
 
@@ -143,11 +144,8 @@ router.post('/', upload.single('imagen'), async (req, res) => {
         return res.status(404).json({ error: 'La lista seleccionada no existe.' })
       }
 
-      // Agregar el ID del curriculum a la lista
       listaExistente.curriculums.push(newCurriculum._id)
       await listaExistente.save()
-
-      // Agregar el ID de la lista al curriculum
       newCurriculum.listas.push(listaExistente._id)
     }
 
@@ -160,6 +158,7 @@ router.post('/', upload.single('imagen'), async (req, res) => {
     res.status(500).json({ error: 'Ocurrió un error al procesar la solicitud.' })
   }
 })
+
 
 // Actualizar un curriculum
 router.put('/:id', upload.single('imagen'), async (req, res) => {
