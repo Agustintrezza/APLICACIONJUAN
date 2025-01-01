@@ -4,8 +4,8 @@ import { Skeleton } from "@chakra-ui/react"
 const Listas = ({ listas, isLoading, onSelectLista }) => {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 gap-4">
-        {Array.from({ length: 4 }).map((_, index) => (
+      <div className="grid grid-cols-3 gap-4"> {/* Cambiado a 3 columnas */}
+        {Array.from({ length: 6 }).map((_, index) => (
           <div key={index} className="p-4 border border-gray-300 rounded-lg shadow-lg">
             <Skeleton height="20px" width="70%" className="mb-4" />
             <Skeleton height="14px" width="90%" className="mb-2" />
@@ -22,8 +22,7 @@ const Listas = ({ listas, isLoading, onSelectLista }) => {
 
   return (
     <div className="border border-gray-300 bg-white rounded-lg p-4 shadow-lg">
-      <h3 className="text-lg font-bold text-[#293e68] mb-4">Listas</h3>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-4"> {/* Cambiado a 3 columnas */}
         {listas.map((lista) => (
           <div
             key={lista._id}
@@ -32,7 +31,7 @@ const Listas = ({ listas, isLoading, onSelectLista }) => {
           >
             {/* Título de la lista */}
             <div className="flex items-center space-x-2 mb-4">
-              <h4 className="text-md font-semibold text-[#293e68]">{lista.cliente}</h4>
+              <h4 className="text-lg font-semibold text-[#293e68]">{lista.cliente}</h4>
               <div
                 style={{
                   width: "14px",
@@ -46,17 +45,19 @@ const Listas = ({ listas, isLoading, onSelectLista }) => {
             {/* Detalles de la lista */}
             <div className="text-sm text-gray-600 mb-2">
               <p>
-                <strong>Posición:</strong> {lista.posicion || "Sin posición"}
+                <strong>Rubro:</strong> {lista.rubro || "Sin rubro"}
               </p>
+              <p>
+                <strong>Puesto:</strong> {lista.puesto || "Sin puesto"}
+              </p>
+              {lista.rubro === "Gastronomía" && (
+                <p>
+                  <strong>Subrubro:</strong> {lista.subrubro || "Sin subrubro"}
+                </p>
+              )}
               <p>
                 <strong>Fecha de creación:</strong>{" "}
                 {new Date(lista.fechaDeCreacion).toLocaleDateString()}
-              </p>
-              <p>
-                <strong>Fecha límite:</strong>{" "}
-                {lista.fechaLimite
-                  ? new Date(lista.fechaLimite).toLocaleDateString()
-                  : "Sin fecha límite"}
               </p>
               <p>
                 <strong>Postulantes:</strong> {lista.curriculums.length}
@@ -80,6 +81,9 @@ Listas.propTypes = {
       posicion: PropTypes.string,
       comentario: PropTypes.string,
       color: PropTypes.string,
+      rubro: PropTypes.string,
+      puesto: PropTypes.string,
+      subrubro: PropTypes.string,
       fechaDeCreacion: PropTypes.string.isRequired,
       fechaLimite: PropTypes.string,
       curriculums: PropTypes.arrayOf(

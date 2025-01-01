@@ -210,7 +210,7 @@ const CrearCvScreen = () => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-800 mt-1">Ingresar CV</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mt-1">Ingresar Curriculum</h2>
       {isSubmitting && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-25 z-50">
           <Spinner size="xl" color="blue.500" />
