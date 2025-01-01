@@ -274,5 +274,25 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({ error: 'Error al eliminar el currículum.' })
   }
 })
+router.put('/:id/no-llamar', async (req, res) => {
+  try {
+    const { id } = req.params
+    const { noLlamar } = req.body
 
+    const updatedCv = await Curriculum.findByIdAndUpdate(
+      id,
+      { noLlamar },
+      { new: true }
+    )
+
+    if (!updatedCv) {
+      return res.status(404).json({ error: 'Curriculum no encontrado' })
+    }
+
+    res.status(200).json(updatedCv)
+  } catch (error) {
+    console.error('Error al actualizar el estado de No Llamar:', error)
+    res.status(500).json({ error: 'Error al actualizar el estado de No Llamar' })
+  }
+})
 module.exports = router
