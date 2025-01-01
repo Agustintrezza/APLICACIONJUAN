@@ -167,6 +167,7 @@ const TableMain = () => {
                           {user.nombre} {user.apellido}
                         </h3>
                         <p className="text-lg font-bold text-[#293e68]">{user.edad}</p>
+                        {/* Mostrar etiqueta de "No Llamar" si está marcado */}
                         <ul className="text-sm text-gray-800 list-inside list-disc">
                           {user.listas?.length > 0 ? (
                             user.listas.map((lista) => (
@@ -182,6 +183,11 @@ const TableMain = () => {
                             <li>No asociado a ningún proyecto</li>
                           )}
                         </ul>
+                        {user.noLlamar && (
+                          <span className="inline-block bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full mt-2">
+                            No Llamar
+                          </span>
+                        )}
                       </div>
                     </Link>
                     <button
@@ -200,6 +206,7 @@ const TableMain = () => {
                 </div>
               )}
             </div>
+            
           )}
         </div>
 

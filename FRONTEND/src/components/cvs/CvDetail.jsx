@@ -20,6 +20,8 @@
   const CvDetail = ({ cv }) => {
     const [isDataLoading, setIsDataLoading] = useState(true)
     const [isDeleting, setIsDeleting] = useState(false)
+    const [isUpdatingNoLlamar, setIsUpdatingNoLlamar] = useState(false)
+    const [isNoLlamarDialogOpen, setIsNoLlamarDialogOpen] = useState(false)
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const cancelRef = useRef()
     const navigate = useNavigate()
@@ -32,6 +34,45 @@
 
       return () => clearTimeout(timer)
     }, [cv])
+
+    const toggleNoLlamar = async () => {
+      setIsUpdatingNoLlamar(true)
+      try {
+        const response = await fetch(`/api/curriculums/${cv._id}/no-llamar`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ noLlamar: !cv.noLlamar }),
+        })
+  
+        if (!response.ok) {
+          throw new Error('Error al actualizar el estado de No Llamar')
+        }
+  
+        const updatedCv = await response.json()
+        toast({
+          title: 'Éxito',
+          description: `El CV ahora está marcado como ${updatedCv.noLlamar ? 'No Llamar' : 'Disponible para llamar'}.`,
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+          position: 'top-right',
+        })
+  
+        navigate(0) // Recargar la página para reflejar cambios
+      } catch {
+        toast({
+          title: 'Error',
+          description: 'Hubo un problema al actualizar el estado de No Llamar.',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+          position: 'top-right',
+        })
+      } finally {
+        setIsUpdatingNoLlamar(false)
+        setIsNoLlamarDialogOpen(false)
+      }
+    }
 
     const getValueOrDefault = (value) =>
       value !== undefined && value !== null && value !== "" ? value : "-"
@@ -125,6 +166,7 @@
                 <Skeleton width={100} height={40} />
                 <Skeleton width={100} height={40} /> {/* Esqueleto para el botón Volver */}
                 <Skeleton width={100} height={40} /> {/* Esqueleto para el botón Whatsapp */}
+                <Skeleton width={100} height={40} /> {/* Esqueleto para el botón Whatsapp */}
               </>
             ) : (
               <>
@@ -157,10 +199,42 @@
                   <FaShareAlt />
                   WhatsApp
                 </button>
+                <button
+                  className="px-4 py-2 bg-red-500 text-white text-sm rounded-lg shadow hover:bg-red-600 flex items-center gap-2"
+                  onClick={() => setIsNoLlamarDialogOpen(true)}
+                >
+                  {cv.noLlamar ? 'Quitar No Llamar' : 'Marcar No Llamar'}
+                </button>
               </>
             )}
           </div>
         </div>
+
+        {/* Diálogo de confirmación para No Llamar */}
+      <AlertDialog
+        isOpen={isNoLlamarDialogOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={() => setIsNoLlamarDialogOpen(false)}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              {cv.noLlamar ? 'Quitar No Llamar' : 'Marcar No Llamar'}
+            </AlertDialogHeader>
+            <AlertDialogBody>
+              ¿Estás seguro que deseas {cv.noLlamar ? 'quitar' : 'marcar'} este CV como {cv.noLlamar ? '`No' : '`No'} Llamar´?
+            </AlertDialogBody>
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={() => setIsNoLlamarDialogOpen(false)}>
+                Cancelar
+              </Button>
+              <Button colorScheme="red" onClick={toggleNoLlamar} ml={3} isLoading={isUpdatingNoLlamar}>
+                Confirmar
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
 
         {/* Información de listas asignadas */}
         <div className="mb-6">
