@@ -108,13 +108,13 @@ const TableMain = () => {
               to="/crear-cv"
               className="flex items-center bg-[#293e68] text-white px-4 py-2 rounded-lg hover:bg-blue-800 shadow-lg"
             >
-              <FaPlus className="mr-2" /> Ingresar CV
+              <FaPlus className="mr-2" /> Ingresar Curriculum
             </Link>
           ) : (
             <Link
               to="/crear-cv"
               className="fixed bottom-6 right-6 bg-[#293e68] text-white p-4 rounded-full shadow-lg hover:bg-blue-800 z-50"
-              title="Ingresar CV"
+              title="Ingresar Curriculum"
             >
               <FaPlus />
             </Link>

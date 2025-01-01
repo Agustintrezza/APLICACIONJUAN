@@ -53,7 +53,7 @@ const SidebarResponsive = ({ isAuthenticated, logout, user }) => {
 
         <nav className="space-y-4">
           <SidebarLink to="/" icon={<FaHome />} label="Curriculums" currentPath={location.pathname} onClick={handleLinkClick} />
-          <SidebarLink to="/crear-cv" icon={<FaPlus />} label="Ingresar CV" currentPath={location.pathname} onClick={handleLinkClick} />
+          <SidebarLink to="/crear-cv" icon={<FaPlus />} label="Ingresar Curriculm" currentPath={location.pathname} onClick={handleLinkClick} />
           <SidebarLink to="/perfil" icon={<FaUser />} label="Mi Perfil" currentPath={location.pathname} onClick={handleLinkClick} />
           <SidebarLink to="/comunicaciones" icon={<FaEnvelope />} label="Comunicaciones" currentPath={location.pathname} onClick={handleLinkClick} />
           <SidebarLink to="/favoritos" icon={<FaHeart />} label="Favoritos" currentPath={location.pathname} onClick={handleLinkClick} />

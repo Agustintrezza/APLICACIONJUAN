@@ -35,16 +35,16 @@ const Sidebar = () => {
             alt="User avatar"
             className="rounded-full h-12 w-12 border border-gray-500"
           />
-          <span className="text-sm text-grey-200">{user.email}</span>
+          <span className="text-sm text-grey-200 font-semibold">{user.email}</span>
         </div>
       )}
 
       <nav className="space-y-6 w-full mt-4">
-        <SidebarLink to="/listas" icon={<FaPlus />} label="Crear Proyecto" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} />
-        <SidebarLink to="/" icon={<FaUser />} label="Curriculums/Postulantes" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} />
-        <SidebarLink to="/crear-cv" icon={<FaFileAlt />} label="Ingresar un CV" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} />
-        <SidebarLink to="/favoritos" icon={<FaHeart />} label="Favoritos" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} showCount={2} />
-        <SidebarLink to="/perfil" icon={<FaUser />} label="Perfil" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} />
+        <SidebarLink to="/listas" icon={<FaPlus />} label="Listas" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} className="font-medium" />
+        <SidebarLink to="/" icon={<FaUser />} label="Curriculums" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} className="font-medium" />
+        <SidebarLink to="/crear-cv" icon={<FaFileAlt />} label="Ingresar Curriculum" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} className="font-medium" />
+        <SidebarLink to="/favoritos" icon={<FaHeart />} label="Favoritos" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} showCount={2} className="font-medium" />
+        <SidebarLink to="/perfil" icon={<FaUser />} label="Perfil" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} className="font-medium" />
       </nav>
 
       <button
@@ -52,7 +52,7 @@ const Sidebar = () => {
         className="mt-auto flex items-center space-x-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white w-full transition-all duration-150 justify-center"
       >
         <FaPowerOff className="text-2xl" />
-        {isSidebarExpanded && <span className="text-sm">Cerrar Sesión</span>}
+        {isSidebarExpanded && <span className="text-sm font-semibold">Cerrar Sesión</span>}
       </button>
     </div>
   )
@@ -66,7 +66,7 @@ const SidebarLink = ({ to, icon, label, isSidebarExpanded, currentPath, showCoun
     <Link
       to={to}
       className={`flex items-center space-x-3 px-4 py-2 w-full relative transition-all duration-150 ${
-        isActive ? 'bg-blue-100 text-[#293e68]' : 'hover:bg-blue-100 hover:text-[#293e68]'
+        isActive ? 'bg-blue-100 text-[#293e68] font-semibold' : 'hover:bg-blue-100 hover:text-[#293e68] font-semibold'
       }`}
     >
       <span className={`relative ${iconSize} transition-colors duration-150`} style={{ color: 'inherit' }}>

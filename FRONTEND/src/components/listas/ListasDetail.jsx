@@ -10,38 +10,39 @@ const ListaDetail = ({ lista, onBack }) => {
   const toast = useToast()
 
   const handleDelete = async () => {
-    setIsDeleting(true)
-    try {
-      const response = await fetch(`/api/listas/${lista._id}`, { method: "DELETE" })
+  setIsDeleting(true)
+  try {
+    const response = await fetch(`/api/listas/${lista._id}`, { method: "DELETE" })
 
-      if (!response.ok) {
-        throw new Error("Error al eliminar la lista")
-      }
-
-      toast({
-        title: "Éxito",
-        description: "La lista se eliminó correctamente.",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-        position: "top-right",
-      })
-
-      onBack() // Regresar a la página anterior
-    } catch {
-      toast({
-        title: "Error",
-        description: "Hubo un problema al eliminar la lista.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "top-right",
-      })
-    } finally {
-      setIsDeleting(false)
-      setIsDialogOpen(false)
+    if (!response.ok) {
+      throw new Error("Error al eliminar la lista")
     }
+
+    toast({
+      title: "Éxito",
+      description: "La lista se eliminó correctamente.",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+      position: "top-right",
+    })
+
+    // Notificar al componente padre que la lista ha sido eliminada
+    onBack() // Pasa el ID de la lista eliminada al componente padre
+  } catch {
+    toast({
+      title: "Error",
+      description: "Hubo un problema al eliminar la lista.",
+      status: "error",
+      duration: 5000,
+      isClosable: true,
+      position: "top-right",
+    })
+  } finally {
+    setIsDeleting(false)
+    setIsDialogOpen(false)
   }
+}
 
   return (
     <div className="border border-gray-300 bg-white rounded-lg p-4 shadow-lg">
@@ -54,6 +55,7 @@ const ListaDetail = ({ lista, onBack }) => {
             bg="#293e68"
             color="white"
             _hover={{ bg: "#1f2d4b" }}
+            fontSize={15}
           >
             Volver
           </Button>
@@ -63,6 +65,7 @@ const ListaDetail = ({ lista, onBack }) => {
             bg="red.500"
             color="white"
             _hover={{ bg: "red.600" }}
+            fontSize={15}
           >
             Eliminar Lista
           </Button>

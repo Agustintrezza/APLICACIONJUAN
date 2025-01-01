@@ -9,32 +9,30 @@ const ListasContainerScreen = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [selectedLista, setSelectedLista] = useState(null)
 
-  useEffect(() => {
-    const fetchListas = async () => {
-      try {
-        const response = await fetch(`${API_URL}/api/listas`)
-        if (!response.ok) throw new Error("Error al cargar las listas")
-        const data = await response.json()
-        setListas(data)
-      } catch (error) {
-        console.error("Error al cargar listas:", error)
-      } finally {
-        setIsLoading(false)
-      }
+  const fetchListas = async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch(`${API_URL}/api/listas`)
+      if (!response.ok) throw new Error("Error al cargar las listas")
+      const data = await response.json()
+      setListas(data)
+    } catch (error) {
+      console.error("Error al cargar listas:", error)
+    } finally {
+      setIsLoading(false)
     }
+  }
 
+  useEffect(() => {
     fetchListas()
   }, [])
 
-  const handleCreate = (newLista) => {
-    setListas((prev) => [...prev, newLista])
+  const handleCreate = async () => {
+    await fetchListas()
   }
 
-  const handleUpdate = (updatedLista) => {
-    setListas((prev) =>
-      prev.map((lista) => (lista._id === updatedLista._id ? updatedLista : lista))
-    )
-    setSelectedLista(updatedLista) // Mantener seleccionado
+  const handleUpdate = async () => {
+    await fetchListas()
   }
 
   const handleDelete = async (id) => {
@@ -43,8 +41,14 @@ const ListasContainerScreen = () => {
         method: "DELETE",
       })
       if (!response.ok) throw new Error("Error al eliminar la lista")
-      setListas((prev) => prev.filter((lista) => lista._id !== id))
-      setSelectedLista(null)
+      
+      // Actualizar la lista de elementos
+      await fetchListas()
+  
+      // Limpiar el formulario de edición
+      if (selectedLista && selectedLista._id === id) {
+        setSelectedLista(null)
+      }
     } catch (error) {
       console.error("Error al eliminar lista:", error)
     }
@@ -56,6 +60,7 @@ const ListasContainerScreen = () => {
 
   const handleBackToList = () => {
     setSelectedLista(null)
+    fetchListas()
   }
 
   return (
@@ -80,7 +85,7 @@ const ListasContainerScreen = () => {
         <div className="w-2/5">
           <FormularioListas
             onCreate={handleCreate}
-            listaToEdit={selectedLista || null} // Pasar null cuando no hay lista seleccionada
+            listaToEdit={selectedLista || null}
             onUpdate={handleUpdate}
           />
         </div>
