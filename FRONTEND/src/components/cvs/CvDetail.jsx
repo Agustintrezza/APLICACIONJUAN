@@ -407,7 +407,7 @@
   }
 
   CvDetail.propTypes = {
-    cv: PropTypes.object.isRequired,
+    cv: PropTypes.object,
   }
 
   export default CvDetail

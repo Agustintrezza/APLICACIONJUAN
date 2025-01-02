@@ -34,7 +34,6 @@ const CrearCvScreen = () => {
   const toast = useToast();
   const navigate = useNavigate();
 
-  // Validación de duplicados en el backend
   const validateDuplicate = async (field, value) => {
     try {
       const response = await fetch(`${API_URL}/api/curriculums/validate`, {
@@ -51,12 +50,11 @@ const CrearCvScreen = () => {
       }
       return true;
     } catch (error) {
-      console.error("Error al validar duplicados:", error); // Log del error
+      console.error("Error al validar duplicados:", error);
       return "Error al validar duplicados.";
     }
   };
 
-  // Esquema de validación con Yup
   const validationSchema = Yup.object().shape({
     nombre: Yup.string().min(3, "Debe tener al menos 3 caracteres").required("El nombre es obligatorio"),
     apellido: Yup.string()
@@ -72,10 +70,7 @@ const CrearCvScreen = () => {
         const result = await validateDuplicate("celular", value);
         return result === true;
       }),
-      email: Yup.string()
-      .email("Debe ser un email válido")
-      .nullable(true) // Permitir que el campo exista aunque esté vacío
-      .notRequired(), // No es obligatorio si así lo prefieres
+    email: Yup.string().email("Debe ser un email válido").nullable(true).notRequired(),
     genero: Yup.string().oneOf(["Masculino", "Femenino", ""], "Opción inválida"),
     edad: Yup.number()
       .transform((value, originalValue) => (originalValue.trim() === "" ? null : value))
@@ -97,16 +92,15 @@ const CrearCvScreen = () => {
     rubro: Yup.string().required("El rubro es obligatorio"),
     puesto: Yup.string().required("El puesto es obligatorio"),
     subrubro: Yup.string(),
-    lista: Yup.string().required("Debe seleccionar una lista"),
   });
 
   const handleChange = async (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value || "", // Asegurarte de que el valor nunca sea undefined
+      [name]: value || "",
     }));
-  
+
     try {
       await validationSchema.validateAt(name, { ...formData, [name]: value });
       setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
@@ -132,28 +126,47 @@ const CrearCvScreen = () => {
     setErrors((prevErrors) => ({ ...prevErrors, imagen: "" }));
   };
 
+  const handleCheckboxChange = (language) => {
+    setFormData((prevData) => {
+      const updatedIdiomas = prevData.idiomas.includes(language)
+        ? prevData.idiomas.filter((idioma) => idioma !== language)
+        : [...prevData.idiomas, language];
+      return { ...prevData, idiomas: updatedIdiomas };
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-
+    console.log("Datos del formulario antes de validar:", formData); // Log para verificar los datos del formulario
+  
     try {
       await validationSchema.validate(formData, { abortEarly: false });
-
+  
       const formDataToSend = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
-        formDataToSend.append(key, value || "");
+        if (key === "imagen" && value) {
+          formDataToSend.append(key, value); // Solo agregar el archivo si está presente
+        } else if (Array.isArray(value)) {
+          value.forEach((v) => formDataToSend.append(`${key}[]`, v)); // Agregar arrays correctamente
+        } else {
+          formDataToSend.append(key, value || "");
+        }
       });
-
+  
+      console.log("Datos enviados al servidor:", [...formDataToSend.entries()]); // Log para verificar los datos enviados
+  
       const response = await fetch(`${API_URL}/api/curriculums`, {
         method: "POST",
         body: formDataToSend,
       });
-
+  
       if (!response.ok) {
         const errorData = await response.json();
+        console.error("Error en la respuesta del servidor:", errorData); // Log para capturar errores del servidor
         throw new Error(errorData.error || "Error desconocido");
       }
-
+  
       toast({
         title: "Éxito",
         description: "CV creado exitosamente.",
@@ -162,7 +175,8 @@ const CrearCvScreen = () => {
         position: "top-right",
         isClosable: true,
       });
-
+  
+      // Restablecer formulario
       setFormData({
         nombre: "",
         apellido: "",
@@ -192,8 +206,10 @@ const CrearCvScreen = () => {
         error.inner.forEach((err) => {
           validationErrors[err.path] = err.message;
         });
+        console.error("Errores de validación:", validationErrors); // Log para errores de validación
         setErrors(validationErrors);
       } else {
+        console.error("Error en la creación del CV:", error.message); // Log para otros errores
         toast({
           title: "Error",
           description: "Error al crear el CV.",
@@ -207,6 +223,7 @@ const CrearCvScreen = () => {
       setIsSubmitting(false);
     }
   };
+  
 
   return (
     <div>
@@ -223,6 +240,7 @@ const CrearCvScreen = () => {
           errors={errors}
           handleChange={handleChange}
           handleFileChange={handleFileChange}
+          handleCheckboxChange={handleCheckboxChange}
           handleSubmit={handleSubmit}
           fileInputRef={fileInputRef}
         />

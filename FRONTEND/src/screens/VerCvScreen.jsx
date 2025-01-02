@@ -13,21 +13,22 @@ const VerCvScreen = () => {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1026)
 
   useEffect(() => {
+    console.log("ID del CV solicitado:", id);
     const fetchCv = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/curriculums/${id}`)
-        if (!response.ok) throw new Error('No se pudo cargar el CV')
-        const data = await response.json()
-        setCv(data)
+        const response = await fetch(`${API_URL}/api/curriculums/${id}`);
+        if (!response.ok) throw new Error('No se pudo cargar el CV');
+        const data = await response.json();
+        setCv(data);
       } catch (error) {
-        console.error('Error:', error)
+        console.error('Error al obtener el CV:', error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
-
-    fetchCv()
-  }, [id])
+    };
+  
+    fetchCv();
+  }, [id]);
 
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 1026)

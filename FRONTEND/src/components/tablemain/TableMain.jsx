@@ -30,20 +30,27 @@ const TableMain = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      const sanitizedFilters = Object.fromEntries(
+        Object.entries(filters).filter(([key, value]) => value !== '')
+      );
+  
+      console.log('Filtros enviados:', sanitizedFilters); // Verifica que idioma es un array
+      const query = new URLSearchParams(sanitizedFilters).toString();
+  
       try {
-        const response = await fetch(`${API_URL}/api/curriculums`)
-        if (!response.ok) throw new Error('Failed to fetch data')
-        const data = await response.json()
-        setCvData(data)
+        const response = await fetch(`${API_URL}/api/curriculums?${query}`);
+        if (!response.ok) throw new Error('Error al obtener currículums');
+        const data = await response.json();
+        setCvData(data);
       } catch (error) {
-        console.error('Error fetching data:', error)
+        console.error('Error al cargar currículums:', error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
-
-    fetchData()
-  }, [])
+    };
+  
+    fetchData();
+  }, [filters]);
 
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 1026)
@@ -75,26 +82,11 @@ const TableMain = () => {
 
   const hasCategoryFilters = Object.values(filters).some((value) => value !== '')
 
-  const filteredData = cvData
-    .filter((user) =>
-      removeAccents(`${user.nombre} ${user.apellido}`)
-        .toLowerCase()
-        .includes(removeAccents(searchTerm.toLowerCase()))
-    )
-    .filter((user) => {
-      return (
-        (filters.genero === '' || user.genero === filters.genero) &&
-        (filters.edad === '' || parseInt(user.edad, 10) >= parseInt(filters.edad, 10)) &&
-        (filters.pais === '' || user.pais === filters.pais) &&
-        (filters.provincia === '' || user.provincia === filters.provincia) &&
-        (filters.localidad === '' || user.localidad === filters.localidad) &&
-        filters.idioma === '' || user.idiomas.some((idioma) => idioma.toLowerCase() === filters.idioma.toLowerCase()) &&
-        (filters.calificacion === '' || user.calificacion === filters.calificacion) &&
-        (filters.nivelEducacion === '' || user.nivelEstudios === filters.nivelEducacion) &&
-        (filters.experienciaAnios === '' || user.experiencia === filters.experienciaAnios) &&
-        (filters.lista === '' || user.listas.some((lista) => lista._id === filters.lista)) // Filtro por listas
-      )
-    })
+  const filteredData = cvData.filter((user) =>
+    removeAccents(`${user.nombre} ${user.apellido}`)
+      .toLowerCase()
+      .includes(removeAccents(searchTerm.toLowerCase()))
+  );
 
   return (
     <div className="w-full mx-auto space-y-4 relative">
