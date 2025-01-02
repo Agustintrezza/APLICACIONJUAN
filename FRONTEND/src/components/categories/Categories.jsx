@@ -56,21 +56,21 @@ const Categories = ({ filters, setFilters }) => {
   }, [])
 
   const handleFilterChange = (e, filterType) => {
-    const value = e.target.value
+    const value = e.target.value;
+  
     setFilters((prevFilters) => {
-      const newFilters = { ...prevFilters, [filterType]: value }
-
-      // Reiniciar valores dependientes
-      if (filterType === 'pais') {
-        newFilters.provincia = ''
-        newFilters.localidad = ''
-      } else if (filterType === 'provincia') {
-        newFilters.localidad = ''
+      const newFilters = { ...prevFilters };
+  
+      if (filterType === "idiomas") {
+        // Convertir siempre a un array
+        newFilters[filterType] = value ? [value] : [];
+      } else {
+        newFilters[filterType] = value;
       }
-
-      return newFilters
-    })
-  }
+  
+      return newFilters;
+    });
+  };
 
   return (
     <div
@@ -253,8 +253,8 @@ const Categories = ({ filters, setFilters }) => {
             <label htmlFor="idioma" className="text-md text-[#293e68] mb-1">Idioma</label>
             <select
               id="idioma"
-              value={filters.idioma}
-              onChange={(e) => handleFilterChange(e, "idioma")}
+              value={filters.idiomas && filters.idiomas.length > 0 ? filters.idiomas[0] : ""}
+              onChange={(e) => handleFilterChange(e, "idiomas")}
               className="form-select rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
             >
               <option value="">Seleccionar</option>

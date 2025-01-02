@@ -27,12 +27,150 @@ const upload = multer({ storage })
 // Obtener todos los curriculums
 router.get('/', async (req, res) => {
   try {
-    const curriculums = await Curriculum.find().populate('listas').sort({ createdAt: -1 })
-    res.status(200).json(curriculums)
+    const {
+      pais,
+      provincia,
+      localidad,
+      calificacion,
+      nivelEstudios,
+      experiencia,
+      genero,
+      edad,
+      idiomas,
+      lista,
+    } = req.query;
+
+    // Construir la consulta dinámica
+    const query = {};
+
+    if (pais) query.pais = pais;
+    if (provincia) query.provincia = provincia;
+    if (localidad) query.localidad = localidad;
+    if (calificacion) query.calificacion = calificacion;
+    if (nivelEstudios) query.nivelEstudios = nivelEstudios;
+    if (experiencia) query.experiencia = experiencia;
+    if (genero) query.genero = genero;
+    if (edad) query.edad = { $gte: parseInt(edad, 10) }; // Edad mínima
+    if (idiomas) {
+      const idiomasArray = Array.isArray(idiomas) ? idiomas : idiomas.split(',');
+      query.idiomas = { $in: idiomasArray }; // Filtro por coincidencia en el array
+    }
+
+    // Filtro por lista
+    if (lista) {
+      const listasArray = lista.split(',').filter((id) => mongoose.Types.ObjectId.isValid(id));
+      if (listasArray.length > 0) {
+        query.listas = { $in: listasArray };
+      }
+    }
+
+    if (idiomas) {
+      const idiomasArray = Array.isArray(idiomas) ? idiomas : [idiomas];
+      query.idiomas = { $in: idiomasArray }; // Buscar currículums que contengan cualquiera de los idiomas
+    }
+
+    // Ejecutar la consulta
+    const curriculums = await Curriculum.find(query).populate('listas');
+    res.status(200).json(curriculums);
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener los currículums.' })
+    console.error('Error al obtener currículums:', error);
+    res.status(500).json({ error: 'Error al obtener currículums.' });
   }
-})
+});
+
+// Crear un nuevo curriculum
+router.post('/', upload.single('imagen'), async (req, res) => {
+  console.log('Body recibido:', req.body);
+console.log('Archivo recibido:', req.file);
+
+  try {
+    const file = req.file;
+    const { idiomas, apellido, celular, pais, provincia, calificacion, lista, ...otrosDatos } = req.body;
+
+    // Validación de idiomas: Convertir siempre a un array
+    const parsedIdiomas = Array.isArray(idiomas)
+      ? idiomas
+      : (idiomas ? idiomas.split(',').map((idioma) => idioma.trim()) : []);
+
+    // Validación: Duplicados por apellido o celular
+    const existingCv = await Curriculum.findOne({
+      $or: [{ apellido }, { celular }],
+    });
+
+    if (existingCv) {
+      if (existingCv.apellido === apellido) {
+        return res.status(400).json({ error: 'Ya existe un candidato con el mismo apellido.' });
+      }
+      if (existingCv.celular === celular) {
+        return res.status(400).json({ error: 'Ya existe un candidato con el mismo número de teléfono celular.' });
+      }
+    }
+
+    // Validación de lógica: Provincia requerida para Argentina
+    if (pais === 'Argentina' && (!provincia || provincia.trim() === '')) {
+      return res.status(400).json({ error: 'La provincia es obligatoria para Argentina.' });
+    }
+
+    // Validación del archivo
+    if (!file) {
+      return res.status(400).json({ error: 'La imagen o archivo es obligatorio.' });
+    }
+
+    const allowedFormats = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+    if (!allowedFormats.includes(file.mimetype)) {
+      return res.status(400).json({ error: 'Formato de archivo no permitido.' });
+    }
+
+    // Subir el archivo a Cloudinary
+    let uploadedFile;
+    await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { folder: 'curriculums' },
+        (error, result) => {
+          if (error) return reject(error);
+          uploadedFile = result;
+          resolve();
+        }
+      );
+      streamifier.createReadStream(file.buffer).pipe(uploadStream);
+    });
+
+    // Validar y sanitizar los datos
+    const sanitizedData = sanitize({ apellido, celular, ...otrosDatos, pais, provincia, calificacion });
+    console.log('Datos sanitizados:', sanitizedData);
+
+    // Crear el nuevo curriculum
+    const newCurriculum = new Curriculum({
+      ...sanitizedData,
+      idiomas: parsedIdiomas, // Asegurarse de que idiomas sea un array
+      imagen: uploadedFile.secure_url,
+    });
+
+    // Si se especifica una lista, asociar el curriculum a esa lista
+    if (lista) {
+      const listaExistente = await Lista.findById(lista);
+      if (!listaExistente) {
+        return res.status(404).json({ error: 'La lista seleccionada no existe.' });
+      }
+
+      listaExistente.curriculums.push(newCurriculum._id);
+      await listaExistente.save();
+      newCurriculum.listas.push(listaExistente._id);
+    }
+
+    // Guardar el curriculum con la información de las listas
+    const savedCurriculum = await newCurriculum.save();
+    if (!savedCurriculum) {
+      throw new Error('Error al guardar el currículum.');
+    }
+
+    res.status(201).json({ message: 'Curriculum creado exitosamente', curriculum: savedCurriculum });
+  } catch (error) {
+    console.error('Error al crear el currículum:', error);
+    res.status(500).json({ error: 'Ocurrió un error al procesar la solicitud.' });
+  }
+});
+
 
 // Validar duplicados
 router.post('/validate', async (req, res) => {
@@ -62,16 +200,18 @@ router.post('/validate', async (req, res) => {
 
 // Obtener un curriculum por ID
 router.get('/:id', async (req, res) => {
+  console.log("Solicitud recibida para ID:", req.params.id);
   try {
-    const curriculum = await Curriculum.findById(req.params.id).populate('listas')
+    const curriculum = await Curriculum.findById(req.params.id).populate('listas');
     if (!curriculum) {
-      return res.status(404).json({ error: 'Curriculum no encontrado' })
+      return res.status(404).json({ error: 'Curriculum no encontrado' });
     }
-    res.status(200).json(curriculum)
+    res.status(200).json(curriculum);
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener el currículum.' })
+    console.error("Error al obtener el curriculum:", error);
+    res.status(500).json({ error: 'Error al obtener el currículum.' });
   }
-})
+});
 
 // Crear un nuevo curriculum
 router.post('/', upload.single('imagen'), async (req, res) => {
@@ -97,6 +237,9 @@ router.post('/', upload.single('imagen'), async (req, res) => {
         return res.status(400).json({ error: 'Ya existe un candidato con el mismo número de teléfono celular.' })
       }
     }
+
+    console.log("Datos recibidos:", req.body);
+    console.log("Archivo recibido:", req.file);
 
     // Validación de lógica: Provincia requerida para Argentina
     if (pais === 'Argentina' && (!provincia || provincia.trim() === '')) {
@@ -150,7 +293,10 @@ router.post('/', upload.single('imagen'), async (req, res) => {
     }
 
     // Guardar el curriculum con la información de las listas
-    const savedCurriculum = await newCurriculum.save()
+    const savedCurriculum = await newCurriculum.save();
+    if (!savedCurriculum) {
+      throw new Error("Error al guardar el currículum.");
+    }
 
     res.status(201).json({ message: 'Curriculum creado exitosamente', curriculum: savedCurriculum })
   } catch (error) {
@@ -277,12 +423,19 @@ router.delete('/:id', async (req, res) => {
 router.put('/:id/no-llamar', async (req, res) => {
   try {
     const { id } = req.params
-    const { noLlamar } = req.body
+    let { noLlamar } = req.body
+
+    // Convertir el valor a booleano si es válido
+    if (noLlamar === "") {
+      noLlamar = undefined // Remover el campo si está vacío
+    } else {
+      noLlamar = noLlamar === "true" || noLlamar === true // Asegurar que sea un booleano
+    }
 
     const updatedCv = await Curriculum.findByIdAndUpdate(
       id,
       { noLlamar },
-      { new: true }
+      { new: true, runValidators: true }
     )
 
     if (!updatedCv) {
@@ -295,4 +448,5 @@ router.put('/:id/no-llamar', async (req, res) => {
     res.status(500).json({ error: 'Error al actualizar el estado de No Llamar' })
   }
 })
+
 module.exports = router

@@ -45,7 +45,14 @@ const CurriculumSchema = new mongoose.Schema({
     },
   },
   puesto: { type: String, required: true },
-  noLlamar: { type: Boolean, default: false },
+  noLlamar: {
+    type: Boolean,
+    default: false,
+    set: (value) => {
+      if (value === "" || value === null) return undefined
+      return value
+    }
+  },
 }, { timestamps: true, versionKey: false });
 
 // Crear un índice compuesto para nombre y apellido (combinado, no único)
