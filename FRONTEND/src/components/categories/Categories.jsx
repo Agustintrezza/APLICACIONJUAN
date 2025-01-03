@@ -87,14 +87,16 @@ const Categories = ({ filters, setFilters }) => {
         <div className="space-y-2">
           {/* Listas */}
           <div>
-            <label htmlFor="listas" className="text-md text-[#293e68] mb-1">
+            <label htmlFor="listas" className="text-sm text-[#293e68] mb-1">
               Lista
             </label>
             <select
               id="listas"
               value={filters.lista}
               onChange={(e) => handleFilterChange(e, 'lista')}
-              className="form-select rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
+              className={`form-select text-sm py-1 bg-transparent px-2 h-8 w-full border-1 rounded-md ${
+                filters.lista ? 'border-red-400 border-2' : 'border-blue-400'
+              }`}
             >
               <option value="">Seleccionar</option>
               {listas.map((lista) => (
@@ -109,13 +111,15 @@ const Categories = ({ filters, setFilters }) => {
           <div className="space-y-2">
           {/* País */}
           <div>
-            <label htmlFor="pais" className="text-md text-[#293e68] mb-1">País</label>
+            <label htmlFor="pais" className="text-sm text-[#293e68] mb-1">País</label>
             <select
               id="pais"
               value={filters.pais}
-              onChange={(e) => handleFilterChange(e, "pais")}
-              className="form-select rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
-            >
+              onChange={(e) => handleFilterChange(e, 'pais')}
+              className={`form-select text-sm py-1 bg-transparent px-2 h-8 w-full border-1 rounded-md ${
+                filters.pais ? 'border-red-400 border-2' : 'border-blue-400'
+              }`}
+>
               <option value="">Seleccionar</option>
               <option value="Argentina">Argentina</option>
               <option value="Estados Unidos">Estados Unidos</option>
@@ -128,12 +132,14 @@ const Categories = ({ filters, setFilters }) => {
           {/* Provincia */}
           {filters.pais === "Argentina" && (
             <div>
-              <label htmlFor="provincia" className="text-md text-[#293e68] mb-1">Provincia</label>
+              <label htmlFor="provincia" className="text-sm text-[#293e68] mb-1">Provincia</label>
               <select
                 id="provincia"
                 value={filters.provincia}
                 onChange={(e) => handleFilterChange(e, "provincia")}
-                className="form-select rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
+                className={`form-select text-sm py-1 bg-transparent px-2 h-8 w-full border-1 rounded-md ${
+                  filters.provincia ? 'border-red-400 border-2' : 'border-blue-400'
+                }`}
               >
                 <option value="">Seleccionar</option>
                 {PROVINCIAS_ARGENTINA.map(provincia => (
@@ -146,12 +152,14 @@ const Categories = ({ filters, setFilters }) => {
           {/* Localidad */}
           {filters.pais === "Argentina" && filters.provincia === "Buenos Aires" && (
             <div>
-              <label htmlFor="localidad" className="text-md text-[#293e68] mb-1">Localidad</label>
+              <label htmlFor="localidad" className="text-sm text-[#293e68] mb-1">Localidad</label>
               <select
                 id="localidad"
                 value={filters.localidad}
                 onChange={(e) => handleFilterChange(e, "localidad")}
-                className="form-select rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
+                className={`form-select text-sm py-1 bg-transparent px-2 h-8 w-full border-1 rounded-md ${
+                  filters.localidad ? 'border-red-400 border-2' : 'border-blue-400'
+                }`}
               >
                 <option value="">Seleccionar</option>
                 {Object.entries(ZONAS_LOCALIDADES).flatMap(([zona, localidades]) =>
@@ -167,12 +175,14 @@ const Categories = ({ filters, setFilters }) => {
 
           {/* Calificación */}
           <div>
-            <label htmlFor="calificacion" className="text-md text-[#293e68] mb-1">Calificación</label>
+            <label htmlFor="calificacion" className="text-sm text-[#293e68] mb-1">Calificación</label>
             <select
               id="calificacion"
               value={filters.calificacion}
               onChange={(e) => handleFilterChange(e, "calificacion")}
-              className="form-select rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
+              className={`form-select text-sm py-1 bg-transparent px-2 h-8 w-full border-1 rounded-md ${
+                filters.calificacion ? 'border-red-400 border-2' : 'border-blue-400'
+              }`}
             >
               <option value="">Seleccionar</option>
               <option value="1- Muy bueno">1- Muy bueno</option>
@@ -183,12 +193,14 @@ const Categories = ({ filters, setFilters }) => {
 
           {/* Nivel de Educación */}
           <div>
-            <label htmlFor="nivelEducacion" className="text-md text-[#293e68] mb-1">Nivel de Educación</label>
+            <label htmlFor="nivelEducacion" className="text-sm text-[#293e68] mb-1">Nivel de Educación</label>
             <select
               id="nivelEducacion"
               value={filters.nivelEducacion}
               onChange={(e) => handleFilterChange(e, "nivelEducacion")}
-              className="form-select rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
+              className={`form-select text-sm py-1 bg-transparent px-2 h-8 w-full border-1 rounded-md ${
+                filters.nivelEducacion ? 'border-red-400 border-2' : 'border-blue-400'
+              }`}
             >
               <option value="">Seleccionar</option>
               <option value="Primario">Primario</option>
@@ -200,12 +212,14 @@ const Categories = ({ filters, setFilters }) => {
 
           {/* Años de Experiencia */}
           <div>
-            <label htmlFor="experienciaAnios" className="text-md text-[#293e68] mb-1">Años de Experiencia</label>
+            <label htmlFor="experienciaAnios" className="text-sm text-[#293e68] mb-1">Años de Experiencia</label>
             <select
               id="experienciaAnios"
               value={filters.experienciaAnios}
               onChange={(e) => handleFilterChange(e, "experienciaAnios")}
-              className="form-select rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
+              className={`form-select text-sm py-1 bg-transparent px-2 h-8 w-full border-1 rounded-md ${
+                filters.experienciaAnios ? 'border-red-400 border-2' : 'border-blue-400'
+              }`}
             >
               <option value="">Seleccionar</option>
               <option value="Menos de un año">Menos de un año</option>
@@ -218,12 +232,14 @@ const Categories = ({ filters, setFilters }) => {
 
           {/* Género */}
           <div>
-            <label htmlFor="genero" className="text-md text-[#293e68] mb-1">Género</label>
+            <label htmlFor="genero" className="text-sm text-[#293e68] mb-1">Género</label>
             <select
               id="genero"
               value={filters.genero}
               onChange={(e) => handleFilterChange(e, "genero")}
-              className="form-select rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
+              className={`form-select text-sm py-1 bg-transparent px-2 h-8 w-full border-1 rounded-md ${
+                filters.genero ? 'border-red-400 border-2' : 'border-blue-400'
+              }`}
             >
               <option value="">Seleccionar</option>
               <option value="Masculino">Masculino</option>
@@ -233,12 +249,14 @@ const Categories = ({ filters, setFilters }) => {
 
           {/* Edad */}
           <div>
-            <label htmlFor="edad" className="text-md text-[#293e68] mb-1">Edad</label>
+            <label htmlFor="edad" className="text-sm text-[#293e68] mb-1">Edad</label>
             <select
               id="edad"
               value={filters.edad}
               onChange={(e) => handleFilterChange(e, "edad")}
-              className="form-select rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
+              className={`form-select text-sm py-1 bg-transparent px-2 h-8 w-full border-1 rounded-md ${
+                filters.edad ? 'border-red-400 border-2' : 'border-blue-400'
+              }`}
             >
               <option value="">Seleccionar</option>
               <option value="18">Más de 18</option>
@@ -250,12 +268,14 @@ const Categories = ({ filters, setFilters }) => {
 
           {/* Idiomas */}
           <div>
-            <label htmlFor="idioma" className="text-md text-[#293e68] mb-1">Idioma</label>
+            <label htmlFor="idioma" className="text-sm text-[#293e68] mb-1">Idioma</label>
             <select
               id="idioma"
               value={filters.idiomas && filters.idiomas.length > 0 ? filters.idiomas[0] : ""}
               onChange={(e) => handleFilterChange(e, "idiomas")}
-              className="form-select rounded bg-[#e9f0ff] p-2 text-base w-full border-[#8bb1ff] focus:border-[#293e68]"
+              className={`form-select text-sm py-1 bg-transparent px-2 h-8 w-full border-1 rounded-md ${
+                filters.idioma ? 'border-red-400 border-2' : 'border-blue-400'
+              }`}
             >
               <option value="">Seleccionar</option>
               <option value="Español">Español</option>

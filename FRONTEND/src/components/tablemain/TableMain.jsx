@@ -212,7 +212,7 @@ const TableMain = () => {
           <FloatingButtonCategories onToggle={handleToggleCategories} />
           {isCategoriesOpen && (
             <div className="fixed inset-0 clase bg-black bg-opacity-50 flex justify-center items-center z-50">
-              <div className="bg-blue-50 rounded-lg p-6 w-11/12 h-3/4 overflow-auto">
+              <div className="bg-blue-50 rounded-lg p-6 w-11/12 h-4/4 overflow-auto">
               {/* Componente SelectFilters */}
                 <SelectFilters
                   searchTerm={searchTerm}
@@ -227,7 +227,7 @@ const TableMain = () => {
                 <Categories filters={filters} setFilters={setFilters} />
                 <button
                   onClick={handleToggleCategories}
-                  className="absolute top-16 mt-2 right-4 bg-red-600 text-white p-2 rounded-lg shadow-lg"
+                  className="absolute top-4 mt-2 right-4 bg-red-600 text-white p-2 rounded-lg shadow-lg"
                 >
                   <FaTimes />
                 </button>

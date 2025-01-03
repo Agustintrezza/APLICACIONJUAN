@@ -10,7 +10,8 @@ const SelectFilters = ({
   hasCategoryFilters,
 }) => {
   return (
-    <div className="flex space-x-4 mb-4 select-filters-container-custom shadow-lg">
+    <div className="space-y-2 sm:space-y-0 sm:flex sm:space-x-0 mb-4 select-filters-container-custom shadow-lg">
+      {/* Contenedor del campo de búsqueda */}
       <div className="flex-1 border border-blue-300 bg-[#e9f0ff] rounded-lg p-2 shadow-md">
         <div className="flex items-center space-x-2">
           <input
@@ -24,25 +25,33 @@ const SelectFilters = ({
           <button className="p-2 bg-[#293e68] text-white rounded-r-lg">
             <FaSearch />
           </button>
-          <button
-            onClick={handleResetSearch}
-            disabled={!hasSearchTerm}
-            className={`p-2 px-4 rounded text-sm ${
-              hasSearchTerm ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            Limpiar Búsqueda
-          </button>
-          <button
-            onClick={handleResetFilters}
-            disabled={!hasCategoryFilters}
-            className={`p-2 px-4 rounded text-sm ${
-              hasCategoryFilters ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            Limpiar Filtros
-          </button>
         </div>
+      </div>
+
+      {/* Contenedor de botones */}
+      <div className="flex flex-wrap gap-2 bg-blue-100 p-2 sm:flex-row sm:space-x-2 sm:items-center">
+        <button
+          onClick={handleResetSearch}
+          disabled={!hasSearchTerm}
+          className={`flex-1 p-2 text-sm rounded ${
+            hasSearchTerm
+              ? 'bg-red-500 text-white hover:bg-red-600 font-medium'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+          }`}
+        >
+          Limpiar Búsqueda
+        </button>
+        <button
+          onClick={handleResetFilters}
+          disabled={!hasCategoryFilters}
+          className={`flex-1 p-2 text-sm rounded ${
+            hasCategoryFilters
+              ? 'bg-red-500 text-white font-medium hover:bg-red-600'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+          }`}
+        >
+          Limpiar Filtros
+        </button>
       </div>
     </div>
   );
@@ -52,8 +61,6 @@ SelectFilters.propTypes = {
   searchTerm: PropTypes.string.isRequired,
   setSearchTerm: PropTypes.func.isRequired,
   handleResetSearch: PropTypes.func.isRequired,
-  filters: PropTypes.object.isRequired,
-  setFilters: PropTypes.func.isRequired,
   handleResetFilters: PropTypes.func.isRequired,
   hasSearchTerm: PropTypes.bool.isRequired,
   hasCategoryFilters: PropTypes.bool.isRequired,
