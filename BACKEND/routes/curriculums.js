@@ -200,7 +200,7 @@ router.post('/validate', async (req, res) => {
 
 // Obtener un curriculum por ID
 router.get('/:id', async (req, res) => {
-  console.log("Solicitud recibida para ID:", req.params.id);
+  // console.log("Solicitud recibida para ID:", req.params.id);
   try {
     const curriculum = await Curriculum.findById(req.params.id).populate('listas');
     if (!curriculum) {
