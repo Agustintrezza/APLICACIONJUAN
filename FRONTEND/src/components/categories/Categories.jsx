@@ -83,7 +83,7 @@ const Categories = ({ filters, setFilters }) => {
           boxShadow: '4px 4px 8px rgba(0, 0, 0, 0.1)',
         }}
       >
-        <h3 className="text-lg font-semibold mb-4 text-[#293e68]">Buscar Curriculums</h3>
+        <h3 className="text-lg font-semibold mb-2 text-[#293e68]">Buscar Curriculums</h3>
         <div className="space-y-2">
           {/* Listas */}
           <div>
