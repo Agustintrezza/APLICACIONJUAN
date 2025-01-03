@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { FaPlus, FaHeart, FaTimes } from 'react-icons/fa'
+import { FaPlus, FaTimes } from 'react-icons/fa'
 import SelectFilters from '../selectfilters/SelectFilters'
 import Categories from '../../components/categories/Categories'
 import FloatingButtonCategories from '../floating-buttons/FloatingButtonCategories'

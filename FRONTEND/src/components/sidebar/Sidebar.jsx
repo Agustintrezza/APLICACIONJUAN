@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import { useContext } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { AppContext } from '../../context/AppContext'
-import { FaPlus, FaUser, FaHeart, FaChevronLeft, FaChevronRight, FaPowerOff, FaFileAlt } from 'react-icons/fa'
+import { FaPlus, FaUser, FaChevronLeft, FaChevronRight, FaPowerOff, FaFileAlt } from 'react-icons/fa'
 import avatarImg from '../../assets/imagenes/avatarimg.webp'
 
 const Sidebar = () => {
@@ -43,8 +43,6 @@ const Sidebar = () => {
         <SidebarLink to="/listas" icon={<FaPlus />} label="Listas" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} className="font-medium" />
         <SidebarLink to="/" icon={<FaUser />} label="Curriculums" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} className="font-medium" />
         <SidebarLink to="/crear-cv" icon={<FaFileAlt />} label="Ingresar Curriculum" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} className="font-medium" />
-        <SidebarLink to="/favoritos" icon={<FaHeart />} label="Favoritos" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} showCount={2} className="font-medium" />
-        <SidebarLink to="/perfil" icon={<FaUser />} label="Perfil" isSidebarExpanded={isSidebarExpanded} currentPath={location.pathname} className="font-medium" />
       </nav>
 
       <button
