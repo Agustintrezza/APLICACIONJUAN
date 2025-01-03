@@ -10,7 +10,7 @@ const SelectFilters = ({
   hasCategoryFilters,
 }) => {
   return (
-    <div className="space-y-4 sm:space-y-0 sm:flex sm:space-x-4 mb-4 select-filters-container-custom shadow-lg">
+    <div className="space-y-2 sm:space-y-0 sm:flex sm:space-x-4 mb-3 select-filters-container-custom shadow-lg">
       {/* Contenedor del campo de búsqueda */}
       <div className="flex-1 border border-blue-300 bg-[#e9f0ff] rounded-lg p-2 shadow-md">
         <div className="flex items-center space-x-2">
@@ -29,22 +29,22 @@ const SelectFilters = ({
       </div>
 
       {/* Contenedor de botones */}
-      <div className="flex flex-col sm:flex-row sm:space-x-2 sm:items-center space-y-2 sm:space-y-0">
+      <div className="flex px-2 pt-0 pb-2 md:pt-2 flex-wrap gap-2 sm:flex-nowrap sm:space-x-2 sm:items-center">
         <button
           onClick={handleResetSearch}
           disabled={!hasSearchTerm}
-          className={`p-2 text-sm rounded ${
+          className={`flex-1 p-2 text-sm rounded w-40 ${
             hasSearchTerm
               ? 'bg-red-500 text-white hover:bg-red-600'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
           }`}
         >
-          Limpiar Búsqueda
+          Limpiar Busqueda
         </button>
         <button
           onClick={handleResetFilters}
           disabled={!hasCategoryFilters}
-          className={`p-2 text-sm rounded ${
+          className={`flex-1 p-2 text-sm rounded ${
             hasCategoryFilters
               ? 'bg-red-500 text-white hover:bg-red-600'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
