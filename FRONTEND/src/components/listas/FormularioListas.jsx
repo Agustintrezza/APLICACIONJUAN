@@ -21,7 +21,7 @@ const FormularioListas = ({ onCreate, listaToEdit, onUpdate }) => {
   const [puestos, setPuestos] = useState({})
   const [subrubros, setSubrubros] = useState({})
 
-  const colors = ["#E53E3E", "#3E8FE5", "#FFB042", "#FFF01A", "#51E302", "#8FE3FF"];
+  const colors = ["#E53E3E", "#3E8FE5", "#FFB042", "#FFF01A", "#51E302", "#8FE3FF"]
 
   const validationSchema = Yup.object().shape({
     cliente: Yup.string().required("El campo Cliente es obligatorio"),
@@ -103,22 +103,22 @@ const FormularioListas = ({ onCreate, listaToEdit, onUpdate }) => {
     e.preventDefault()
     const isValid = await handleValidation()
     if (!isValid) return
-  
+
     setIsLoading(true)
     try {
       const url = listaToEdit ? `${API_URL}/api/listas/${listaToEdit._id}` : `${API_URL}/api/listas`
       const method = listaToEdit ? "PUT" : "POST"
-  
+
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       })
-  
+
       if (!response.ok) throw new Error(listaToEdit ? "Error al actualizar la lista" : "Error al crear la lista")
-  
+
       const updatedLista = await response.json()
-  
+
       toast({
         title: "Éxito",
         description: listaToEdit ? "Lista actualizada correctamente" : "Lista creada correctamente",
@@ -126,7 +126,7 @@ const FormularioListas = ({ onCreate, listaToEdit, onUpdate }) => {
         duration: 5000,
         isClosable: true,
       })
-  
+
       if (listaToEdit) {
         onUpdate(updatedLista)
       } else {

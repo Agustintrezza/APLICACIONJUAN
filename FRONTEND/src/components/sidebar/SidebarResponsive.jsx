@@ -52,7 +52,14 @@ const SidebarResponsive = ({ isAuthenticated, logout, user }) => {
         {user && <div className="py-4 p-4 font-bold">{user.email}</div>}
 
         <nav className="space-y-4 p-2">
-        <SidebarLink to="/listas" icon={<FaPlus />} label="Listas" currentPath={location.pathname} className="font-medium"/>
+        <SidebarLink
+          to="/listas"
+          icon={<FaPlus />}
+          label="Listas"
+          currentPath={location.pathname}
+          onClick={handleLinkClick} // Asegúrate de pasar esta función
+          className="font-medium"
+        />
           <SidebarLink to="/" icon={<FaHome />} label="Curriculums" currentPath={location.pathname} onClick={handleLinkClick} className="font-medium"/>
           <SidebarLink to="/crear-cv" icon={<FaFileAlt />} label="Ingresar Curriculm" currentPath={location.pathname} onClick={handleLinkClick} className="font-medium"/>
         </nav>
