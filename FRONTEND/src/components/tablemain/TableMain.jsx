@@ -227,7 +227,7 @@ const TableMain = () => {
                 <Categories filters={filters} setFilters={setFilters} />
                 <button
                   onClick={handleToggleCategories}
-                  className="absolute top-14 mt-2 right-4 bg-red-600 text-white p-2 rounded-lg shadow-lg"
+                  className="absolute top-14 mt-2 right-4 bg-red-600 text-white p-2 rounded-lg shadow-lg z-50"
                 >
                   <FaTimes />
                 </button>
