@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { FaPlus, FaHeart } from 'react-icons/fa'
+import { FaPlus, FaHeart, FaTimes } from 'react-icons/fa'
 import SelectFilters from '../selectfilters/SelectFilters'
 import Categories from '../../components/categories/Categories'
+import FloatingButtonCategories from '../floating-buttons/FloatingButtonCategories'
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 import { API_URL } from '../../config'
 
-const removeAccents = (text) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+const removeAccents = (text) => text.normalize('NFD').replace(/[̀-ͯ]/g, '')
 
 const TableMain = () => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -21,36 +22,35 @@ const TableMain = () => {
     calificacion: '',
     nivelEducacion: '',
     experienciaAnios: '',
-    lista: '', // Agregado filtro de listas
+    lista: '',
   })
   const [cvData, setCvData] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [favoriteIds, setFavoriteIds] = useState([])
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1026)
+  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
       const sanitizedFilters = Object.fromEntries(
-        Object.entries(filters).filter(([key, value]) => value !== '')
-      );
-  
-      console.log('Filtros enviados:', sanitizedFilters); // Verifica que idioma es un array
-      const query = new URLSearchParams(sanitizedFilters).toString();
-  
+        Object.entries(filters).filter(([value]) => value !== '')
+      )
+      const query = new URLSearchParams(sanitizedFilters).toString()
+
       try {
-        const response = await fetch(`${API_URL}/api/curriculums?${query}`);
-        if (!response.ok) throw new Error('Error al obtener currículums');
-        const data = await response.json();
-        setCvData(data);
+        const response = await fetch(`${API_URL}/api/curriculums?${query}`)
+        if (!response.ok) throw new Error('Error al obtener currículums')
+        const data = await response.json()
+        setCvData(data)
       } catch (error) {
-        console.error('Error al cargar currículums:', error);
+        console.error('Error al cargar currículums:', error)
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
-  
-    fetchData();
-  }, [filters]);
+    }
+
+    fetchData()
+  }, [filters])
 
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 1026)
@@ -76,7 +76,7 @@ const TableMain = () => {
       calificacion: '',
       nivelEducacion: '',
       experienciaAnios: '',
-      lista: '', // Reiniciar filtro de listas
+      lista: '',
     })
   }
 
@@ -86,7 +86,11 @@ const TableMain = () => {
     removeAccents(`${user.nombre} ${user.apellido}`)
       .toLowerCase()
       .includes(removeAccents(searchTerm.toLowerCase()))
-  );
+  )
+
+  const handleToggleCategories = () => {
+    setIsCategoriesOpen((prev) => !prev)
+  }
 
   return (
     <div className="w-full mx-auto space-y-4 relative">
@@ -159,7 +163,6 @@ const TableMain = () => {
                           {user.nombre} {user.apellido}
                         </h3>
                         <p className="text-lg font-bold text-[#293e68]">{user.edad}</p>
-                        {/* Mostrar etiqueta de "No Llamar" si está marcado */}
                         <ul className="text-sm text-gray-800 list-inside list-disc">
                           {user.listas?.length > 0 ? (
                             user.listas.map((lista) => (
@@ -167,7 +170,7 @@ const TableMain = () => {
                                 <span>{lista.cliente}</span>
                                 <span
                                   className="inline-block w-3 h-3 rounded-full"
-                                  style={{ backgroundColor: lista.color || '#cccccc' }} // Default to gray if no color
+                                  style={{ backgroundColor: lista.color || '#cccccc' }}
                                 ></span>
                               </li>
                             ))
@@ -198,12 +201,30 @@ const TableMain = () => {
                 </div>
               )}
             </div>
-            
           )}
         </div>
 
         {isDesktop && <Categories filters={filters} setFilters={setFilters} />}
       </div>
+
+      {!isDesktop && (
+        <>
+          <FloatingButtonCategories onToggle={handleToggleCategories} />
+          {isCategoriesOpen && (
+            <div className="fixed inset-0 clase bg-black bg-opacity-50 flex justify-center items-center z-50">
+              <div className="bg-blue-50 rounded-lg p-6 w-11/12 h-3/4 overflow-auto">
+                <Categories filters={filters} setFilters={setFilters} />
+                <button
+                  onClick={handleToggleCategories}
+                  className="absolute top-16 mt-2 right-4 bg-red-600 text-white p-2 rounded-lg shadow-lg"
+                >
+                  <FaTimes />
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   )
 }

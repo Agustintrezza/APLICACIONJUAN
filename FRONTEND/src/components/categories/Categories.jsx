@@ -74,7 +74,7 @@ const Categories = ({ filters, setFilters }) => {
 
   return (
     <div
-      className="w-2/5"
+      className="className={`${isDesktop ? 'w-2/5' : 'w-full'} max-h-screen overflow-y-auto`}"
       style={{ position: 'sticky', top: '-16px', maxHeight: '100vh', overflowY: 'auto' }}
     >
       <div

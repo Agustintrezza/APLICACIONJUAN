@@ -56,3 +56,19 @@
 .iframe-cv {
     height: 30rem!important;
 }
+.modal {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    max-width: 90%;
+    max-height: 80%;
+    overflow-y: auto;
+    padding: 20px;
+  }
+  .clase {
+    margin-top: 0px!important;
+  }
+  .clase-contraria {
+    margin-top: -20px!important;
+
+  }

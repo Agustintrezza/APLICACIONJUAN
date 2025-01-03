@@ -1,18 +1,24 @@
-import { useContext, useState, useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
-import Sidebar from '../sidebar/Sidebar';
-import SidebarResponsive from '../sidebar/SidebarResponsive';
-import { AppContext } from '../../context/AppContext';
+import { useContext, useState, useEffect } from 'react'
+import { Outlet } from 'react-router-dom'
+import Sidebar from '../sidebar/Sidebar'
+import SidebarResponsive from '../sidebar/SidebarResponsive'
+import FloatingButtonCategories from '../floating-buttons/FloatingButtonCategories'
+import { AppContext } from '../../context/AppContext'
 
 const Layout = () => {
-  const { isAuthenticated, logout, isSidebarExpanded, toggleSidebar, user } = useContext(AppContext);
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1026);
+  const { isAuthenticated, logout, isSidebarExpanded, toggleSidebar, user } = useContext(AppContext)
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1026)
+  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
 
   useEffect(() => {
-    const handleResize = () => setIsDesktop(window.innerWidth >= 1026);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    const handleResize = () => setIsDesktop(window.innerWidth >= 1026)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  const toggleCategories = (isOpen) => {
+    setIsCategoriesOpen(isOpen)
+  }
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -31,11 +37,14 @@ const Layout = () => {
           user={user}
         />
       )}
-      <main className="flex-1 p-4 bg-gray-100 overflow-auto">
-        <Outlet />
+      <main className="flex-1 p-4 bg-gray-100 overflow-auto relative">
+        {!isDesktop && (
+          <FloatingButtonCategories onToggle={toggleCategories} />
+        )}
+        <Outlet context={{ isCategoriesOpen }} />
       </main>
     </div>
-  );
-};
+  )
+}
 
-export default Layout;
+export default Layout
