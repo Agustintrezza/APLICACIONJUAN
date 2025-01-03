@@ -78,7 +78,7 @@ const Categories = ({ filters, setFilters }) => {
       style={{ position: 'sticky', top: '-16px', maxHeight: '100vh', overflowY: 'auto' }}
     >
       <div
-        className="border border-blue-300 bg-[#e9f0ff] rounded-lg p-4 shadow-lg"
+        className="border border-blue-300 bg-[#e9f0ff] rounded-lg p-3 shadow-lg"
         style={{
           boxShadow: '4px 4px 8px rgba(0, 0, 0, 0.1)',
         }}
