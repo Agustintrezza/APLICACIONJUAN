@@ -26,7 +26,7 @@ const TableMain = () => {
   })
   const [cvData, setCvData] = useState([])
   const [isLoading, setIsLoading] = useState(true)
-  const [favoriteIds, setFavoriteIds] = useState([])
+  // const [favoriteIds, setFavoriteIds] = useState([])
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1026)
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
 
@@ -58,11 +58,11 @@ const TableMain = () => {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  const toggleFavorite = (id) => {
-    setFavoriteIds((prevIds) =>
-      prevIds.includes(id) ? prevIds.filter((favId) => favId !== id) : [...prevIds, id]
-    )
-  }
+  // const toggleFavorite = (id) => {
+  //   setFavoriteIds((prevIds) =>
+  //     prevIds.includes(id) ? prevIds.filter((favId) => favId !== id) : [...prevIds, id]
+  //   )
+  // }
 
   const handleResetSearch = () => setSearchTerm('')
   const handleResetFilters = () => {
@@ -150,7 +150,7 @@ const TableMain = () => {
               ))}
             </div>
           ) : (
-            <div className="grid gap-4 mt-4 grid-cols-3">
+            <div className="grid gap-4 mt-4 grid-cols-2 md:grid-cols-3">
               {filteredData.length > 0 ? (
                 filteredData.map((user) => (
                   <div
@@ -185,14 +185,14 @@ const TableMain = () => {
                         )}
                       </div>
                     </Link>
-                    <button
+                    {/* <button
                       onClick={() => toggleFavorite(user._id)}
                       className={`absolute top-4 right-4 p-2 bg-white rounded-full ${
                         favoriteIds.includes(user._id) ? 'text-red-500' : 'text-gray-500'
                       } hover:text-red-600`}
                     >
                       <FaHeart />
-                    </button>
+                    </button> */}
                   </div>
                 ))
               ) : (
@@ -213,6 +213,17 @@ const TableMain = () => {
           {isCategoriesOpen && (
             <div className="fixed inset-0 clase bg-black bg-opacity-50 flex justify-center items-center z-50">
               <div className="bg-blue-50 rounded-lg p-6 w-11/12 h-3/4 overflow-auto">
+              {/* Componente SelectFilters */}
+                <SelectFilters
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                  handleResetSearch={handleResetSearch}
+                  filters={filters}
+                  setFilters={setFilters}
+                  handleResetFilters={handleResetFilters}
+                  hasSearchTerm={searchTerm.trim() !== ''}
+                  hasCategoryFilters={hasCategoryFilters}
+                />
                 <Categories filters={filters} setFilters={setFilters} />
                 <button
                   onClick={handleToggleCategories}
