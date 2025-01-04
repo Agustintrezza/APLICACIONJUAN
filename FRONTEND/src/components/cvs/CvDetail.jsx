@@ -16,6 +16,7 @@
     Tag,
     TagLabel,
   } from "@chakra-ui/react"
+  import { API_URL } from "../../config"
 
   const CvDetail = ({ cv }) => {
     const [isDataLoading, setIsDataLoading] = useState(true)
@@ -95,14 +96,15 @@
     const handleDeleteCv = async () => {
       setIsDeleting(true)
       try {
-        const response = await fetch(`/api/curriculums/${cv._id}`, {
+        console.log(`Eliminando CV con ID: ${cv._id}`)
+        const response = await fetch(`${API_URL}/api/curriculums/${cv._id}`, {
           method: "DELETE",
         })
-
+    
         if (!response.ok) {
           throw new Error("Error al eliminar el CV")
         }
-
+    
         toast({
           title: "Éxito",
           description: "El CV se eliminó correctamente.",
@@ -111,7 +113,7 @@
           isClosable: true,
           position: "top-right",
         })
-
+    
         navigate("/")
       } catch {
         toast({
