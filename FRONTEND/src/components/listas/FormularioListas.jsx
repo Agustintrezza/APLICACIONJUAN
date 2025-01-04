@@ -94,19 +94,19 @@ const FormularioListas = ({ onCreate = () => {}, listaToEdit, onUpdate }) => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     console.log("FormularioListas: Datos enviados al manejar submit:", formData)
-
+  
     if (!(await handleValidation())) {
       console.log("FormularioListas: Validación fallida")
       return
     }
-
+  
     try {
       if (listaToEdit && onUpdate) {
         console.log("FormularioListas: Llamando a onUpdate con:", formData)
         await onUpdate({ ...listaToEdit, ...formData })
       } else if (onCreate) {
         console.log("FormularioListas: Llamando a onCreate con:", formData)
-        await onCreate(formData)
+        await onCreate(formData) // Esto debe llamar correctamente a createList
       }
     } catch (error) {
       console.error("FormularioListas: Error al procesar la lista:", error)

@@ -8,7 +8,7 @@ import { useToast } from "@chakra-ui/react"
 const FloatingButtonListas = () => {
   const { createList } = useContext(AppContext)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const [creationStatus, setCreationStatus] = useState(null)
+//   const [creationStatus, setCreationStatus] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const toast = useToast()
 
@@ -22,7 +22,7 @@ const FloatingButtonListas = () => {
   const toggleSidebar = () => {
     console.log("Sidebar toggled")
     setIsSidebarOpen((prev) => !prev)
-    setCreationStatus(null) // Limpia el estado tras abrir/cerrar el sidebar
+    // setCreationStatus(null) // Limpia el estado tras abrir/cerrar el sidebar
   }
 
   const handleCreate = async (newLista) => {
@@ -38,7 +38,7 @@ const FloatingButtonListas = () => {
       console.log("Llamando a createList con:", newLista)
       await createList(newLista)
       console.log("Lista creada con éxito en FloatingButtonListas")
-      setCreationStatus({ type: "success", message: "Lista creada con éxito" })
+    //   setCreationStatus({ type: "success", message: "Lista creada con éxito" })
 
       // Mostrar el toast de éxito
       toast({
@@ -53,7 +53,7 @@ const FloatingButtonListas = () => {
       setIsSidebarOpen(false)
     } catch (error) {
       console.error("Error al crear la lista en FloatingButtonListas:", error)
-      setCreationStatus({ type: "error", message: error.message || "Error al crear la lista" })
+    //   setCreationStatus({ type: "error", message: error.message || "Error al crear la lista" })
 
       // Mostrar el toast de error
       toast({

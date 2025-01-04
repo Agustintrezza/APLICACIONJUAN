@@ -7,7 +7,7 @@ import { useToast } from "@chakra-ui/react"
 import { AppContext } from "../context/AppContext"
 
 const ListasContainerScreen = () => {
-  const { listas, loadLists, updateList } = useContext(AppContext)
+  const { listas, loadLists, updateList, createList } = useContext(AppContext)
   const [isLoading, setIsLoading] = useState(true)
   const [selectedLista, setSelectedLista] = useState(null)
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1026)
@@ -79,7 +79,7 @@ const ListasContainerScreen = () => {
               listaToEdit={selectedLista}
               onUpdate={handleUpdate}
               toast={toast}
-              onCreate={() => {}}
+              onCreate={createList}
             />
           </div>
         </div>
