@@ -1,15 +1,19 @@
-import { useState, useEffect } from 'react'
-import { FaEdit } from 'react-icons/fa'
-import FormularioListas from '../listas/FormularioListas'
-import PropTypes from 'prop-types'
+import { useState, useEffect, useContext } from "react"
+import { FaEdit } from "react-icons/fa"
+import PropTypes from "prop-types"
+import FormularioListas from "../listas/FormularioListas"
+import { AppContext } from "../../context/AppContext"
+import { useToast } from "@chakra-ui/react"
 
-const FloatingButtonEdit = ({ listaToEdit, onUpdate }) => {
+const FloatingButtonEdit = ({ listaToEdit, onForceFetch }) => {
+  const { updateList } = useContext(AppContext)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const toast = useToast()
 
   useEffect(() => {
-    document.body.style.overflow = isSidebarOpen ? 'hidden' : 'auto'
+    document.body.style.overflow = isSidebarOpen ? "hidden" : "auto"
     return () => {
-      document.body.style.overflow = 'auto'
+      document.body.style.overflow = "auto"
     }
   }, [isSidebarOpen])
 
@@ -17,9 +21,39 @@ const FloatingButtonEdit = ({ listaToEdit, onUpdate }) => {
     setIsSidebarOpen((prev) => !prev)
   }
 
+  const handleUpdate = async (updatedLista) => {
+    try {
+      console.log("FloatingButtonEdit: Intentando actualizar la lista:", updatedLista)
+      await updateList(updatedLista._id, updatedLista)
+  
+      if (onForceFetch) {
+        await onForceFetch() // Sincronización global después de la actualización
+      }
+  
+      toggleSidebar()
+      toast({
+        title: "Lista actualizada",
+        description: "La lista se actualizó correctamente.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      })
+    } catch (error) {
+      console.error("FloatingButtonEdit: Error al actualizar lista:", error)
+      toast({
+        title: "Error",
+        description: "No se pudo actualizar la lista.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      })
+    }
+  }
+  
+  
+
   return (
     <>
-      {/* Botón flotante para editar */}
       <button
         onClick={toggleSidebar}
         className="fixed bg-[#293e68] mt-3 top-2 right-16 text-white p-2 rounded-md shadow-lg z-50"
@@ -28,37 +62,23 @@ const FloatingButtonEdit = ({ listaToEdit, onUpdate }) => {
         <FaEdit size={20} />
       </button>
 
-      {/* Overlay */}
-      <div
-        className={`fixed inset-0 z-40 bg-black bg-opacity-50 transition-opacity duration-500 ${
-          isSidebarOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
-        }`}
-        onClick={toggleSidebar}
-      ></div>
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black bg-opacity-50"
+          onClick={toggleSidebar}
+        ></div>
+      )}
 
-      {/* Sidebar */}
       <div
-        className={`fixed top-0 right-0 h-full w-72 bg-blue-100 shadow-lg p-4 z-50 transform transition-transform duration-500 ${
-          isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
+        className={`fixed top-0 right-0 h-full w-72 bg-blue-100 shadow-lg p-4 z-50 transform ${
+          isSidebarOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-800">Editar Lista</h3>
-          <button
-            onClick={toggleSidebar}
-            className="text-gray-500 hover:text-gray-700"
-            title="Cerrar"
-          >
-            ✖
-          </button>
-        </div>
         <FormularioListas
           listaToEdit={listaToEdit}
-          onUpdate={(updatedLista) => {
-            console.log('Lista actualizada:', updatedLista)
-            onUpdate(updatedLista)
-            toggleSidebar()
-          }}
+          onUpdate={handleUpdate}
+          onCreate={() => {}}
+          toast={toast}
         />
       </div>
     </>
@@ -67,7 +87,7 @@ const FloatingButtonEdit = ({ listaToEdit, onUpdate }) => {
 
 FloatingButtonEdit.propTypes = {
   listaToEdit: PropTypes.object.isRequired,
-  onUpdate: PropTypes.func.isRequired,
+  onForceFetch: PropTypes.func, // Ahora se espera como prop
 }
 
 export default FloatingButtonEdit
