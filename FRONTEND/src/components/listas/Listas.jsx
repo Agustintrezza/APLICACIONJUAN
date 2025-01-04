@@ -30,7 +30,7 @@ const Listas = ({ listas, isLoading }) => {
           <div
             key={lista._id}
             className="bg-white rounded-lg shadow-lg p-4 flex flex-col items-start cursor-pointer"
-            onClick={() => navigate(`/listas/${lista._id}`)} // Redirigir a la ruta de detalles
+            onClick={() => navigate(`/listas/${lista._id}`)}
           >
             <div className="flex items-center space-x-2 mb-4">
               <h4 className="text-lg font-semibold text-[#293e68]">{lista.cliente}</h4>

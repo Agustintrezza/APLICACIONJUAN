@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react"
-import { Input, Textarea, Button, FormLabel, useToast, Skeleton } from "@chakra-ui/react"
+import { Input, Textarea, Button, FormLabel } from "@chakra-ui/react"
 import PropTypes from "prop-types"
 import * as Yup from "yup"
-import { API_URL } from "../../config"
 
-const FormularioListas = ({ onCreate, listaToEdit, onUpdate }) => {
+const FormularioListas = ({ onCreate = () => {}, listaToEdit, onUpdate }) => {
   const [formData, setFormData] = useState({
     cliente: "",
     comentario: "",
@@ -13,9 +12,7 @@ const FormularioListas = ({ onCreate, listaToEdit, onUpdate }) => {
     puesto: "",
     subrubro: "",
   })
-  const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState({})
-  const toast = useToast()
 
   const [rubros, setRubros] = useState([])
   const [puestos, setPuestos] = useState({})
@@ -33,22 +30,18 @@ const FormularioListas = ({ onCreate, listaToEdit, onUpdate }) => {
   })
 
   useEffect(() => {
-    // Definir las opciones de Rubros, Puestos y Subrubros
     setRubros(["Gastronomía", "Industria", "Comercio", "Administración"])
-
     setPuestos({
       Gastronomía: ["Cocina", "Salón", "Barra"],
       Industria: ["Metalúrgica", "IT/Programación", "Transporte", "Maquinarias"],
       Comercio: ["Atención al público", "Encargado de local"],
       Administración: ["Recursos Humanos", "Administrativo de Compras", "Administrativo de Ventas", "Marketing", "Contable", "Legales"],
     })
-
     setSubrubros({
       Cocina: ["Chef", "Fast Food", "Jefe de cocina", "Cocinero", "Pizzero", "Sushiman", "Ayudante de cocina", "Pastelero", "Panadero"],
       Salón: ["Jefe de sala", "Camarero", "Mozo", "Comis", "Runner"],
       Barra: ["Bartender", "Barista", "Cajero", "Encargado", "Gerente de local", "Gerente de operaciones"],
     })
-
     if (listaToEdit) {
       setFormData({
         cliente: listaToEdit.cliente || "",
@@ -87,7 +80,6 @@ const FormularioListas = ({ onCreate, listaToEdit, onUpdate }) => {
         subrubro: listaToEdit.subrubro || "",
       })
     } else {
-      // Reiniciar el formulario si no hay una lista seleccionada
       setFormData({
         cliente: "",
         comentario: "",
@@ -101,56 +93,23 @@ const FormularioListas = ({ onCreate, listaToEdit, onUpdate }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const isValid = await handleValidation()
-    if (!isValid) return
+    console.log("FormularioListas: Datos enviados al manejar submit:", formData)
 
-    setIsLoading(true)
+    if (!(await handleValidation())) {
+      console.log("FormularioListas: Validación fallida")
+      return
+    }
+
     try {
-      const url = listaToEdit ? `${API_URL}/api/listas/${listaToEdit._id}` : `${API_URL}/api/listas`
-      const method = listaToEdit ? "PUT" : "POST"
-
-      const response = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      })
-
-      if (!response.ok) throw new Error(listaToEdit ? "Error al actualizar la lista" : "Error al crear la lista")
-
-      const updatedLista = await response.json()
-
-      toast({
-        title: "Éxito",
-        description: listaToEdit ? "Lista actualizada correctamente" : "Lista creada correctamente",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      })
-
-      if (listaToEdit) {
-        onUpdate(updatedLista)
-      } else {
-        onCreate(updatedLista)
-        // Reinicia el formulario después de crear una nueva lista
-        setFormData({
-          cliente: "",
-          comentario: "",
-          color: "#E53E3E",
-          rubro: "",
-          puesto: "",
-          subrubro: "",
-        })
+      if (listaToEdit && onUpdate) {
+        console.log("FormularioListas: Llamando a onUpdate con:", formData)
+        await onUpdate({ ...listaToEdit, ...formData })
+      } else if (onCreate) {
+        console.log("FormularioListas: Llamando a onCreate con:", formData)
+        await onCreate(formData)
       }
-    } catch {
-      toast({
-        title: "Error",
-        description: listaToEdit ? "No se pudo actualizar la lista" : "No se pudo crear la lista",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      })
-    } finally {
-      setIsLoading(false)
+    } catch (error) {
+      console.error("FormularioListas: Error al procesar la lista:", error)
     }
   }
 
@@ -163,8 +122,6 @@ const FormularioListas = ({ onCreate, listaToEdit, onUpdate }) => {
 
   const inputStyle =
     "p-3 bg-[#e9f0ff] border text-sm border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
-
-  if (isLoading) return <Skeleton height="400px" />
 
   return (
     <div className="w-5/5 xl:w-5/5" style={{ position: "sticky", top: "0px", maxHeight: "100vh", overflowY: "auto" }}>
@@ -264,7 +221,13 @@ const FormularioListas = ({ onCreate, listaToEdit, onUpdate }) => {
               ))}
             </div>
           </div>
-          <Button type="submit" bg="#293e68" color="white" _hover={{ bg: "#1f2d4b" }} className="w-full">
+          <Button
+            type="submit"
+            bg="#293e68"
+            color="white"
+            _hover={{ bg: "#1f2d4b" }}
+            className="w-full"
+          >
             {listaToEdit ? "Guardar Cambios" : "Crear Lista"}
           </Button>
         </form>
