@@ -58,23 +58,30 @@ router.put("/:id", async (req, res) => {
 
 // Ruta para eliminar una lista
 router.delete('/:id', async (req, res) => {
+  console.log(`[DELETE] Solicitud recibida para eliminar lista: ${req.params.id}`);
   try {
-    const listaEliminada = await Lista.findByIdAndDelete(req.params.id)
+    const listaEliminada = await Lista.findByIdAndDelete(req.params.id);
     if (!listaEliminada) {
-      return res.status(404).json({ error: 'Lista no encontrada' })
+      console.warn(`[DELETE] Lista no encontrada: ${req.params.id}`);
+      return res.status(404).json({ error: 'Lista no encontrada' });
     }
 
+    console.log(`[DELETE] Lista eliminada de la base de datos: ${listaEliminada._id}`);
+
     // Quitar la lista eliminada de los curriculums asociados
-    await Curriculum.updateMany(
+    const result = await Curriculum.updateMany(
       { listas: listaEliminada._id },
       { $pull: { listas: listaEliminada._id } }
-    )
+    );
 
-    res.status(200).json({ message: 'Lista eliminada correctamente' })
+    console.log(`[DELETE] Actualización de curriculums completada:`, result);
+
+    res.status(200).json({ message: 'Lista eliminada correctamente' });
   } catch (error) {
-    res.status(500).json({ error: 'Error al eliminar la lista' })
+    console.error(`[DELETE] Error al eliminar la lista: ${error.message}`);
+    res.status(500).json({ error: 'Error al eliminar la lista' });
   }
-})
+});
 
 // Ruta para obtener una lista específica por ID
 router.get('/:id', async (req, res) => {
