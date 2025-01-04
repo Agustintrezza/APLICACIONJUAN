@@ -124,6 +124,7 @@ export const AppProvider = ({ children }) => {
       throw error
     }
   }
+  console.log('Hola')
 
   return (
     <AppContext.Provider
