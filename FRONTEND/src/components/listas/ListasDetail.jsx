@@ -11,6 +11,7 @@ import {
 } from "@chakra-ui/react"
 import { FaArrowLeft, FaTrash } from "react-icons/fa"
 import { useState, useEffect } from "react"
+import { API_URL } from "../../config"
 
 const ListaDetail = ({ lista, onBack, onForceFetch }) => {
   const [localLista, setLocalLista] = useState({ ...lista })
@@ -27,8 +28,10 @@ const ListaDetail = ({ lista, onBack, onForceFetch }) => {
   const handleDelete = async () => {
     setIsDeleting(true)
     try {
-      const response = await fetch(`/api/listas/${localLista._id}`, { method: "DELETE" })
+      console.log(`Eliminando lista con ID: ${localLista._id}`)
+      const response = await fetch(`${API_URL}/api/listas/${localLista._id}`, { method: "DELETE" })
       if (!response.ok) throw new Error("Error al eliminar la lista")
+      console.log("Lista eliminada correctamente.")
       onBack()
       await onForceFetch() // Refresca datos globales tras eliminar
     } catch (error) {
