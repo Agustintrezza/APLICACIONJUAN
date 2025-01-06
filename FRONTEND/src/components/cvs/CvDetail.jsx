@@ -208,7 +208,7 @@ const CvDetail = ({ cv, onToggleNoLlamar }) => {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold text-[#293e68]">
           {isDataLoading ? (
-            <Skeleton width={200} />
+            <Skeleton width={150} height={40}/>
           ) : (
             `${getValueOrDefault(cv.nombre)} ${getValueOrDefault(cv.apellido)}`
           )}
