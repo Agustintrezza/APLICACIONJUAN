@@ -50,10 +50,6 @@ const EditarCvScreen = () => {
           duration: 5000,
           isClosable: true,
           position: "bottom-right",
-          containerStyle: {
-            marginBottom: "20px", // Ajusta este valor para subir o bajar el toast
-            marginRight: "15px"
-          },
         })
       } finally {
         setIsLoading(false)
@@ -92,28 +88,24 @@ const EditarCvScreen = () => {
     e.preventDefault()
     setIsSubmitting(true)
     setErrors({})
-  
+
     try {
       const formDataToSend = new FormData()
       Object.entries(formData).forEach(([key, value]) => {
         if (key === "imagen" && typeof value === "object") {
           formDataToSend.append(key, value)
-        } else if (key === "listas") {
-          // Convertir listas a un arreglo de IDs (si no lo es ya)
-          const listaIds = Array.isArray(value) ? value.map((item) => item._id || item) : [value]
-          listaIds.forEach((id) => formDataToSend.append(key, id))
         } else {
           formDataToSend.append(key, value || "")
         }
       })
-  
+
       const response = await fetch(`${API_URL}/api/curriculums/${id}`, {
         method: "PUT",
         body: formDataToSend,
       })
-  
+
       if (!response.ok) throw new Error("Error al actualizar el CV")
-  
+
       toast({
         title: "Éxito",
         description: "El CV se actualizó correctamente.",
@@ -122,7 +114,7 @@ const EditarCvScreen = () => {
         isClosable: true,
         position: "bottom-right",
       })
-  
+
       navigate(`/ver-cv/${id}`)
     } catch {
       toast({
@@ -144,7 +136,7 @@ const EditarCvScreen = () => {
       <div className="bg-transparent mb-4">
         <div className="flex items-center gap-4">
           {isLoading ? (
-            <Skeleton width={40} height={40} />
+            ''
           ) : (
             <button
               onClick={() => navigate(-1)}
@@ -162,7 +154,15 @@ const EditarCvScreen = () => {
       {/* Contenedor del formulario */}
       <div className="w-full bg-white p-6 shadow-md rounded">
         {isLoading ? (
-          <Skeleton height={400} />
+          <div className="space-y-4">
+            <Skeleton height={50} width={200} />
+            <Skeleton height={20} />
+            <Skeleton height={20} />
+            <Skeleton height={20} />
+            <Skeleton height={20} />
+            <Skeleton height={20} />
+            <Skeleton height={50} width={150} />
+          </div>
         ) : isSubmitting ? (
           <div className="flex justify-center">
             <Spinner size="xl" color="blue.500" />
