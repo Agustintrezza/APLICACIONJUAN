@@ -24,6 +24,7 @@ import {
   Tag,
   TagLabel,
 } from "@chakra-ui/react";
+import { API_URL } from "../../config"
 import FloatingButtonCvDetail from "../floating-buttons/FlotatingButtonCvDetail"
 
 const CvDetail = ({ cv }) => {
@@ -88,14 +89,14 @@ const CvDetail = ({ cv }) => {
   const handleDeleteCv = async () => {
     setIsDeleting(true);
     try {
-      const response = await fetch(`/api/curriculums/${cv._id}`, {
+      const response = await fetch(`${API_URL}/api/curriculums/${cv._id}`, {
         method: "DELETE",
       });
-
+  
       if (!response.ok) {
         throw new Error("Error al eliminar el CV");
       }
-
+  
       toast({
         title: "Éxito",
         description: "El CV se eliminó correctamente.",
@@ -104,7 +105,7 @@ const CvDetail = ({ cv }) => {
         isClosable: true,
         position: "top-right",
       });
-
+  
       navigate("/");
     } catch {
       toast({
@@ -120,6 +121,7 @@ const CvDetail = ({ cv }) => {
       setIsDialogOpen(false);
     }
   };
+  
 
   const handleListTagClick = (listId) => {
     navigate(`/listas/${listId}`, { state: { from: `/ver-cv/${cv._id}` } });
@@ -129,14 +131,14 @@ const CvDetail = ({ cv }) => {
     setIsUpdatingNoLlamar(true);
     try {
       const updatedNoLlamar = !cvData.noLlamar;
-      const response = await fetch(`/api/curriculums/${cvData._id}/no-llamar`, {
+      const response = await fetch(`${API_URL}/api/curriculums/${cvData._id}/no-llamar`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ noLlamar: updatedNoLlamar }),
       });
-
+  
       if (!response.ok) throw new Error("Error al actualizar el estado de No Llamar");
-
+  
       setCvData((prev) => ({ ...prev, noLlamar: updatedNoLlamar }));
       toast({
         title: "Éxito",
@@ -159,6 +161,7 @@ const CvDetail = ({ cv }) => {
       setIsNoLlamarDialogOpen(false);
     }
   };
+  
 
   const formatWhatsappMessage = () => {
     const message = `
