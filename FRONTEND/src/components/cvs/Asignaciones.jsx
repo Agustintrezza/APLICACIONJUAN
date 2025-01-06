@@ -128,7 +128,7 @@ const Asignaciones = ({ curriculumId, onUpdateCvLists }) => {
 
   return (
     <div
-      className="w-full h-full"
+      className="w-full md:w-4/12 h-full"
       style={{ position: "sticky", top: "0", maxHeight: "100vh", overflowY: "auto" }}
     >
       <div className="border border-blue-300 bg-[#e9f0ff] rounded-lg p-4 shadow-lg">
