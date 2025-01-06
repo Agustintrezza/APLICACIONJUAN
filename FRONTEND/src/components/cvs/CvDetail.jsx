@@ -4,7 +4,6 @@ import PropTypes from "prop-types";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import Asignaciones from "./Asignaciones";
-// import { FaArrowLeft, FaShareAlt } from "react-icons/fa"
 import {
   FaArrowLeft,
   FaShareAlt,
@@ -24,10 +23,10 @@ import {
   Tag,
   TagLabel,
 } from "@chakra-ui/react";
-import { API_URL } from "../../config"
-import FloatingButtonCvDetail from "../floating-buttons/FlotatingButtonCvDetail"
+import { API_URL } from "../../config";
+import FloatingButtonCvDetail from "../floating-buttons/FlotatingButtonCvDetail";
 
-const CvDetail = ({ cv }) => {
+const CvDetail = ({ cv, onToggleNoLlamar }) => {
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdatingNoLlamar, setIsUpdatingNoLlamar] = useState(false);
@@ -37,19 +36,16 @@ const CvDetail = ({ cv }) => {
   const cancelRef = useRef();
   const navigate = useNavigate();
   const toast = useToast();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false) 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [cvData, setCvData] = useState(cv);
 
   const toggleSidebar = () => {
-    console.log("Toggling Sidebar") // Para depuración
-    setIsSidebarOpen((prev) => !prev)
-  }
-
-  // console.log("Prop onToggleNoLlamar en CvDetail:", onToggleNoLlamar);
-
+    console.log("Toggling Sidebar"); // Para depuración
+    setIsSidebarOpen((prev) => !prev);
+  };
   useEffect(() => {
-    setCvData(cv) // Actualiza el estado interno cuando cambian los props
-  }, [cv])
+    setCvData(cv); // Actualiza el estado interno cuando cambian los props
+  }, [cv]);
 
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 1026);
@@ -92,11 +88,11 @@ const CvDetail = ({ cv }) => {
       const response = await fetch(`${API_URL}/api/curriculums/${cv._id}`, {
         method: "DELETE",
       });
-  
+
       if (!response.ok) {
         throw new Error("Error al eliminar el CV");
       }
-  
+
       toast({
         title: "Éxito",
         description: "El CV se eliminó correctamente.",
@@ -105,7 +101,7 @@ const CvDetail = ({ cv }) => {
         isClosable: true,
         position: "top-right",
       });
-  
+
       navigate("/");
     } catch {
       toast({
@@ -121,7 +117,6 @@ const CvDetail = ({ cv }) => {
       setIsDialogOpen(false);
     }
   };
-  
 
   const handleListTagClick = (listId) => {
     navigate(`/listas/${listId}`, { state: { from: `/ver-cv/${cv._id}` } });
@@ -131,14 +126,18 @@ const CvDetail = ({ cv }) => {
     setIsUpdatingNoLlamar(true);
     try {
       const updatedNoLlamar = !cvData.noLlamar;
-      const response = await fetch(`${API_URL}/api/curriculums/${cvData._id}/no-llamar`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ noLlamar: updatedNoLlamar }),
-      });
-  
-      if (!response.ok) throw new Error("Error al actualizar el estado de No Llamar");
-  
+      const response = await fetch(
+        `${API_URL}/api/curriculums/${cvData._id}/no-llamar`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ noLlamar: updatedNoLlamar }),
+        }
+      );
+
+      if (!response.ok)
+        throw new Error("Error al actualizar el estado de No Llamar");
+
       setCvData((prev) => ({ ...prev, noLlamar: updatedNoLlamar }));
       toast({
         title: "Éxito",
@@ -161,7 +160,6 @@ const CvDetail = ({ cv }) => {
       setIsNoLlamarDialogOpen(false);
     }
   };
-  
 
   const formatWhatsappMessage = () => {
     const message = `
@@ -181,7 +179,9 @@ const CvDetail = ({ cv }) => {
 
   const renderAssignedLists = () => (
     <div className="mb-6">
-      <h3 className="text-lg font-bold text-[#293e68] mb-2">Listas Asignadas</h3>
+      <h3 className="text-lg font-bold text-[#293e68] mb-2">
+        Listas Asignadas
+      </h3>
       <div className="flex flex-wrap gap-2">
         {cvData.listas.length > 0 ? (
           cvData.listas.map((list) => (
@@ -205,7 +205,6 @@ const CvDetail = ({ cv }) => {
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-4 border border-gray-300 w-5/5">
-      {/* Encabezado con título y botones */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold text-[#293e68]">
           {isDataLoading ? (
@@ -215,110 +214,110 @@ const CvDetail = ({ cv }) => {
           )}
         </h2>
         <div className="flex gap-4">
-          {isDataLoading ? (
-            <>
-              <Skeleton width={100} height={40} />
-              <Skeleton width={100} height={40} />
-              <Skeleton width={100} height={40} />{" "}
-              {/* Esqueleto para el botón Volver */}
-              <Skeleton width={100} height={40} />{" "}
-              {/* Esqueleto para el botón Whatsapp */}
-            </>
-          ) : isDesktop ? (
-            <>
-              <Button
-                leftIcon={<FaArrowLeft />}
-                onClick={onBack}
-                bg="#293e68"
-                color="white"
-                _hover={{ bg: "#1f2d4b" }}
-              >
-                Volver
-              </Button>
-              <button
-                className="bg-[#293e68] text-white px-4 py-2 rounded-lg"
-                onClick={() => navigate(`/editar-cv/${cv._id}`)}
-              >
-                {" "}
-                Editar
-              </button>
-              <button
-                className="bg-red-500 text-white px-4 py-2 rounded-lg"
-                onClick={() => setIsDialogOpen(true)}
-              >
-                {" "}
-                Eliminar
-              </button>
-              <button
-                className="bg-green-500 text-white px-4 py-2 rounded-lg"
-                onClick={handleWhatsappShare}
-              >
-                {" "}
-                WhatsApp
-              </button>
-              <Button
-  className="bg-red-500 text-white px-4 py-2 rounded-lg"
-  onClick={() => {
-    console.log("Llamando a onToggleNoLlamar");
-    setIsNoLlamarDialogOpen(true); // Abre el diálogo de confirmación
-  }}
->
-  {cv.noLlamar ? "Quitar" : "Marcar"} No Llamar
-</Button>
-            </>
-          ) : (
-            <>
-              <div className="me-8">
-                <div className="mb-2 gap-2 flex">
-                  <button
-                    onClick={onBack}
-                    className="p-2 bg-blue-500 text-white rounded-full"
-                  >
-                    <FaArrowLeft />
-                  </button>
-                  <button
-                    onClick={() => navigate(`/editar-cv/${cv._id}`)}
-                    className="p-2 bg-blue-500 text-white rounded-full"
-                  >
-                    <FaEdit />
-                  </button>
-                  <button
-                    onClick={() => setIsDialogOpen(true)}
-                    className="p-2 bg-red-500 text-white rounded-full"
-                  >
-                    <FaTrashAlt />
-                  </button>
-                </div>
-                <div className="mb-2 gap-2 flex">
-                  <button
-                    onClick={() => setIsNoLlamarDialogOpen(true)}
-                    className="p-2 bg-red-500 text-white rounded-full"
-                  >
-                    <FaPhoneSlash />
-                  </button>
-                  <button
-                    onClick={handleWhatsappShare}
-                    className="p-2 bg-green-500 text-white rounded-full"
-                  >
-                    <FaShareAlt />
-                  </button>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
+  {isDataLoading ? (
+    isDesktop ? (
+      <>
+        <Skeleton width={100} height={40} /> {/* Botones de escritorio */}
+        <Skeleton width={100} height={40} />
+        <Skeleton width={100} height={40} />
+        <Skeleton width={100} height={40} />
+      </>
+    ) : (
+      <div className="flex gap-2 me-10">
+        <Skeleton width={40} height={40} circle={true} /> {/* Botones redondos */}
+        <Skeleton width={40} height={40} circle={true} />
       </div>
-
-      {/* Botón flotante para responsive */}
-  {!isDesktop && (
-    <FloatingButtonCvDetail
-      onToggleSidebar={toggleSidebar}
-      isSidebarOpen={isSidebarOpen}
-    />
+    )
+  ) : isDesktop ? (
+    <>
+      <Button
+        leftIcon={<FaArrowLeft />}
+        onClick={onBack}
+        bg="#293e68"
+        color="white"
+        _hover={{ bg: "#1f2d4b" }}
+      >
+        Volver
+      </Button>
+      <button
+        className="bg-[#293e68] text-white px-4 py-2 rounded-lg"
+        onClick={() => navigate(`/editar-cv/${cv._id}`)}
+      >
+        Editar
+      </button>
+      <button
+        className="bg-red-500 text-white px-4 py-2 rounded-lg"
+        onClick={() => setIsDialogOpen(true)}
+      >
+        Eliminar
+      </button>
+      <button
+        className="bg-green-500 text-white px-4 py-2 rounded-lg"
+        onClick={handleWhatsappShare}
+      >
+        WhatsApp
+      </button>
+      <button
+  onClick={onToggleNoLlamar}
+  className={`p-3 text-white rounded-full ${
+    cv.noLlamar ? "bg-red-500" : "bg-gray-500"
+  }`}
+  title={cv.noLlamar ? "Marcado como No Llamar" : "No está marcado como No Llamar"}
+>
+  <FaPhoneSlash />
+</button>
+    </>
+  ) : (
+    <div className="me-8">
+      <div className="mb-2 gap-2 flex">
+        <button
+          onClick={onBack}
+          className="p-2 bg-blue-500 text-white rounded-full"
+        >
+          <FaArrowLeft />
+        </button>
+        <button
+          onClick={() => navigate(`/editar-cv/${cv._id}`)}
+          className="p-2 bg-blue-500 text-white rounded-full"
+        >
+          <FaEdit />
+        </button>
+        <button
+          onClick={() => setIsDialogOpen(true)}
+          className="p-2 bg-red-500 text-white rounded-full"
+        >
+          <FaTrashAlt />
+        </button>
+      </div>
+      <div className="mb-2 gap-2 flex">
+      <button
+  onClick={onToggleNoLlamar}
+  className={`p-2 text-white rounded-full ${
+    cv.noLlamar ? "bg-red-500" : "bg-gray-500"
+  }`}
+  title={cv.noLlamar ? "Marcado como No Llamar" : "No está marcado como No Llamar"}
+>
+  <FaPhoneSlash />
+</button>
+        <button
+          onClick={handleWhatsappShare}
+          className="p-2 bg-green-500 text-white rounded-full"
+        >
+          <FaShareAlt />
+        </button>
+      </div>
+    </div>
   )}
+</div>
 
-  {/* Sidebar */}
-  {isSidebarOpen && (
+      </div>
+      {!isDesktop && (
+        <FloatingButtonCvDetail
+          onToggleSidebar={toggleSidebar}
+          isSidebarOpen={isSidebarOpen}
+        />
+      )}
+      {isSidebarOpen && (
         <div className="w-full">
           <div
             className="fixed inset-0 z-40 bg-black bg-opacity-50"
@@ -326,49 +325,31 @@ const CvDetail = ({ cv }) => {
           ></div>
           <div className="fixed top-0 right-0 h-full w-80 bg-blue-100 shadow-lg z-50 overflow-y-auto p-4">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">Asignaciones</h3>
+              <h3 className="text-lg font-semibold text-gray-800">
+                Asignaciones
+              </h3>
               <button onClick={toggleSidebar} title="Cerrar">
                 ✖
               </button>
             </div>
             <div>
-            <p className="text-sm mb-4 font-semibold text-gray-800">Asigná y desasigná el curriculum a las listas</p>
+              <p className="text-sm mb-4 font-semibold text-gray-800">
+                Asigná y desasigná el curriculum a las listas
+              </p>
+            </div>
 
-              </div>
-            
-              <Asignaciones
-  curriculumId={cvData._id}
-  onUpdateCvLists={(updatedLists) => {
-    setCvData((prev) => ({
-      ...prev,
-      listas: updatedLists, // Actualiza el estado local
-    }));
-  }}
-/>
-          
+            <Asignaciones
+              curriculumId={cvData._id}
+              onUpdateCvLists={(updatedLists) => {
+                setCvData((prev) => ({
+                  ...prev,
+                  listas: updatedLists,
+                }));
+              }}
+            />
           </div>
         </div>
       )}
-      {/* Información de listas asignadas */}
-      {/* <div className="mb-6">
-        <h3 className="text-lg font-bold text-[#293e68] mb-2">Listas Asignadas</h3>
-        <div className="flex flex-wrap gap-2">
-          {cvData.listas.map((list) => (
-            <Tag
-              key={list._id}
-              bg={list.color}
-              color="white"
-              onClick={() => handleListTagClick(list._id)}
-            >
-              <TagLabel>{list.cliente}</TagLabel>
-            </Tag>
-          ))}
-        </div>
-      </div> */}
-
-      
-
-      {/* Diálogo de confirmación para No Llamar */}
       <AlertDialog
         isOpen={isNoLlamarDialogOpen}
         leastDestructiveRef={cancelRef}
@@ -402,14 +383,9 @@ const CvDetail = ({ cv }) => {
           </AlertDialogContent>
         </AlertDialogOverlay>
       </AlertDialog>
-
-      {/* Información de listas asignadas */}
       <div className="mb-6">
-       {/* Listas asignadas compartidas */}
-      {renderAssignedLists()}
+        {renderAssignedLists()}
       </div>
-
-      {/* Contenido principal */}
       <div className="grid grid-cols-2 gap-6">
         <div>
           {isDataLoading ? (
@@ -452,7 +428,6 @@ const CvDetail = ({ cv }) => {
             </>
           )}
         </div>
-
         <div>
           {isDataLoading ? (
             <Skeleton count={7} height={20} className="mb-2" />
@@ -472,13 +447,14 @@ const CvDetail = ({ cv }) => {
                 <strong>Nivel de Estudios:</strong>{" "}
                 {getValueOrDefault(cv.nivelEstudios)}
               </p>
+              <p className="text-sm text-gray-600"></p>
               <p className="text-sm text-gray-600">
                 <strong>Experiencia:</strong>{" "}
                 {getValueOrDefault(cv.experiencia)}
               </p>
               <p className="text-sm text-gray-600">
                 <strong>Idiomas:</strong>{" "}
-                {getValueOrDefault(cv.idiomas.filter((i) => i).join(", "))}
+                {getValueOrDefault(cv.idiomas?.filter((i) => i).join(", "))}
               </p>
               <p className="text-sm text-gray-600">
                 <strong>Comentarios:</strong>{" "}
@@ -488,8 +464,6 @@ const CvDetail = ({ cv }) => {
           )}
         </div>
       </div>
-
-      {/* Renderización del archivo */}
       <div className="mt-6">
         <h3 className="text-lg font-bold text-[#293e68] mb-4">Archivo</h3>
         {isDataLoading ? (
@@ -523,8 +497,6 @@ const CvDetail = ({ cv }) => {
           </>
         )}
       </div>
-
-      {/* Diálogo de confirmación */}
       <AlertDialog
         isOpen={isDialogOpen}
         leastDestructiveRef={cancelRef}
@@ -535,12 +507,10 @@ const CvDetail = ({ cv }) => {
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
               Confirmar eliminación
             </AlertDialogHeader>
-
             <AlertDialogBody>
               ¿Estás seguro de que deseas eliminar este CV? Esta acción no se
               puede deshacer.
             </AlertDialogBody>
-
             <AlertDialogFooter>
               <Button ref={cancelRef} onClick={() => setIsDialogOpen(false)}>
                 Cancelar
@@ -563,6 +533,7 @@ const CvDetail = ({ cv }) => {
 
 CvDetail.propTypes = {
   cv: PropTypes.object.isRequired,
+  onToggleNoLlamar: PropTypes.func.isRequired,
 };
 
 export default CvDetail;
