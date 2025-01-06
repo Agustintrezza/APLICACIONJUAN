@@ -26,7 +26,6 @@ const TableMain = () => {
   })
   const [cvData, setCvData] = useState([])
   const [isLoading, setIsLoading] = useState(true)
-  // const [favoriteIds, setFavoriteIds] = useState([])
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1026)
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
 
@@ -57,12 +56,6 @@ const TableMain = () => {
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
-
-  // const toggleFavorite = (id) => {
-  //   setFavoriteIds((prevIds) =>
-  //     prevIds.includes(id) ? prevIds.filter((favId) => favId !== id) : [...prevIds, id]
-  //   )
-  // }
 
   const handleResetSearch = () => setSearchTerm('')
   const handleResetFilters = () => {
@@ -140,12 +133,10 @@ const TableMain = () => {
                   key={index}
                   className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300 p-4"
                 >
-                  <Skeleton height={20} width="80%" className="mb-2" />
-                  <Skeleton height={15} width="60%" />
-                  <div className="flex justify-between items-center mt-4">
-                    <Skeleton height={30} width="30%" />
-                    <Skeleton circle={true} height={30} width={30} />
-                  </div>
+                  <Skeleton height={20} width="80%" className="mb-2" /> {/* Nombre */}
+                  <Skeleton height={15} width="40%" className="mb-2" /> {/* Edad */}
+                  <Skeleton height={15} width="60%" className="mb-2" /> {/* Listas */}
+                  <Skeleton height={20} width="30%" className="mt-2" /> {/* No llamar */}
                 </div>
               ))}
             </div>
@@ -162,7 +153,9 @@ const TableMain = () => {
                         <h3 className="text-lg font-bold text-[#293e68]">
                           {user.nombre} {user.apellido}
                         </h3>
-                        <p className="text-lg font-bold text-[#293e68]">{user.edad}</p>
+                        <p className="text-lg font-bold text-[#293e68]">
+                          {user.edad ? `${user.edad} años` : 'Sin edad especificada'}
+                        </p>
                         <ul className="text-sm text-gray-800 list-inside list-disc">
                           {user.listas?.length > 0 ? (
                             user.listas.map((lista) => (
@@ -185,14 +178,6 @@ const TableMain = () => {
                         )}
                       </div>
                     </Link>
-                    {/* <button
-                      onClick={() => toggleFavorite(user._id)}
-                      className={`absolute top-4 right-4 p-2 bg-white rounded-full ${
-                        favoriteIds.includes(user._id) ? 'text-red-500' : 'text-gray-500'
-                      } hover:text-red-600`}
-                    >
-                      <FaHeart />
-                    </button> */}
                   </div>
                 ))
               ) : (
@@ -213,7 +198,7 @@ const TableMain = () => {
           {isCategoriesOpen && (
             <div className="fixed inset-0 clase bg-black bg-opacity-50 flex justify-center items-center z-50">
               <div className="bg-blue-50 rounded-lg px-4 py-4 w-11/12 h-5/6 overflow-auto">
-              {/* Componente SelectFilters */}
+                {/* Componente SelectFilters */}
                 <SelectFilters
                   searchTerm={searchTerm}
                   setSearchTerm={setSearchTerm}
