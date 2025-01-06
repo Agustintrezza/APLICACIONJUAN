@@ -128,8 +128,8 @@ const Asignaciones = ({ curriculumId, onUpdateCvLists }) => {
 
   return (
     <div
-      className="w-2/5 xl:w-1/5"
-      style={{ position: "sticky", top: "-16px", maxHeight: "100vh", overflowY: "auto" }}
+      className="w-full h-full"
+      style={{ position: "sticky", top: "0", maxHeight: "100vh", overflowY: "auto" }}
     >
       <div className="border border-blue-300 bg-[#e9f0ff] rounded-lg p-4 shadow-lg">
         <h3 className="text-lg font-semibold mb-4 text-[#293e68]">Asignaciones</h3>
@@ -143,6 +143,7 @@ const Asignaciones = ({ curriculumId, onUpdateCvLists }) => {
             options={lists}
             components={{ Option: customOption, SingleValue: customSingleValue }}
             placeholder="Seleccionar listas"
+            className="w-full"
           />
         )}
       </div>

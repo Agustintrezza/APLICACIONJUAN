@@ -1,218 +1,373 @@
-  import { useState, useEffect, useRef } from "react"
-  import { useNavigate } from "react-router-dom"
-  import PropTypes from "prop-types"
-  import Skeleton from "react-loading-skeleton"
-  import "react-loading-skeleton/dist/skeleton.css"
-  import { FaArrowLeft, FaShareAlt } from "react-icons/fa"
-  import {
-    Button,
-    useToast,
-    AlertDialog,
-    AlertDialogBody,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogContent,
-    AlertDialogOverlay,
-    Tag,
-    TagLabel,
-  } from "@chakra-ui/react"
-  import { API_URL } from "../../config"
+import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+import Asignaciones from "./Asignaciones";
+// import { FaArrowLeft, FaShareAlt } from "react-icons/fa"
+import {
+  FaArrowLeft,
+  FaShareAlt,
+  FaTrashAlt,
+  FaPhoneSlash,
+  FaEdit,
+} from "react-icons/fa";
+import {
+  Button,
+  useToast,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+  Tag,
+  TagLabel,
+} from "@chakra-ui/react";
+import FloatingButtonCvDetail from "../floating-buttons/FlotatingButtonCvDetail"
 
-  const CvDetail = ({ cv }) => {
-    const [isDataLoading, setIsDataLoading] = useState(true)
-    const [isDeleting, setIsDeleting] = useState(false)
-    const [isUpdatingNoLlamar, setIsUpdatingNoLlamar] = useState(false)
-    const [isNoLlamarDialogOpen, setIsNoLlamarDialogOpen] = useState(false)
-    const [isDialogOpen, setIsDialogOpen] = useState(false)
-    const cancelRef = useRef()
-    const navigate = useNavigate()
-    const toast = useToast()
+const CvDetail = ({ cv }) => {
+  const [isDataLoading, setIsDataLoading] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isUpdatingNoLlamar, setIsUpdatingNoLlamar] = useState(false);
+  const [isNoLlamarDialogOpen, setIsNoLlamarDialogOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1026);
+  const cancelRef = useRef();
+  const navigate = useNavigate();
+  const toast = useToast();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false) 
+  const [cvData, setCvData] = useState(cv);
 
-    useEffect(() => {
-      const timer = setTimeout(() => {
-        setIsDataLoading(false)
-      }, 1500)
+  const toggleSidebar = () => {
+    console.log("Toggling Sidebar") // Para depuración
+    setIsSidebarOpen((prev) => !prev)
+  }
 
-      return () => clearTimeout(timer)
-    }, [cv])
+  useEffect(() => {
+    setCvData(cv) // Actualiza el estado interno cuando cambian los props
+  }, [cv])
 
-    const toggleNoLlamar = async () => {
-      setIsUpdatingNoLlamar(true)
-      try {
-        const response = await fetch(`/api/curriculums/${cv._id}/no-llamar`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ noLlamar: !cv.noLlamar }),
-        })
-  
-        if (!response.ok) {
-          throw new Error('Error al actualizar el estado de No Llamar')
-        }
-  
-        const updatedCv = await response.json()
-        toast({
-          title: 'Éxito',
-          description: `El CV ahora está marcado como ${updatedCv.noLlamar ? 'No Llamar' : 'Disponible para llamar'}.`,
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-          position: 'top-right',
-        })
-  
-        navigate(0) // Recargar la página para reflejar cambios
-      } catch {
-        toast({
-          title: 'Error',
-          description: 'Hubo un problema al actualizar el estado de No Llamar.',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-          position: 'top-right',
-        })
-      } finally {
-        setIsUpdatingNoLlamar(false)
-        setIsNoLlamarDialogOpen(false)
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 1026);
+    window.addEventListener("resize", handleResize);
+
+    const timer = setTimeout(() => {
+      setIsDataLoading(false);
+    }, 1500);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      clearTimeout(timer);
+    };
+  }, [cv]);
+
+  const toggleNoLlamar = async () => {
+    setIsUpdatingNoLlamar(true);
+    try {
+      const response = await fetch(`/api/curriculums/${cvData._id}/no-llamar`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ noLlamar: !cvData.noLlamar }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al actualizar el estado de No Llamar");
       }
+
+      const updatedCv = await response.json();
+      toast({
+        title: "Éxito",
+        description: `El CV ahora está marcado como ${
+          updatedCv.noLlamar ? "No Llamar" : "Disponible para llamar"
+        }.`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
+      });
+
+      setCvData(updatedCv); // Actualiza el estado con los nuevos datos
+    } catch {
+      toast({
+        title: "Error",
+        description: "Hubo un problema al actualizar el estado de No Llamar.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
+      });
+    } finally {
+      setIsUpdatingNoLlamar(false);
+      setIsNoLlamarDialogOpen(false);
     }
+  };
 
-    const getValueOrDefault = (value) =>
-      value !== undefined && value !== null && value !== "" ? value : "-"
+  const getValueOrDefault = (value) =>
+    value !== undefined && value !== null && value !== "" ? value : "-";
 
-    const isImage = (url) => /\.(jpg|jpeg|png)$/i.test(url)
-    const isPDF = (url) => /\.pdf$/i.test(url)
+  const isImage = (url) => /\.(jpg|jpeg|png)$/i.test(url);
+  const isPDF = (url) => /\.pdf$/i.test(url);
 
-    const getPDFThumbnail = (url) => {
-      if (isPDF(url)) {
-        const parts = url.split("/upload/")
-        return `${parts[0]}/upload/w_150,h_150,c_fit/${parts[1].replace(".pdf", ".jpg")}`
+  const getPDFThumbnail = (url) => {
+    if (isPDF(url)) {
+      const parts = url.split("/upload/");
+      return `${parts[0]}/upload/w_150,h_150,c_fit/${parts[1].replace(
+        ".pdf",
+        ".jpg"
+      )}`;
+    }
+    return null;
+  };
+
+  const onBack = () => {
+    navigate("/curriculums"); // Navega a la ruta '/curriculums'
+  };
+
+  const handleDeleteCv = async () => {
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`/api/curriculums/${cv._id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al eliminar el CV");
       }
-      return null
-    }
 
-    const onBack = () => {
-      navigate("/curriculums") // Navega a la ruta '/curriculums'
-    }
+      toast({
+        title: "Éxito",
+        description: "El CV se eliminó correctamente.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
+      });
 
-    const handleDeleteCv = async () => {
-      setIsDeleting(true)
-      try {
-        console.log(`Eliminando CV con ID: ${cv._id}`)
-        const response = await fetch(`${API_URL}/api/curriculums/${cv._id}`, {
-          method: "DELETE",
-        })
-    
-        if (!response.ok) {
-          throw new Error("Error al eliminar el CV")
-        }
-    
-        toast({
-          title: "Éxito",
-          description: "El CV se eliminó correctamente.",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "top-right",
-        })
-    
-        navigate("/")
-      } catch {
-        toast({
-          title: "Error",
-          description: "Hubo un problema al eliminar el CV.",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "top-right",
-        })
-      } finally {
-        setIsDeleting(false)
-        setIsDialogOpen(false)
-      }
+      navigate("/");
+    } catch {
+      toast({
+        title: "Error",
+        description: "Hubo un problema al eliminar el CV.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
+      });
+    } finally {
+      setIsDeleting(false);
+      setIsDialogOpen(false);
     }
+  };
 
-    const handleListTagClick = (listId) => {
-      navigate(`/listas/${listId}`, { state: { from: `/ver-cv/${cv._id}` } })
-    }
+  const handleListTagClick = (listId) => {
+    navigate(`/listas/${listId}`, { state: { from: `/ver-cv/${cv._id}` } });
+  };
 
-    const formatWhatsappMessage = () => {
-          const message = `
+  const formatWhatsappMessage = () => {
+    const message = `
       🚀 *Curriculum Vitae* 🚀
-      ${getValueOrDefault(cv.nombre) }
-      ${getValueOrDefault(cv.apellido) }
+      ${getValueOrDefault(cv.nombre)}
+      ${getValueOrDefault(cv.apellido)}
       ${getValueOrDefault(cv.imagen)}
-          `
-          return encodeURIComponent(message.trim())
-        }
+          `;
+    return encodeURIComponent(message.trim());
+  };
 
-        const handleWhatsappShare = () => {
-          const message = formatWhatsappMessage()
-          const whatsappUrl = `https://wa.me/1132368312?text=${message}`
-          window.open(whatsappUrl, "_blank")
-        }
+  const handleWhatsappShare = () => {
+    const message = formatWhatsappMessage();
+    const whatsappUrl = `https://wa.me/1132368312?text=${message}`;
+    window.open(whatsappUrl, "_blank");
+  };
 
-    return (
-      <div className="bg-white rounded-lg shadow-lg p-4 border border-gray-300 w-5/5">
-        {/* Encabezado con título y botones */}
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold text-[#293e68]">
-            {isDataLoading ? (
-              <Skeleton width={200} />
-            ) : (
-              `${getValueOrDefault(cv.nombre)} ${getValueOrDefault(cv.apellido)}`
-            )}
-          </h2>
-          <div className="flex gap-4">
-            {isDataLoading ? (
-              <>
-                <Skeleton width={100} height={40} />
-                <Skeleton width={100} height={40} />
-                <Skeleton width={100} height={40} /> {/* Esqueleto para el botón Volver */}
-                <Skeleton width={100} height={40} /> {/* Esqueleto para el botón Whatsapp */}
-                <Skeleton width={100} height={40} /> {/* Esqueleto para el botón Whatsapp */}
-              </>
-            ) : (
-              <>
-                <Button
-                  leftIcon={<FaArrowLeft />}
-                  onClick={onBack}
-                  bg="#293e68"
-                  color="white"
-                  _hover={{ bg: "#1f2d4b" }}
-                  className="px-4 py-2 text-sm rounded-lg shadow hover:bg-[#1f2d4b]"
-                >
-                  Volver
-                </Button>
-                <button
-                  className="px-4 py-2 bg-[#293e68] text-white text-sm rounded-lg shadow hover:bg-[#1f2d4b]"
-                  onClick={() => navigate(`/editar-cv/${cv._id}`)}
-                >
-                  Editar
-                </button>
-                <button
-                  className="px-4 py-2 bg-red-500 text-white text-sm rounded-lg shadow hover:bg-red-600"
-                  onClick={() => setIsDialogOpen(true)}
-                >
-                  Eliminar
-                </button>
-                <button
-                  className="px-4 py-2 bg-green-500 text-white text-sm rounded-lg shadow hover:bg-green-600 flex items-center gap-2"
-                  onClick={handleWhatsappShare}
-                >
-                  <FaShareAlt />
-                  WhatsApp
-                </button>
-                <button
-                  className="px-4 py-2 bg-red-500 text-white text-sm rounded-lg shadow hover:bg-red-600 flex items-center gap-2"
-                  onClick={() => setIsNoLlamarDialogOpen(true)}
-                >
-                  {cv.noLlamar ? 'Quitar No Llamar' : 'Marcar No Llamar'}
-                </button>
-              </>
-            )}
+  const renderAssignedLists = () => (
+    <div className="mb-6">
+      <h3 className="text-lg font-bold text-[#293e68] mb-2">Listas Asignadas</h3>
+      <div className="flex flex-wrap gap-2">
+        {cvData.listas.length > 0 ? (
+          cvData.listas.map((list) => (
+            <Tag
+              key={list._id}
+              bg={list.color}
+              color="white"
+              borderRadius="full"
+              className="flex items-center cursor-pointer"
+              onClick={() => handleListTagClick(list._id)}
+            >
+              <TagLabel>{list.cliente || "Sin nombre"}</TagLabel>
+            </Tag>
+          ))
+        ) : (
+          <p className="text-sm text-gray-600">No asignado a ninguna lista.</p>
+        )}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="bg-white rounded-lg shadow-lg p-4 border border-gray-300 w-5/5">
+      {/* Encabezado con título y botones */}
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold text-[#293e68]">
+          {isDataLoading ? (
+            <Skeleton width={200} />
+          ) : (
+            `${getValueOrDefault(cv.nombre)} ${getValueOrDefault(cv.apellido)}`
+          )}
+        </h2>
+        <div className="flex gap-4">
+          {isDataLoading ? (
+            <>
+              <Skeleton width={100} height={40} />
+              <Skeleton width={100} height={40} />
+              <Skeleton width={100} height={40} />{" "}
+              {/* Esqueleto para el botón Volver */}
+              <Skeleton width={100} height={40} />{" "}
+              {/* Esqueleto para el botón Whatsapp */}
+            </>
+          ) : isDesktop ? (
+            <>
+              <Button
+                leftIcon={<FaArrowLeft />}
+                onClick={onBack}
+                bg="#293e68"
+                color="white"
+                _hover={{ bg: "#1f2d4b" }}
+              >
+                Volver
+              </Button>
+              <button
+                className="bg-[#293e68] text-white px-4 py-2 rounded-lg"
+                onClick={() => navigate(`/editar-cv/${cv._id}`)}
+              >
+                {" "}
+                Editar
+              </button>
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded-lg"
+                onClick={() => setIsDialogOpen(true)}
+              >
+                {" "}
+                Eliminar
+              </button>
+              <button
+                className="bg-green-500 text-white px-4 py-2 rounded-lg"
+                onClick={handleWhatsappShare}
+              >
+                {" "}
+                WhatsApp
+              </button>
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded-lg"
+                onClick={() => setIsNoLlamarDialogOpen(true)}
+              >
+                {" "}
+                {cv.noLlamar ? "Quitar" : "Marcar"} No Llamar
+              </button>
+            </>
+          ) : (
+            <>
+              <div className="me-8">
+                <div className="mb-2 gap-2 flex">
+                  <button
+                    onClick={onBack}
+                    className="p-2 bg-blue-500 text-white rounded-full"
+                  >
+                    <FaArrowLeft />
+                  </button>
+                  <button
+                    onClick={() => navigate(`/editar-cv/${cv._id}`)}
+                    className="p-2 bg-blue-500 text-white rounded-full"
+                  >
+                    <FaEdit />
+                  </button>
+                  <button
+                    onClick={() => setIsDialogOpen(true)}
+                    className="p-2 bg-red-500 text-white rounded-full"
+                  >
+                    <FaTrashAlt />
+                  </button>
+                </div>
+                <div className="mb-2 gap-2 flex">
+                  <button
+                    onClick={() => setIsNoLlamarDialogOpen(true)}
+                    className="p-2 bg-red-500 text-white rounded-full"
+                  >
+                    <FaPhoneSlash />
+                  </button>
+                  <button
+                    onClick={handleWhatsappShare}
+                    className="p-2 bg-green-500 text-white rounded-full"
+                  >
+                    <FaShareAlt />
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Botón flotante para responsive */}
+  {!isDesktop && (
+    <FloatingButtonCvDetail
+      onToggleSidebar={toggleSidebar}
+      isSidebarOpen={isSidebarOpen}
+    />
+  )}
+
+  {/* Sidebar */}
+  {isSidebarOpen && (
+        <div className="w-full">
+          <div
+            className="fixed inset-0 z-40 bg-black bg-opacity-50"
+            onClick={toggleSidebar}
+          ></div>
+          <div className="fixed top-0 right-0 h-full w-80 bg-blue-100 shadow-lg z-50 overflow-y-auto p-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">Asignaciones</h3>
+              <button onClick={toggleSidebar} title="Cerrar">
+                ✖
+              </button>
+            </div>
+            <div>
+            <p className="text-sm mb-4 font-semibold text-gray-800">Asigná y desasigná el curriculum a las listas</p>
+
+              </div>
+            
+              <Asignaciones
+  curriculumId={cvData._id}
+  onUpdateCvLists={(updatedLists) => {
+    setCvData((prev) => ({
+      ...prev,
+      listas: updatedLists, // Actualiza el estado local
+    }));
+  }}
+/>
+          
           </div>
         </div>
+      )}
+      {/* Información de listas asignadas */}
+      {/* <div className="mb-6">
+        <h3 className="text-lg font-bold text-[#293e68] mb-2">Listas Asignadas</h3>
+        <div className="flex flex-wrap gap-2">
+          {cvData.listas.map((list) => (
+            <Tag
+              key={list._id}
+              bg={list.color}
+              color="white"
+              onClick={() => handleListTagClick(list._id)}
+            >
+              <TagLabel>{list.cliente}</TagLabel>
+            </Tag>
+          ))}
+        </div>
+      </div> */}
 
-        {/* Diálogo de confirmación para No Llamar */}
+      
+
+      {/* Diálogo de confirmación para No Llamar */}
       <AlertDialog
         isOpen={isNoLlamarDialogOpen}
         leastDestructiveRef={cancelRef}
@@ -221,16 +376,25 @@
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              {cv.noLlamar ? 'Quitar No Llamar' : 'Marcar No Llamar'}
+              {cv.noLlamar ? "Quitar No Llamar" : "Marcar No Llamar"}
             </AlertDialogHeader>
             <AlertDialogBody>
-              ¿Estás seguro que deseas {cv.noLlamar ? 'quitar' : 'marcar'} este CV como {cv.noLlamar ? '`No' : '`No'} Llamar´?
+              ¿Estás seguro que deseas {cv.noLlamar ? "quitar" : "marcar"} este
+              CV como {cv.noLlamar ? "`No" : "`No"} Llamar`?
             </AlertDialogBody>
             <AlertDialogFooter>
-              <Button ref={cancelRef} onClick={() => setIsNoLlamarDialogOpen(false)}>
+              <Button
+                ref={cancelRef}
+                onClick={() => setIsNoLlamarDialogOpen(false)}
+              >
                 Cancelar
               </Button>
-              <Button colorScheme="red" onClick={toggleNoLlamar} ml={3} isLoading={isUpdatingNoLlamar}>
+              <Button
+                colorScheme="red"
+                onClick={toggleNoLlamar}
+                ml={3}
+                isLoading={isUpdatingNoLlamar}
+              >
                 Confirmar
               </Button>
             </AlertDialogFooter>
@@ -238,178 +402,166 @@
         </AlertDialogOverlay>
       </AlertDialog>
 
-        {/* Información de listas asignadas */}
-        <div className="mb-6">
-          <h3 className="text-lg font-bold text-[#293e68] mb-2">Listas Asignadas</h3>
+      {/* Información de listas asignadas */}
+      <div className="mb-6">
+       {/* Listas asignadas compartidas */}
+      {renderAssignedLists()}
+      </div>
+
+      {/* Contenido principal */}
+      <div className="grid grid-cols-2 gap-6">
+        <div>
           {isDataLoading ? (
-            <Skeleton count={3} height={30} className="mb-2" />
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {cv.listas.length > 0 ? (
-                cv.listas.map((list) => (
-                  <Tag
-                    size="lg"
-                    key={list._id}
-                    bg={list.color}
-                    color="white"
-                    borderRadius="full"
-                    className="flex items-center cursor-pointer"
-                    onClick={() => handleListTagClick(list._id)}
-                  >
-                    <TagLabel>{list.cliente || "Sin nombre"}</TagLabel>
-                  </Tag>
-                ))
-              ) : (
-                <p className="text-sm text-gray-600">No asignado a ninguna lista.</p>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Contenido principal */}
-        <div className="grid grid-cols-2 gap-6">
-          <div>
-            {isDataLoading ? (
-              <Skeleton count={7} height={20} className="mb-2" />
-            ) : (
-              <>
-                <p className="text-sm text-gray-600">
-                  <strong>Edad:</strong> {getValueOrDefault(cv.edad)}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <strong>Género:</strong> {getValueOrDefault(cv.genero)}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <strong>Teléfono Fijo:</strong> {getValueOrDefault(cv.telefonoFijo)}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <strong>Celular:</strong> {getValueOrDefault(cv.celular)}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <strong>Email:</strong> {getValueOrDefault(cv.email)}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <strong>País:</strong> {getValueOrDefault(cv.pais)}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <strong>Provincia:</strong> {getValueOrDefault(cv.provincia)}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <strong>Rubro:</strong> {getValueOrDefault(cv.rubro)}
-                </p>
-                {cv.rubro === "Gastronomía" && cv.subrubro && (
-                  <p className="text-sm text-gray-600">
-                    <strong>Subrubro:</strong> {getValueOrDefault(cv.subrubro)}
-                  </p>
-                )}
-                <p className="text-sm text-gray-600">
-                  <strong>Puesto:</strong> {getValueOrDefault(cv.puesto)}
-                </p>
-              </>
-            )}
-          </div>
-
-          <div>
-            {isDataLoading ? (
-              <Skeleton count={7} height={20} className="mb-2" />
-            ) : (
-              <>
-                <p className="text-sm text-gray-600">
-                  <strong>Localidad:</strong> {getValueOrDefault(cv.localidad)}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <strong>Zona:</strong> {getValueOrDefault(cv.zona)}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <strong>Calificación:</strong> {getValueOrDefault(cv.calificacion)}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <strong>Nivel de Estudios:</strong> {getValueOrDefault(cv.nivelEstudios)}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <strong>Experiencia:</strong> {getValueOrDefault(cv.experiencia)}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <strong>Idiomas:</strong>{" "}
-                  {getValueOrDefault(cv.idiomas.filter((i) => i).join(", "))}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <strong>Comentarios:</strong> {getValueOrDefault(cv.comentarios)}
-                </p>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Renderización del archivo */}
-        <div className="mt-6">
-          <h3 className="text-lg font-bold text-[#293e68] mb-4">Archivo</h3>
-          {isDataLoading ? (
-            <Skeleton height={240} width={240} borderRadius="8px" />
+            <Skeleton count={7} height={20} className="mb-2" />
           ) : (
             <>
-              {isImage(cv.imagen) && (
-                <div className="w-3/12">
-                  <a href={cv.imagen} target="_blank" rel="noopener noreferrer">
-                    <img
-                      src={cv.imagen}
-                      alt="Archivo del CV"
-                      className="w-80 h-60 object-center rounded-md shadow-md transition-transform transform hover:scale-105 cursor-pointer"
-                    />
-                  </a>
-                </div>
+              <p className="text-sm text-gray-600">
+                <strong>Edad:</strong> {getValueOrDefault(cv.edad)}
+              </p>
+              <p className="text-sm text-gray-600">
+                <strong>Género:</strong> {getValueOrDefault(cv.genero)}
+              </p>
+              <p className="text-sm text-gray-600">
+                <strong>Teléfono Fijo:</strong>{" "}
+                {getValueOrDefault(cv.telefonoFijo)}
+              </p>
+              <p className="text-sm text-gray-600">
+                <strong>Celular:</strong> {getValueOrDefault(cv.celular)}
+              </p>
+              <p className="text-sm text-gray-600">
+                <strong>Email:</strong> {getValueOrDefault(cv.email)}
+              </p>
+              <p className="text-sm text-gray-600">
+                <strong>País:</strong> {getValueOrDefault(cv.pais)}
+              </p>
+              <p className="text-sm text-gray-600">
+                <strong>Provincia:</strong> {getValueOrDefault(cv.provincia)}
+              </p>
+              <p className="text-sm text-gray-600">
+                <strong>Rubro:</strong> {getValueOrDefault(cv.rubro)}
+              </p>
+              {cv.rubro === "Gastronomía" && cv.subrubro && (
+                <p className="text-sm text-gray-600">
+                  <strong>Subrubro:</strong> {getValueOrDefault(cv.subrubro)}
+                </p>
               )}
-              {isPDF(cv.imagen) && (
-                <a href={cv.imagen} target="_blank" rel="noopener noreferrer">
-                  <img
-                    src={getPDFThumbnail(cv.imagen)}
-                    alt="Archivo PDF del CV"
-                    className="w-60 h-60 object-cover rounded-md shadow-md transition-transform transform hover:scale-105 cursor-pointer"
-                  />
-                </a>
-              )}
+              <p className="text-sm text-gray-600">
+                <strong>Puesto:</strong> {getValueOrDefault(cv.puesto)}
+              </p>
             </>
           )}
         </div>
 
-        {/* Diálogo de confirmación */}
-        <AlertDialog
-          isOpen={isDialogOpen}
-          leastDestructiveRef={cancelRef}
-          onClose={() => setIsDialogOpen(false)}
-        >
-          <AlertDialogOverlay>
-            <AlertDialogContent>
-              <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                Confirmar eliminación
-              </AlertDialogHeader>
-
-              <AlertDialogBody>
-                ¿Estás seguro de que deseas eliminar este CV? Esta acción no se puede deshacer.
-              </AlertDialogBody>
-
-              <AlertDialogFooter>
-                <Button ref={cancelRef} onClick={() => setIsDialogOpen(false)}>
-                  Cancelar
-                </Button>
-                <Button
-                  colorScheme="red"
-                  onClick={handleDeleteCv}
-                  ml={3}
-                  isLoading={isDeleting}
-                >
-                  Eliminar
-                </Button>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialogOverlay>
-        </AlertDialog>
+        <div>
+          {isDataLoading ? (
+            <Skeleton count={7} height={20} className="mb-2" />
+          ) : (
+            <>
+              <p className="text-sm text-gray-600">
+                <strong>Localidad:</strong> {getValueOrDefault(cv.localidad)}
+              </p>
+              <p className="text-sm text-gray-600">
+                <strong>Zona:</strong> {getValueOrDefault(cv.zona)}
+              </p>
+              <p className="text-sm text-gray-600">
+                <strong>Calificación:</strong>{" "}
+                {getValueOrDefault(cv.calificacion)}
+              </p>
+              <p className="text-sm text-gray-600">
+                <strong>Nivel de Estudios:</strong>{" "}
+                {getValueOrDefault(cv.nivelEstudios)}
+              </p>
+              <p className="text-sm text-gray-600">
+                <strong>Experiencia:</strong>{" "}
+                {getValueOrDefault(cv.experiencia)}
+              </p>
+              <p className="text-sm text-gray-600">
+                <strong>Idiomas:</strong>{" "}
+                {getValueOrDefault(cv.idiomas.filter((i) => i).join(", "))}
+              </p>
+              <p className="text-sm text-gray-600">
+                <strong>Comentarios:</strong>{" "}
+                {getValueOrDefault(cv.comentarios)}
+              </p>
+            </>
+          )}
+        </div>
       </div>
-    )
-  }
 
-  CvDetail.propTypes = {
-    cv: PropTypes.object,
-  }
+      {/* Renderización del archivo */}
+      <div className="mt-6">
+        <h3 className="text-lg font-bold text-[#293e68] mb-4">Archivo</h3>
+        {isDataLoading ? (
+          <Skeleton height={240} width={240} borderRadius="8px" />
+        ) : (
+          <>
+            {isImage(cv.imagen) && (
+              <div className="w-10/12">
+                <a href={cv.imagen} target="_blank" rel="noopener noreferrer">
+                  <img
+                    src={cv.imagen}
+                    alt="Archivo del CV"
+                    className={`rounded-md shadow-md transition-transform transform hover:scale-105 cursor-pointer ${
+                      isDesktop ? "w-60 h-60 object-cover" : "w-full h-auto"
+                    }`}
+                  />
+                </a>
+              </div>
+            )}
+            {isPDF(cv.imagen) && (
+              <a href={cv.imagen} target="_blank" rel="noopener noreferrer">
+                <img
+                  src={getPDFThumbnail(cv.imagen)}
+                  alt="Archivo PDF del CV"
+                  className={`rounded-md shadow-md transition-transform transform hover:scale-105 cursor-pointer ${
+                    isDesktop ? "w-60 h-60 object-cover" : "w-full h-auto"
+                  }`}
+                />
+              </a>
+            )}
+          </>
+        )}
+      </div>
 
-  export default CvDetail
+      {/* Diálogo de confirmación */}
+      <AlertDialog
+        isOpen={isDialogOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={() => setIsDialogOpen(false)}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Confirmar eliminación
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              ¿Estás seguro de que deseas eliminar este CV? Esta acción no se
+              puede deshacer.
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={() => setIsDialogOpen(false)}>
+                Cancelar
+              </Button>
+              <Button
+                colorScheme="red"
+                onClick={handleDeleteCv}
+                ml={3}
+                isLoading={isDeleting}
+              >
+                Eliminar
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
+    </div>
+  );
+};
+
+CvDetail.propTypes = {
+  cv: PropTypes.object.isRequired,
+};
+
+export default CvDetail;
