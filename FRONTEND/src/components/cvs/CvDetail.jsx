@@ -44,6 +44,8 @@ const CvDetail = ({ cv }) => {
     setIsSidebarOpen((prev) => !prev)
   }
 
+  // console.log("Prop onToggleNoLlamar en CvDetail:", onToggleNoLlamar);
+
   useEffect(() => {
     setCvData(cv) // Actualiza el estado interno cuando cambian los props
   }, [cv])
@@ -61,47 +63,6 @@ const CvDetail = ({ cv }) => {
       clearTimeout(timer);
     };
   }, [cv]);
-
-  const toggleNoLlamar = async () => {
-    setIsUpdatingNoLlamar(true);
-    try {
-      const response = await fetch(`/api/curriculums/${cvData._id}/no-llamar`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ noLlamar: !cvData.noLlamar }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Error al actualizar el estado de No Llamar");
-      }
-
-      const updatedCv = await response.json();
-      toast({
-        title: "Éxito",
-        description: `El CV ahora está marcado como ${
-          updatedCv.noLlamar ? "No Llamar" : "Disponible para llamar"
-        }.`,
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-        position: "top-right",
-      });
-
-      setCvData(updatedCv); // Actualiza el estado con los nuevos datos
-    } catch {
-      toast({
-        title: "Error",
-        description: "Hubo un problema al actualizar el estado de No Llamar.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "top-right",
-      });
-    } finally {
-      setIsUpdatingNoLlamar(false);
-      setIsNoLlamarDialogOpen(false);
-    }
-  };
 
   const getValueOrDefault = (value) =>
     value !== undefined && value !== null && value !== "" ? value : "-";
@@ -162,6 +123,41 @@ const CvDetail = ({ cv }) => {
 
   const handleListTagClick = (listId) => {
     navigate(`/listas/${listId}`, { state: { from: `/ver-cv/${cv._id}` } });
+  };
+
+  const handleToggleNoLlamar = async () => {
+    setIsUpdatingNoLlamar(true);
+    try {
+      const updatedNoLlamar = !cvData.noLlamar;
+      const response = await fetch(`/api/curriculums/${cvData._id}/no-llamar`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ noLlamar: updatedNoLlamar }),
+      });
+
+      if (!response.ok) throw new Error("Error al actualizar el estado de No Llamar");
+
+      setCvData((prev) => ({ ...prev, noLlamar: updatedNoLlamar }));
+      toast({
+        title: "Éxito",
+        description: "El estado de 'No Llamar' se actualizó correctamente.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error("Error al actualizar el estado de No Llamar:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo actualizar el estado de 'No Llamar'.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      setIsUpdatingNoLlamar(false);
+      setIsNoLlamarDialogOpen(false);
+    }
   };
 
   const formatWhatsappMessage = () => {
@@ -257,13 +253,15 @@ const CvDetail = ({ cv }) => {
                 {" "}
                 WhatsApp
               </button>
-              <button
-                className="bg-red-500 text-white px-4 py-2 rounded-lg"
-                onClick={() => setIsNoLlamarDialogOpen(true)}
-              >
-                {" "}
-                {cv.noLlamar ? "Quitar" : "Marcar"} No Llamar
-              </button>
+              <Button
+  className="bg-red-500 text-white px-4 py-2 rounded-lg"
+  onClick={() => {
+    console.log("Llamando a onToggleNoLlamar");
+    setIsNoLlamarDialogOpen(true); // Abre el diálogo de confirmación
+  }}
+>
+  {cv.noLlamar ? "Quitar" : "Marcar"} No Llamar
+</Button>
             </>
           ) : (
             <>
@@ -391,7 +389,7 @@ const CvDetail = ({ cv }) => {
               </Button>
               <Button
                 colorScheme="red"
-                onClick={toggleNoLlamar}
+                onClick={handleToggleNoLlamar}
                 ml={3}
                 isLoading={isUpdatingNoLlamar}
               >
