@@ -40,13 +40,52 @@ const CvContainer = ({ curriculumId }) => {
     }
   }
 
+  const handleToggleNoLlamar = async () => {
+    if (!cvData) return;
+    const updatedNoLlamar = !cvData.noLlamar;
+  
+    try {
+      const response = await fetch(`${API_URL}/api/curriculums/${cvData._id}/no-llamar`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ noLlamar: updatedNoLlamar }),
+      });
+  
+      if (!response.ok) throw new Error("Error al actualizar el estado de No Llamar");
+  
+      setCvData((prevData) => ({
+        ...prevData,
+        noLlamar: updatedNoLlamar,
+      }));
+  
+      toast({
+        title: "Éxito",
+        description: `El estado de "No Llamar" ha sido actualizado.`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.log(error)
+      toast({
+        title: "Error",
+        description: "No se pudo actualizar el estado de No Llamar.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+  
+  
+
   if (isLoading) {
     return <Spinner size="lg" />
   }
 
   return (
     <div className="flex">
-      <CvDetail cv={cvData} />
+      <CvDetail cv={cvData} onToggleNoLlamar={handleToggleNoLlamar}/>
       <Asignaciones curriculumId={curriculumId} onUpdateCvLists={handleUpdateCvLists} />
     </div>
   )
