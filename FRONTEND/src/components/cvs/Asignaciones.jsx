@@ -128,26 +128,32 @@ const Asignaciones = ({ curriculumId, onUpdateCvLists }) => {
 
   return (
     <div
-      className="w-full md:w-4/12 h-full"
-      style={{ position: "sticky", top: "0", maxHeight: "100vh", overflowY: "auto" }}
-    >
-      <div className="border border-blue-300 bg-[#e9f0ff] rounded-lg p-4 shadow-lg">
-        <h3 className="text-lg font-semibold mb-4 text-[#293e68]">Asignaciones</h3>
-        {isLoading ? (
-          <Spinner size="lg" color="blue.500" />
-        ) : (
-          <Select
-            isMulti
-            value={selectedLists}
-            onChange={handleChange}
-            options={lists}
-            components={{ Option: customOption, SingleValue: customSingleValue }}
-            placeholder="Seleccionar listas"
-            className="w-full"
-          />
-        )}
-      </div>
-    </div>
+  className="w-full md:w-4/12 h-full relative"
+  style={{ position: "sticky", top: "0", maxHeight: "100vh", overflowY: "auto" }}
+>
+  <div className="border border-blue-300 bg-[#e9f0ff] rounded-lg p-4 shadow-lg">
+    <h3 className="text-lg font-semibold mb-4 text-[#293e68]">Asignaciones</h3>
+    {isLoading ? (
+      <Spinner size="lg" color="blue.500" />
+    ) : (
+      <Select
+        isMulti
+        value={selectedLists}
+        onChange={handleChange}
+        options={lists}
+        components={{ Option: customOption, SingleValue: customSingleValue }}
+        placeholder="Seleccionar listas"
+        className="w-full"
+        menuPlacement="bottom"
+        menuPortalTarget={document.body} // Asegura que el menú no esté restringido
+        styles={{
+          menuPortal: (base) => ({ ...base, zIndex: 9999 }), // Prioridad alta
+        }}
+      />
+    )}
+  </div>
+</div>
+
   )
 }
 

@@ -213,7 +213,9 @@ const FormularioCv = ({
 
         {/* Columna 2 */}
         <div className="space-y-4">
-          <ListasSelect selectedLista={selectedLista} setSelectedLista={setSelectedLista} />
+        {!isEditMode && (
+  <ListasSelect selectedLista={selectedLista} setSelectedLista={setSelectedLista} />
+)}
           <div>
             <label htmlFor="calificacion" className="block mb-2 text-sm font-medium text-gray-900">
               Calificación
