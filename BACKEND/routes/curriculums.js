@@ -216,146 +216,147 @@ router.get('/:id', async (req, res) => {
 // Crear un nuevo curriculum
 router.post('/', upload.single('imagen'), async (req, res) => {
   try {
-    const file = req.file
-    const { idiomas, apellido, celular, pais, provincia, calificacion, lista, ...otrosDatos } = req.body
+    const file = req.file;
+    const { idiomas, apellido, celular, pais, provincia, calificacion, lista, ...otrosDatos } = req.body;
 
-    // Validación de idiomas: Asegúrate de que sean un array
+    // Validar y limpiar el campo idiomas
     const parsedIdiomas = Array.isArray(idiomas)
-      ? idiomas
-      : idiomas.split(',').map((idioma) => idioma.trim())
+      ? idiomas.filter((idioma) => typeof idioma === "string").map((idioma) => idioma.trim())
+      : idiomas
+      ? idiomas.split(',').map((idioma) => idioma.trim())
+      : [];
 
-    // Validación: Duplicados por apellido o celular
+    // Validación de duplicados
     const existingCv = await Curriculum.findOne({
       $or: [{ apellido }, { celular }],
-    })
+    });
 
     if (existingCv) {
       if (existingCv.apellido === apellido) {
-        return res.status(400).json({ error: 'Ya existe un candidato con el mismo apellido.' })
+        return res.status(400).json({ error: 'Ya existe un candidato con el mismo apellido.' });
       }
       if (existingCv.celular === celular) {
-        return res.status(400).json({ error: 'Ya existe un candidato con el mismo número de teléfono celular.' })
+        return res.status(400).json({ error: 'Ya existe un candidato con el mismo número de teléfono celular.' });
       }
     }
 
-    console.log("Datos recibidos:", req.body);
-    console.log("Archivo recibido:", req.file);
-
-    // Validación de lógica: Provincia requerida para Argentina
+    // Validación de provincia
     if (pais === 'Argentina' && (!provincia || provincia.trim() === '')) {
-      return res.status(400).json({ error: 'La provincia es obligatoria para Argentina.' })
+      return res.status(400).json({ error: 'La provincia es obligatoria para Argentina.' });
     }
 
     // Validación del archivo
     if (!file) {
-      return res.status(400).json({ error: 'La imagen o archivo es obligatorio.' })
+      return res.status(400).json({ error: 'La imagen o archivo es obligatorio.' });
     }
 
-    const allowedFormats = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf']
+    const allowedFormats = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
     if (!allowedFormats.includes(file.mimetype)) {
-      return res.status(400).json({ error: 'Formato de archivo no permitido.' })
+      return res.status(400).json({ error: 'Formato de archivo no permitido.' });
     }
 
     // Subir el archivo a Cloudinary
-    let uploadedFile
+    let uploadedFile;
     await new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         { folder: 'curriculums' },
         (error, result) => {
-          if (error) return reject(error)
-          uploadedFile = result
-          resolve()
+          if (error) return reject(error);
+          uploadedFile = result;
+          resolve();
         }
-      )
-      streamifier.createReadStream(file.buffer).pipe(uploadStream)
-    })
+      );
+      streamifier.createReadStream(file.buffer).pipe(uploadStream);
+    });
 
-    // Validar y sanitizar los datos
-    const sanitizedData = sanitize({ apellido, celular, ...otrosDatos, pais, provincia, calificacion })
-
-    // Crear el nuevo curriculum
+    // Crear el nuevo currículum
     const newCurriculum = new Curriculum({
-      ...sanitizedData,
-      idiomas: parsedIdiomas, // Asegurarse de que idiomas sea un array
+      ...sanitize({ apellido, celular, ...otrosDatos, pais, provincia, calificacion }),
+      idiomas: parsedIdiomas,
       imagen: uploadedFile.secure_url,
-    })
+    });
 
-    // Si se especifica una lista, asociar el curriculum a esa lista
+    // Manejar listas asociadas
     if (lista) {
-      const listaExistente = await Lista.findById(lista)
+      const listaExistente = await Lista.findById(lista);
       if (!listaExistente) {
-        return res.status(404).json({ error: 'La lista seleccionada no existe.' })
+        return res.status(404).json({ error: 'La lista seleccionada no existe.' });
       }
-
-      listaExistente.curriculums.push(newCurriculum._id)
-      await listaExistente.save()
-      newCurriculum.listas.push(listaExistente._id)
+      listaExistente.curriculums.push(newCurriculum._id);
+      await listaExistente.save();
+      newCurriculum.listas.push(listaExistente._id);
     }
 
-    // Guardar el curriculum con la información de las listas
     const savedCurriculum = await newCurriculum.save();
-    if (!savedCurriculum) {
-      throw new Error("Error al guardar el currículum.");
-    }
-
-    res.status(201).json({ message: 'Curriculum creado exitosamente', curriculum: savedCurriculum })
+    res.status(201).json({ message: 'Currículum creado exitosamente', curriculum: savedCurriculum });
   } catch (error) {
-    console.error('Error al crear el currículum:', error)
-    res.status(500).json({ error: 'Ocurrió un error al procesar la solicitud.' })
+    console.error('Error al crear el currículum:', error);
+    res.status(500).json({ error: 'Ocurrió un error al procesar la solicitud.' });
   }
-})
+});
 
 
 // Actualizar un curriculum
 router.put('/:id', upload.single('imagen'), async (req, res) => {
-  const { id } = req.params
-  const updates = sanitize(req.body)
+  const { id } = req.params;
+  let updates = sanitize(req.body);
 
   try {
-    if (updates.listas) {
-      if (!Array.isArray(updates.listas)) {
-        updates.listas = updates.listas.split(',').map((id) => id.trim())
-      }
+    // Manejar campo `idiomas`
+    if (updates.idiomas) {
+      updates.idiomas = Array.isArray(updates.idiomas)
+        ? updates.idiomas.filter((idioma) => typeof idioma === "string").map((idioma) => idioma.trim())
+        : updates.idiomas
+        ? updates.idiomas.split(',').map((idioma) => idioma.trim())
+        : [];
+    }
 
-      // Validar que todos los IDs son válidos
-      updates.listas = updates.listas.filter((listId) => mongoose.Types.ObjectId.isValid(listId))
+    // Manejar campo `listas`
+    if (updates.listas) {
+      updates.listas = Array.isArray(updates.listas)
+        ? updates.listas.filter((listId) => mongoose.Types.ObjectId.isValid(listId))
+        : updates.listas.split(',').filter((listId) => mongoose.Types.ObjectId.isValid(listId));
 
       if (updates.listas.length === 0) {
-        return res.status(400).json({ error: 'El campo listas contiene elementos inválidos.' })
+        delete updates.listas;
       }
     }
 
+    // Subir imagen si está presente
     if (req.file) {
-      let uploadedFile
+      let uploadedFile;
       await new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           { folder: 'curriculums' },
           (error, result) => {
-            if (error) return reject(error)
-            uploadedFile = result
-            resolve()
+            if (error) return reject(error);
+            uploadedFile = result;
+            resolve();
           }
-        )
-        streamifier.createReadStream(req.file.buffer).pipe(uploadStream)
-      })
-      updates.imagen = uploadedFile.secure_url
+        );
+        streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+      });
+      updates.imagen = uploadedFile.secure_url;
     }
 
     const updatedCv = await Curriculum.findByIdAndUpdate(id, updates, {
       new: true,
       runValidators: true,
-    })
+    });
 
     if (!updatedCv) {
-      return res.status(404).json({ error: 'Curriculum no encontrado' })
+      return res.status(404).json({ error: 'Currículum no encontrado' });
     }
 
-    res.status(200).json(updatedCv)
+    res.status(200).json(updatedCv);
   } catch (error) {
-    console.error('Error al actualizar el currículum:', error)
-    res.status(500).json({ error: 'Error al actualizar el currículum.' })
+    console.error('Error al actualizar el currículum:', error);
+    res.status(500).json({ error: 'Error al actualizar el currículum.' });
   }
-})
+});
+
+
+
 
 // Asignar listas a un curriculum
 router.post('/:id/assign', async (req, res) => {

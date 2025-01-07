@@ -38,11 +38,15 @@ const EditarCvScreen = () => {
   useEffect(() => {
     const fetchCvData = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/curriculums/${id}`)
-        if (!response.ok) throw new Error("Error al cargar los datos del CV")
-        const data = await response.json()
-        setFormData(data)
-      } catch {
+        const response = await fetch(`${API_URL}/api/curriculums/${id}`);
+        if (!response.ok) throw new Error("Error al cargar los datos del CV");
+        const data = await response.json();
+  
+        // Garantiza que idiomas sea un array
+        const idiomas = Array.isArray(data.idiomas) ? data.idiomas : [];
+        setFormData({ ...data, idiomas });
+      } catch (error) {
+        console.error("Error al cargar los datos del CV:", error);
         toast({
           title: "Error",
           description: "Hubo un problema al cargar los datos del CV.",
@@ -50,14 +54,15 @@ const EditarCvScreen = () => {
           duration: 5000,
           isClosable: true,
           position: "bottom-right",
-        })
+        });
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
-
-    fetchCvData()
-  }, [id, toast])
+    };
+  
+    fetchCvData();
+  }, [id, toast]);
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -76,36 +81,50 @@ const EditarCvScreen = () => {
   }
 
   const handleCheckboxChange = (language) => {
-    setFormData((prev) => ({
-      ...prev,
-      idiomas: prev.idiomas.includes(language)
-        ? prev.idiomas.filter((idioma) => idioma !== language)
-        : [...prev.idiomas, language],
-    }))
-  }
+    setFormData((prevData) => {
+      const updatedIdiomas = prevData.idiomas.includes(language)
+        ? prevData.idiomas.filter((idioma) => idioma !== language) // Elimina si ya está seleccionado
+        : [...prevData.idiomas, language]; // Agrega si no está seleccionado
+      return { ...prevData, idiomas: updatedIdiomas };
+    });
+  };
+  
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setErrors({})
-
+    e.preventDefault();
+    setIsSubmitting(true);
+    setErrors({});
+  
     try {
-      const formDataToSend = new FormData()
-      Object.entries(formData).forEach(([key, value]) => {
+      const formDataToSend = new FormData();
+  
+      // Asegurar que idiomas sea un array de cadenas válidas
+      const sanitizedIdiomas = Array.isArray(formData.idiomas)
+        ? formData.idiomas
+            .filter((idioma) => typeof idioma === "string") // Filtrar solo cadenas
+            .map((idioma) => idioma.trim()) // Limpiar espacios
+        : [];
+  
+      const updatedFormData = { ...formData, idiomas: sanitizedIdiomas };
+  
+      // Llenar formDataToSend
+      Object.entries(updatedFormData).forEach(([key, value]) => {
         if (key === "imagen" && typeof value === "object") {
-          formDataToSend.append(key, value)
+          formDataToSend.append(key, value);
+        } else if (Array.isArray(value)) {
+          value.forEach((v) => formDataToSend.append(`${key}[]`, v));
         } else {
-          formDataToSend.append(key, value || "")
+          formDataToSend.append(key, value || "");
         }
-      })
-
+      });
+  
       const response = await fetch(`${API_URL}/api/curriculums/${id}`, {
         method: "PUT",
         body: formDataToSend,
-      })
-
-      if (!response.ok) throw new Error("Error al actualizar el CV")
-
+      });
+  
+      if (!response.ok) throw new Error("Error al actualizar el CV");
+  
       toast({
         title: "Éxito",
         description: "El CV se actualizó correctamente.",
@@ -113,10 +132,11 @@ const EditarCvScreen = () => {
         duration: 5000,
         isClosable: true,
         position: "bottom-right",
-      })
-
-      navigate(`/ver-cv/${id}`)
-    } catch {
+      });
+  
+      navigate(`/ver-cv/${id}`);
+    } catch (error) {
+      console.error("Error al enviar el formulario:", error);
       toast({
         title: "Error",
         description: "Hubo un problema al actualizar el CV.",
@@ -124,11 +144,13 @@ const EditarCvScreen = () => {
         duration: 5000,
         isClosable: true,
         position: "bottom-right",
-      })
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
+  
+  
 
   return (
     <div className="w-full">

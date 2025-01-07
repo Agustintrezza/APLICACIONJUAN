@@ -291,26 +291,27 @@ const FormularioCv = ({
           </div>
 
           <div>
-            <label className="block mb-2 text-sm font-medium text-gray-900">Idiomas</label>
-            {isLoading ? (
-              <Skeleton count={5} height={20} />
-            ) : (
-              <div className="grid grid-cols-2 lg:grid-cols-5 gap-2">
-                {["Inglés", "Español", "Portugués", "Italiano", "Francés"].map((language) => (
-                  <label key={language} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      value={language}
-                      checked={formData.idiomas.includes(language)}
-                      onChange={() => handleCheckboxChange(language)}
-                      className="mr-2"
-                    />
-                    {language}
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
+  <label className="block mb-2 text-sm font-medium text-gray-900">Idiomas</label>
+  {isLoading ? (
+    <Skeleton count={5} height={20} />
+  ) : (
+    <div className="grid grid-cols-2 lg:grid-cols-5 gap-2">
+      {["Inglés", "Español", "Portugués", "Italiano", "Francés"].map((language) => (
+        <label key={language} className="flex items-center">
+          <input
+            type="checkbox"
+            value={language}
+            checked={formData.idiomas.includes(language)} // Chequea si está seleccionado
+            onChange={() => handleCheckboxChange(language)}
+            className="mr-2"
+          />
+          {language}
+        </label>
+      ))}
+    </div>
+  )}
+</div>
+
 
           <div>
             <label htmlFor="imagen" className="block mb-2 text-sm font-medium text-gray-900">
