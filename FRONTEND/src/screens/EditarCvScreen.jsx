@@ -4,6 +4,8 @@ import FormularioCv from "../components/formulariocv/FormularioCv"
 import { API_URL } from "../config"
 import { FaArrowLeft } from "react-icons/fa"
 import { Skeleton, Spinner, useToast } from "@chakra-ui/react"
+import * as Yup from "yup";
+
 
 const EditarCvScreen = () => {
   const { id } = useParams()
@@ -42,9 +44,20 @@ const EditarCvScreen = () => {
         if (!response.ok) throw new Error("Error al cargar los datos del CV");
         const data = await response.json();
   
-        // Garantiza que idiomas sea un array
+        // Asegurar que idiomas sea un array
         const idiomas = Array.isArray(data.idiomas) ? data.idiomas : [];
-        setFormData({ ...data, idiomas });
+        setFormData({
+          ...data,
+          idiomas,
+          originalApellido: data.apellido,
+          originalCelular: data.celular,
+          originalNombre: data.nombre,
+          originalGenero: data.genero,
+          originalEdad: data.edad,
+          originalPais: data.pais,
+          originalProvincia: data.provincia,
+          originalIdiomas: idiomas,
+        });
       } catch (error) {
         console.error("Error al cargar los datos del CV:", error);
         toast({
@@ -63,14 +76,83 @@ const EditarCvScreen = () => {
     fetchCvData();
   }, [id, toast]);
   
+  
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
+  const validateDuplicate = async (field, value, excludeId) => {
+    try {
+      const response = await fetch(`${API_URL}/api/curriculums/validate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ [field]: value, excludeId }), // Incluir excludeId
+      });
+  
+      if (!response.ok) {
+        const result = await response.json();
+        if (result.error === "Duplicado") {
+          return `${field === "apellido" ? "Apellido" : "Celular"} ya está registrado.`;
+        }
+      }
+      return true;
+    } catch (error) {
+      console.error("Error al validar duplicados:", error);
+      return "Error al validar duplicados.";
+    }
+  };  
+  
+  const validationSchema = Yup.object().shape({
+    apellido: Yup.string()
+      .min(2, "Debe tener al menos 2 caracteres")
+      .required("El apellido es obligatorio")
+      .test(
+        "check-duplicate",
+        "Apellido ya está registrado.",
+        async (value, context) => {
+          const excludeId = context?.parent?.id || null; // ID del CV actual
+          const originalValue = context?.parent?.originalApellido || ""; // Valor original
+          if (value === originalValue) {
+            return true; // Si no ha cambiado, no validar duplicados
+          }
+          const result = await validateDuplicate("apellido", value, excludeId);
+          return result === true;
+        }
+      ),
+    celular: Yup.string()
+      .required("El teléfono celular es obligatorio")
+      .test(
+        "check-duplicate",
+        "Celular ya está registrado.",
+        async (value, context) => {
+          const excludeId = context?.parent?.id || null; // ID del CV actual
+          const originalValue = context?.parent?.originalCelular || ""; // Valor original
+          if (value === originalValue) {
+            return true; // Si no ha cambiado, no validar duplicados
+          }
+          const result = await validateDuplicate("celular", value, excludeId);
+          return result === true;
+        }
+      ),
+  });
+  
+  
+  
+  const handleChange = async (e) => {
+    const { name, value } = e.target;
+  
+    // Actualizar el estado del formulario
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
-  }
+    }));
+  
+    try {
+      // Validar el campo modificado
+      await validationSchema.validateAt(name, { ...formData, [name]: value, id });
+      setErrors((prevErrors) => ({ ...prevErrors, [name]: "" })); // Limpiar errores si la validación pasa
+    } catch (validationError) {
+      setErrors((prevErrors) => ({ ...prevErrors, [name]: validationError.message })); // Actualizar error
+    }
+  };
+  
 
   const handleFileChange = (e) => {
     const file = e.target.files[0]
@@ -88,7 +170,6 @@ const EditarCvScreen = () => {
       return { ...prevData, idiomas: updatedIdiomas };
     });
   };
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -96,18 +177,45 @@ const EditarCvScreen = () => {
     setErrors({});
   
     try {
+      // Comparar si hay cambios
+      const isUnchanged =
+        formData.apellido === formData.originalApellido &&
+        formData.celular === formData.originalCelular &&
+        formData.nombre === formData.originalNombre &&
+        formData.genero === formData.originalGenero &&
+        formData.edad === formData.originalEdad &&
+        formData.pais === formData.originalPais &&
+        formData.provincia === formData.originalProvincia &&
+        JSON.stringify(formData.idiomas) === JSON.stringify(formData.originalIdiomas);
+  
+      if (isUnchanged) {
+        toast({
+          title: "Sin cambios",
+          description: "No se realizaron cambios en el formulario.",
+          status: "info",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom-right",
+        });
+  
+        // Redirigir a la vista del CV después de mostrar el mensaje
+        navigate(`/ver-cv/${id}`);
+        return;
+      }
+  
+      // Validar formulario
+      await validationSchema.validate(
+        { ...formData, id, originalApellido: formData.originalApellido, originalCelular: formData.originalCelular },
+        { abortEarly: false }
+      );
+  
+      // Preparar datos para enviar
       const formDataToSend = new FormData();
-  
-      // Asegurar que idiomas sea un array de cadenas válidas
       const sanitizedIdiomas = Array.isArray(formData.idiomas)
-        ? formData.idiomas
-            .filter((idioma) => typeof idioma === "string") // Filtrar solo cadenas
-            .map((idioma) => idioma.trim()) // Limpiar espacios
+        ? formData.idiomas.filter((idioma) => typeof idioma === "string").map((idioma) => idioma.trim())
         : [];
-  
       const updatedFormData = { ...formData, idiomas: sanitizedIdiomas };
   
-      // Llenar formDataToSend
       Object.entries(updatedFormData).forEach(([key, value]) => {
         if (key === "imagen" && typeof value === "object") {
           formDataToSend.append(key, value);
@@ -118,6 +226,7 @@ const EditarCvScreen = () => {
         }
       });
   
+      // Enviar datos al backend
       const response = await fetch(`${API_URL}/api/curriculums/${id}`, {
         method: "PUT",
         body: formDataToSend,
@@ -137,6 +246,13 @@ const EditarCvScreen = () => {
       navigate(`/ver-cv/${id}`);
     } catch (error) {
       console.error("Error al enviar el formulario:", error);
+      if (error.name === "ValidationError") {
+        const validationErrors = {};
+        error.inner.forEach((err) => {
+          validationErrors[err.path] = err.message;
+        });
+        setErrors(validationErrors); // Mostrar errores en tiempo real
+      }
       toast({
         title: "Error",
         description: "Hubo un problema al actualizar el CV.",
@@ -149,7 +265,6 @@ const EditarCvScreen = () => {
       setIsSubmitting(false);
     }
   };
-  
   
 
   return (
