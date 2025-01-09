@@ -14,28 +14,28 @@ const EditarCvScreen = () => {
   const fileInputRef = useRef(null)
 
   const [formData, setFormData] = useState({
-    nombre: "",
-    apellido: "",
-    edad: "",
-    genero: "",
-    pais: "Argentina",
-    provincia: "",
-    zona: "",
-    localidad: "",
-    ubicacionManual: "",
-    telefonoFijo: "",
-    celular: "",
-    email: "",
-    calificacion: "",
-    nivelEstudios: "",
-    experiencia: "",
-    idiomas: [],
-    imagen: null,
-    comentarios: "",
-    rubro: "",
-    puesto: "",
-    subrubro: "",
-  });
+  nombre: "",
+  apellido: "",
+  edad: "",
+  genero: "",
+  pais: "Argentina",
+  provincia: "",
+  zona: "",
+  localidad: "",
+  ubicacionManual: "",
+  telefonoFijo: "",
+  celular: "",
+  email: "",
+  calificacion: "",
+  nivelEstudios: "",
+  experiencia: "",
+  idiomas: [],
+  imagen: null,
+  comentarios: "",
+  rubro: "",
+  puesto: "",
+  subrubro: "",
+});
 
   const [errors, setErrors] = useState({})
   const [isLoading, setIsLoading] = useState(true)
@@ -48,23 +48,40 @@ const EditarCvScreen = () => {
         if (!response.ok) throw new Error("Error al cargar los datos del CV");
         const data = await response.json();
   
-        console.log("Imagen original cargada:", data.imagen);
-  
+        // Asegurar que idiomas sea un array
+        const idiomas = Array.isArray(data.idiomas) ? data.idiomas : [];
         setFormData({
           ...data,
-          originalImagen: data.imagen || null,
+          idiomas,
+          originalApellido: data.apellido,
+          originalCelular: data.celular,
+          originalNombre: data.nombre,
+          originalGenero: data.genero,
+          originalEdad: data.edad,
+          originalPais: data.pais,
+          originalProvincia: data.provincia,
+          originalIdiomas: idiomas,
         });
       } catch (error) {
         console.error("Error al cargar los datos del CV:", error);
+        toast({
+          title: "Error",
+          description: "Hubo un problema al cargar los datos del CV.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom-right",
+        });
       } finally {
         setIsLoading(false);
       }
     };
   
     fetchCvData();
-  }, [id]);
+  }, [id, toast]);
   
   
+
   const validateDuplicate = async (field, value, excludeId) => {
     try {
       const response = await fetch(`${API_URL}/api/curriculums/validate`, {
@@ -88,45 +105,35 @@ const EditarCvScreen = () => {
   
   const validationSchema = Yup.object().shape({
     nombre: Yup.string()
-    .min(3, "Debe tener al menos 3 caracteres")
-    .required("El nombre es obligatorio"),
-  apellido: Yup.string()
-    .min(2, "Debe tener al menos 2 caracteres")
-    .required("El apellido es obligatorio")
-    .test("check-duplicate", "Apellido ya está registrado.", async (value, context) => {
-      const excludeId = context?.parent?.id || "";
-      const originalValue = context?.parent?.originalApellido || "";
-      if (value === originalValue) return true;
-      const result = await validateDuplicate("apellido", value, excludeId);
-      return result === true;
-    }),
-  celular: Yup.string()
-    .required("El teléfono celular es obligatorio")
-    .test("check-duplicate", "Celular ya está registrado.", async (value, context) => {
-      const excludeId = context?.parent?.id || "";
-      const originalValue = context?.parent?.originalCelular || "";
-      if (value === originalValue) return true;
-      const result = await validateDuplicate("celular", value, excludeId);
-      return result === true;
-    }),
-  //   imagen: Yup.mixed()
-  // .nullable()
-  // .test("fileType", "El archivo debe ser una imagen JPG, JPEG, PNG o un PDF", function (value) {
-  //   const { originalImagen } = this.parent;
-  //   console.log("Validación de imagen: ", { value, originalImagen });
-  //   if (!value && originalImagen) {
-  //     console.log("Validación pasada: Se conserva imagen original.");
-  //     return true;
-  //   }
-  //   if (!value) {
-  //     console.log("Validación fallida: No hay imagen seleccionada ni original.");
-  //     return false;
-  //   }
-  //   const allowedFormats = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
-  //   const isValid = allowedFormats.includes(value.type);
-  //   console.log(`Formato de archivo ${isValid ? "válido" : "inválido"} para:`, value.type);
-  //   return isValid;
-  // }),
+      .min(3, "Debe tener al menos 3 caracteres")
+      .required("El nombre es obligatorio"),
+    apellido: Yup.string()
+      .min(2, "Debe tener al menos 2 caracteres")
+      .required("El apellido es obligatorio")
+      .test(
+        "check-duplicate",
+        "Apellido ya está registrado.",
+        async (value, context) => {
+          const excludeId = context?.parent?.id || "";
+          const originalValue = context?.parent?.originalApellido || "";
+          if (value === originalValue) return true;
+          const result = await validateDuplicate("apellido", value, excludeId);
+          return result === true;
+        }
+      ),
+    celular: Yup.string()
+      .required("El teléfono celular es obligatorio")
+      .test(
+        "check-duplicate",
+        "Celular ya está registrado.",
+        async (value, context) => {
+          const excludeId = context?.parent?.id || "";
+          const originalValue = context?.parent?.originalCelular || "";
+          if (value === originalValue) return true;
+          const result = await validateDuplicate("celular", value, excludeId);
+          return result === true;
+        }
+      ),
     email: Yup.string().email("Debe ser un email válido").nullable(true).notRequired(),
     genero: Yup.string().oneOf(["Masculino", "Femenino", ""], "Opción inválida"),
     edad: Yup.number()
@@ -142,8 +149,8 @@ const EditarCvScreen = () => {
       .nullable()
       .when("pais", {
         is: "Argentina",
-        then: (schema) => schema.required("La provincia es obligatoria para Argentina"),
-        otherwise: (schema) => schema.notRequired(),
+        then: Yup.string().required("La provincia es obligatoria para Argentina"),
+        otherwise: Yup.string().notRequired(),
       }),
     calificacion: Yup.string()
       .oneOf(["1- Muy bueno", "2- Bueno", "3- Regular"], "Opción inválida")
@@ -153,7 +160,14 @@ const EditarCvScreen = () => {
     puesto: Yup.string()
       .required("El puesto es obligatorio"),
     subrubro: Yup.string(),
-  
+    imagen: Yup.mixed()
+      .test("fileType", "El archivo debe ser una imagen JPG, JPEG, PNG o un PDF", (value) =>
+        !value || ["image/jpeg", "image/jpg", "image/png", "application/pdf"].includes(value?.type)
+      )
+      .test("required-if-no-existing", "La imagen o archivo es obligatorio", function (value) {
+        const { imagen } = this.parent;
+        return imagen || value;
+      }),
   });
   
   
@@ -199,55 +213,47 @@ const EditarCvScreen = () => {
     setErrors({});
   
     try {
-      console.log("Datos actuales del formulario:", formData);
+      // Comparar si hay cambios
+      const isUnchanged =
+        formData.apellido === formData.originalApellido &&
+        formData.celular === formData.originalCelular &&
+        formData.nombre === formData.originalNombre &&
+        formData.genero === formData.originalGenero &&
+        formData.edad === formData.originalEdad &&
+        formData.pais === formData.originalPais &&
+        formData.provincia === formData.originalProvincia &&
+        JSON.stringify(formData.idiomas) === JSON.stringify(formData.originalIdiomas);
   
-      // Validación de imagen
-      if (!formData.imagen && !formData.originalImagen) {
-        console.error("Error: No hay imagen seleccionada ni original.");
-        setErrors((prev) => ({
-          ...prev,
-          imagen: "La imagen es obligatoria.",
-        }));
-        setIsSubmitting(false);
+      if (isUnchanged) {
+        toast({
+          title: "Sin cambios",
+          description: "No se realizaron cambios en el formulario.",
+          status: "info",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom-right",
+        });
+  
+        // Redirigir a la vista del CV después de mostrar el mensaje
+        navigate(`/ver-cv/${id}`);
         return;
       }
   
-      if (typeof formData.imagen === "object" && formData.imagen) {
-        // Validar nueva imagen cargada
-        console.log("Validando nueva imagen:", formData.imagen);
-        const allowedFormats = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
-        if (!formData.imagen.type || !allowedFormats.includes(formData.imagen.type)) {
-          console.error("Error: Formato de archivo no permitido:", formData.imagen.type);
-          setErrors((prev) => ({
-            ...prev,
-            imagen: "El archivo debe ser una imagen JPG, JPEG, PNG o un PDF.",
-          }));
-          setIsSubmitting(false);
-          return;
-        }
-        console.log("Validación de nueva imagen pasada.");
-      } else if (typeof formData.imagen === "string") {
-        // Es una URL, usar como imagen original
-        console.log("Usando imagen original:", formData.originalImagen);
-      }
-  
-      // Validar el resto del formulario con Yup
+      // Validar formulario
       await validationSchema.validate(
-        { ...formData, id },
+        { ...formData, id, originalApellido: formData.originalApellido, originalCelular: formData.originalCelular },
         { abortEarly: false }
       );
   
-      console.log("Validación completa sin errores.");
-  
       // Preparar datos para enviar
       const formDataToSend = new FormData();
-      Object.entries(formData).forEach(([key, value]) => {
-        if (key === "imagen" && typeof value === "string") {
-          console.log("No se envía imagen nueva. Usando la original.");
-          return;
-        }
+      const sanitizedIdiomas = Array.isArray(formData.idiomas)
+        ? formData.idiomas.filter((idioma) => typeof idioma === "string").map((idioma) => idioma.trim())
+        : [];
+      const updatedFormData = { ...formData, idiomas: sanitizedIdiomas };
+  
+      Object.entries(updatedFormData).forEach(([key, value]) => {
         if (key === "imagen" && typeof value === "object") {
-          console.log("Se envía nueva imagen:", value);
           formDataToSend.append(key, value);
         } else if (Array.isArray(value)) {
           value.forEach((v) => formDataToSend.append(`${key}[]`, v));
@@ -256,8 +262,7 @@ const EditarCvScreen = () => {
         }
       });
   
-      console.log("Datos preparados para envío al backend:", [...formDataToSend.entries()]);
-  
+      // Enviar datos al backend
       const response = await fetch(`${API_URL}/api/curriculums/${id}`, {
         method: "PUT",
         body: formDataToSend,
@@ -277,16 +282,13 @@ const EditarCvScreen = () => {
       navigate(`/ver-cv/${id}`);
     } catch (error) {
       console.error("Error al enviar el formulario:", error);
-  
       if (error.name === "ValidationError") {
         const validationErrors = {};
         error.inner.forEach((err) => {
           validationErrors[err.path] = err.message;
         });
-        console.log("Errores de validación capturados:", validationErrors);
-        setErrors(validationErrors);
+        setErrors(validationErrors); // Mostrar errores en tiempo real
       }
-  
       toast({
         title: "Error",
         description: "Hubo un problema al actualizar el CV.",
@@ -299,6 +301,7 @@ const EditarCvScreen = () => {
       setIsSubmitting(false);
     }
   };
+  
 
   return (
     <div className="w-full">
