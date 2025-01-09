@@ -419,11 +419,11 @@ const CvDetail = ({ cv, onToggleNoLlamar }) => {
               </p>
               {cv.rubro === "Gastronomía" && cv.subrubro && (
                 <p className="text-sm text-gray-600">
-                  <strong>Subrubro:</strong> {getValueOrDefault(cv.subrubro)}
+                  <strong>Puesto:</strong> {getValueOrDefault(cv.subrubro)}
                 </p>
               )}
               <p className="text-sm text-gray-600">
-                <strong>Puesto:</strong> {getValueOrDefault(cv.puesto)}
+                <strong>Subrubro:</strong> {getValueOrDefault(cv.puesto)}
               </p>
             </>
           )}

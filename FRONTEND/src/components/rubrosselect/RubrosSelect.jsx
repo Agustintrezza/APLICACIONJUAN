@@ -127,7 +127,7 @@ const RubrosSelect = ({ formData, setFormData, errors, handleChange, isLoading }
       {formData.rubro === "Gastronomía" && formData.puesto && (
         <div className="flex flex-col">
           <label htmlFor="subrubro" className="text-sm text-gray-900">
-            Subrubro
+            Puesto
           </label>
           {isLoading ? (
             <Skeleton height={40} />
@@ -139,7 +139,7 @@ const RubrosSelect = ({ formData, setFormData, errors, handleChange, isLoading }
               onChange={handleSubrubroChange}
               className="p-3 border text-sm border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
             >
-              <option value="">Selecciona un subrubro</option>
+              <option value="">Selecciona un Puesto</option>
               {subrubros[formData.puesto]?.map((subrubro) => (
                 <option key={subrubro} value={subrubro}>
                   {subrubro}
@@ -148,7 +148,7 @@ const RubrosSelect = ({ formData, setFormData, errors, handleChange, isLoading }
             </select>
           )}
           {isSubrubroRequired && (
-            <div className="text-red-500 text-sm">El subrubro es obligatorio para el rubro Gastronomía</div>
+            <div className="text-red-500 text-sm">El puesto es obligatorio para el subrurbro</div>
           )}
         </div>
       )}
