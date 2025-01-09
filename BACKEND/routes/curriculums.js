@@ -171,32 +171,37 @@ console.log('Archivo recibido:', req.file);
   }
 });
 
-
-// Validar duplicados
+// Validar duplicados (con exclusión de ID actual en edición)
 router.post('/validate', async (req, res) => {
-  const { apellido, celular } = req.body
+  const { apellido, celular, excludeId } = req.body;
 
   try {
+    const query = {};
     if (apellido) {
-      const duplicateByLastName = await Curriculum.findOne({ apellido })
-      if (duplicateByLastName) {
-        return res.status(400).json({ error: 'Duplicado', duplicadoEn: 'apellido' })
-      }
+      query.apellido = apellido;
     }
-
     if (celular) {
-      const duplicateByPhone = await Curriculum.findOne({ celular })
-      if (duplicateByPhone) {
-        return res.status(400).json({ error: 'Duplicado', duplicadoEn: 'celular' })
-      }
+      query.celular = celular;
     }
 
-    res.status(200).json({ message: 'No hay duplicados.' })
+    if (excludeId) {
+      query._id = { $ne: excludeId }; // Excluir el ID actual
+    }
+
+    const duplicate = await Curriculum.findOne(query);
+
+    if (duplicate) {
+      const duplicadoEn = duplicate.apellido === apellido ? 'apellido' : 'celular';
+      return res.status(400).json({ error: 'Duplicado', duplicadoEn });
+    }
+
+    res.status(200).json({ message: 'No hay duplicados.' });
   } catch (error) {
-    console.error('Error al validar duplicados:', error)
-    res.status(500).json({ error: 'Error al validar duplicados.' })
+    console.error('Error al validar duplicados:', error);
+    res.status(500).json({ error: 'Error al validar duplicados.' });
   }
-})
+});
+
 
 // Obtener un curriculum por ID
 router.get('/:id', async (req, res) => {
