@@ -307,6 +307,9 @@ router.put('/:id', upload.single('imagen'), async (req, res) => {
   let updates = sanitize(req.body);
 
   try {
+    console.log("Actualizando currículum con ID:", id);
+    console.log("Datos de actualización recibidos:", updates);
+
     // Manejar campo `idiomas`
     if (updates.idiomas) {
       updates.idiomas = Array.isArray(updates.idiomas)
@@ -327,7 +330,7 @@ router.put('/:id', upload.single('imagen'), async (req, res) => {
       }
     }
 
-    // Subir imagen si está presente
+    // Subir imagen si está presente, de lo contrario, conservar la existente
     if (req.file) {
       let uploadedFile;
       await new Promise((resolve, reject) => {
@@ -342,6 +345,16 @@ router.put('/:id', upload.single('imagen'), async (req, res) => {
         streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
       });
       updates.imagen = uploadedFile.secure_url;
+      console.log("Nueva imagen cargada:", updates.imagen);
+    } else if (!updates.imagen) {
+      // Si no se envió un nuevo archivo ni una referencia a la imagen actual, conservar la existente
+      const existingCv = await Curriculum.findById(id);
+      if (existingCv) {
+        updates.imagen = existingCv.imagen;
+        console.log("Conservando imagen existente:", updates.imagen);
+      } else {
+        return res.status(404).json({ error: 'Currículum no encontrado' });
+      }
     }
 
     const updatedCv = await Curriculum.findByIdAndUpdate(id, updates, {
@@ -359,6 +372,7 @@ router.put('/:id', upload.single('imagen'), async (req, res) => {
     res.status(500).json({ error: 'Error al actualizar el currículum.' });
   }
 });
+
 
 
 
