@@ -159,13 +159,13 @@ const FormularioListas = ({ onCreate = () => {}, listaToEdit, onUpdate }) => {
           </div>
           {formData.rubro && (
             <div>
-              <FormLabel className="text-sm text-[#293e68]">Puesto</FormLabel>
+              <FormLabel className="text-sm text-[#293e68]">Subrubro</FormLabel>
               <select
                 value={formData.puesto}
                 onChange={(e) => handleInputChange("puesto", e.target.value)}
                 className={inputStyle}
               >
-                <option value="">Selecciona un puesto</option>
+                <option value="">Selecciona un subrubro</option>
                 {puestos[formData.rubro]?.map((puesto) => (
                   <option key={puesto} value={puesto}>
                     {puesto}
@@ -176,13 +176,13 @@ const FormularioListas = ({ onCreate = () => {}, listaToEdit, onUpdate }) => {
           )}
           {formData.rubro === "Gastronomía" && formData.puesto && (
             <div>
-              <FormLabel className="text-sm text-[#293e68]">Subrubro</FormLabel>
+              <FormLabel className="text-sm text-[#293e68]">Puesto</FormLabel>
               <select
                 value={formData.subrubro}
                 onChange={(e) => handleInputChange("subrubro", e.target.value)}
                 className={inputStyle}
               >
-                <option value="">Selecciona un subrubro</option>
+                <option value="">Selecciona un puesto</option>
                 {subrubros[formData.puesto]?.map((subrubro) => (
                   <option key={subrubro} value={subrubro}>
                     {subrubro}
