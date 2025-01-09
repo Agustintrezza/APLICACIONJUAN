@@ -56,43 +56,64 @@ const CrearCvScreen = () => {
   };
 
   const validationSchema = Yup.object().shape({
-    nombre: Yup.string().min(3, "Debe tener al menos 3 caracteres").required("El nombre es obligatorio"),
-    apellido: Yup.string()
-      .min(2, "Debe tener al menos 2 caracteres")
-      .required("El apellido es obligatorio")
-      .test("check-duplicate", "Apellido ya está registrado.", async (value) => {
-        const result = await validateDuplicate("apellido", value);
+  nombre: Yup.string().min(3, "Debe tener al menos 3 caracteres").required("El nombre es obligatorio"),
+  apellido: Yup.string()
+    .min(2, "Debe tener al menos 2 caracteres")
+    .required("El apellido es obligatorio")
+    .test(
+      "check-duplicate",
+      "Apellido ya está registrado.",
+      async (value, context) => {
+        const excludeId = context?.parent?.id || ""; // Extraer el ID del CV desde el formulario
+        const originalValue = context?.parent?.originalApellido || ""; // Valor original del apellido
+        if (value === originalValue) {
+          return true; // Si no se ha cambiado, pasa la validación
+        }
+        const result = await validateDuplicate("apellido", value, excludeId);
         return result === true;
-      }),
-    celular: Yup.string()
-      .required("El teléfono celular es obligatorio")
-      .test("check-duplicate", "Celular ya está registrado.", async (value) => {
-        const result = await validateDuplicate("celular", value);
+      }
+    ),
+  celular: Yup.string()
+    .required("El teléfono celular es obligatorio")
+    .test(
+      "check-duplicate",
+      "Celular ya está registrado.",
+      async (value, context) => {
+        const excludeId = context?.parent?.id || ""; // Extraer el ID del CV desde el formulario
+        const originalValue = context?.parent?.originalCelular || ""; // Valor original del celular
+        if (value === originalValue) {
+          return true; // Si no se ha cambiado, pasa la validación
+        }
+        const result = await validateDuplicate("celular", value, excludeId);
         return result === true;
-      }),
-    email: Yup.string().email("Debe ser un email válido").nullable(true).notRequired(),
-    genero: Yup.string().oneOf(["Masculino", "Femenino", ""], "Opción inválida"),
-    edad: Yup.number()
-      .transform((value, originalValue) => (originalValue.trim() === "" ? null : value))
-      .nullable()
-      .typeError("Debe ingresar un número válido")
-      .min(18, "Debe ser mayor o igual a 18 años")
-      .max(100, "Debe ser menor o igual a 100 años"),
-    pais: Yup.string()
-      .required("El país es obligatorio")
-      .oneOf(["Argentina", "Estados Unidos", "Chile", "Uruguay", "Brasil"], "Seleccione un país válido"),
-    calificacion: Yup.string()
-      .oneOf(["1- Muy bueno", "2- Bueno", "3- Regular"], "Opción inválida")
-      .required("La calificación es obligatoria"),
-    imagen: Yup.mixed()
-      .test("fileType", "El archivo debe ser una imagen JPG, JPEG, PNG o un PDF", (value) =>
-        !value || ["image/jpeg", "image/jpg", "image/png", "application/pdf"].includes(value?.type)
-      )
-      .required("La imagen o archivo es obligatorio"),
-    rubro: Yup.string().required("El rubro es obligatorio"),
-    puesto: Yup.string().required("El puesto es obligatorio"),
-    subrubro: Yup.string(),
-  });
+      }
+    ),
+  email: Yup.string().email("Debe ser un email válido").nullable(true).notRequired(),
+  genero: Yup.string().oneOf(["Masculino", "Femenino", ""], "Opción inválida"),
+  edad: Yup.number()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .nullable()
+    .typeError("Debe ingresar un número válido")
+    .min(18, "Debe ser mayor o igual a 18 años")
+    .max(100, "Debe ser menor o igual a 100 años"),
+  pais: Yup.string()
+    .required("El país es obligatorio")
+    .oneOf(["Argentina", "Estados Unidos", "Chile", "Uruguay", "Brasil"], "Seleccione un país válido"),
+  calificacion: Yup.string()
+    .oneOf(["1- Muy bueno", "2- Bueno", "3- Regular"], "Opción inválida")
+    .required("La calificación es obligatoria"),
+  imagen: Yup.mixed()
+    .test("fileType", "El archivo debe ser una imagen JPG, JPEG, PNG o un PDF", (value) =>
+      !value || ["image/jpeg", "image/jpg", "image/png", "application/pdf"].includes(value?.type)
+    )
+    .test("required-if-no-existing", "La imagen o archivo es obligatorio", function (value) {
+      const { imagen } = this.parent; // Acceder a la imagen actual
+      return imagen || value; // Si hay una imagen existente o se carga una nueva, pasa la validación
+    }),
+  rubro: Yup.string().required("El rubro es obligatorio"),
+  puesto: Yup.string().required("El puesto es obligatorio"),
+  subrubro: Yup.string(),
+});
 
   const handleChange = async (e) => {
     const { name, value } = e.target;
@@ -138,91 +159,93 @@ const CrearCvScreen = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    console.log("Datos del formulario antes de validar:", formData); // Log para verificar los datos del formulario
-  
+    setErrors({});
+    
     try {
-      await validationSchema.validate(formData, { abortEarly: false });
+      // Comprobar si no se realizaron cambios
+      const isUnchanged =
+        formData.apellido === formData.originalApellido &&
+        formData.celular === formData.originalCelular &&
+        formData.nombre === formData.originalNombre &&
+        formData.genero === formData.originalGenero &&
+        formData.edad === formData.originalEdad &&
+        formData.pais === formData.originalPais &&
+        formData.provincia === formData.originalProvincia &&
+        JSON.stringify(formData.idiomas) === JSON.stringify(formData.originalIdiomas) &&
+        !formData.imagen; // Si no se cargó una nueva imagen
   
+      if (isUnchanged) {
+        toast({
+          title: "Sin cambios",
+          description: "No se realizaron cambios en el formulario.",
+          status: "info",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom-right",
+        });
+        navigate(`/ver-cv/${formData.id}`);
+        return;
+      }
+  
+      // Validar el formulario
+      await validationSchema.validate(
+        { ...formData, id: formData.id }, 
+        { abortEarly: false }
+      );
+  
+      // Preparar los datos para enviar
       const formDataToSend = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
-        if (key === "imagen" && value) {
-          formDataToSend.append(key, value); // Solo agregar el archivo si está presente
+        if (key === "imagen" && typeof value === "object") {
+          formDataToSend.append(key, value);
         } else if (Array.isArray(value)) {
-          value.forEach((v) => formDataToSend.append(`${key}[]`, v)); // Agregar arrays correctamente
+          value.forEach((v) => formDataToSend.append(`${key}[]`, v));
         } else {
           formDataToSend.append(key, value || "");
         }
       });
   
-      console.log("Datos enviados al servidor:", [...formDataToSend.entries()]); // Log para verificar los datos enviados
-  
-      const response = await fetch(`${API_URL}/api/curriculums`, {
-        method: "POST",
+      // Hacer la solicitud al backend
+      const response = await fetch(`${API_URL}/api/curriculums/${formData.id}`, {
+        method: "PUT",
         body: formDataToSend,
       });
   
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Error en la respuesta del servidor:", errorData); // Log para capturar errores del servidor
-        throw new Error(errorData.error || "Error desconocido");
-      }
+      if (!response.ok) throw new Error("Error al actualizar el CV");
   
       toast({
         title: "Éxito",
-        description: "CV creado exitosamente.",
+        description: "El CV se actualizó correctamente.",
         status: "success",
         duration: 5000,
-        position: "top-right",
         isClosable: true,
+        position: "bottom-right",
       });
   
-      // Restablecer formulario
-      setFormData({
-        nombre: "",
-        apellido: "",
-        edad: "",
-        genero: "",
-        pais: "Argentina",
-        provincia: "Buenos Aires",
-        zona: "",
-        localidad: "",
-        ubicacionManual: "",
-        telefonoFijo: "",
-        celular: "",
-        email: "",
-        calificacion: "",
-        nivelEstudios: "",
-        experiencia: "",
-        idiomas: [],
-        imagen: null,
-        comentarios: "",
-        lista: "",
-      });
-      fileInputRef.current.value = "";
-      navigate("/");
+      navigate(`/ver-cv/${formData.id}`);
     } catch (error) {
+      console.error("Error al enviar el formulario:", error);
       if (error.name === "ValidationError") {
         const validationErrors = {};
         error.inner.forEach((err) => {
           validationErrors[err.path] = err.message;
         });
-        console.error("Errores de validación:", validationErrors); // Log para errores de validación
         setErrors(validationErrors);
-      } else {
-        console.error("Error en la creación del CV:", error.message); // Log para otros errores
-        toast({
-          title: "Error",
-          description: "Error al crear el CV.",
-          status: "error",
-          duration: 5000,
-          position: "top-right",
-          isClosable: true,
-        });
       }
+      toast({
+        title: "Error",
+        description: "Hubo un problema al actualizar el CV.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom-right",
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
+  
+  
   
 
   return (
