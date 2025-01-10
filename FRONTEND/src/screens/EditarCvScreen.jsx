@@ -137,6 +137,9 @@ const EditarCvScreen = () => {
           return result === true;
         }
       ),
+      genero: Yup.string()
+    .oneOf(["Masculino", "Femenino", ""], "Género inválido")  // No es obligatorio, así que no es necesario usar `.required()`
+    .default(''),
     pais: Yup.string()
       .required("El país es obligatorio")
       .oneOf(["Argentina", "Estados Unidos", "Chile", "Uruguay", "Brasil"], "Seleccione un país válido"),
@@ -216,8 +219,9 @@ const EditarCvScreen = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setErrors({});
-  
+    
     try {
+      // Validar formulario
       console.log("Valores actuales del formulario:", formData);
       console.log("Valores originales:", {
         originalApellido: formData.originalApellido,
@@ -248,8 +252,8 @@ const EditarCvScreen = () => {
         formData.apellido === formData.originalApellido &&
         formData.celular === formData.originalCelular &&
         formData.nombre === formData.originalNombre &&
-        formData.genero === formData.originalGenero &&
-        formData.edad === formData.originalEdad &&
+        (formData.genero === formData.originalGenero || formData.genero === "") &&  // Asegúrate de comparar vacío correctamente
+        (formData.edad === formData.originalEdad || formData.edad === null) &&  // Compara adecuadamente la edad nula
         formData.pais === formData.originalPais &&
         formData.provincia === formData.originalProvincia &&
         formData.calificacion === formData.originalCalificacion &&
@@ -267,7 +271,7 @@ const EditarCvScreen = () => {
         toast({
           title: "Sin cambios",
           description: "No se realizaron cambios en el curriculum.",
-          status: "info",
+          status: "info",  // Azul cuando no hubo cambios
           duration: 5000,
           isClosable: true,
           position: "bottom-right",
@@ -339,6 +343,8 @@ const EditarCvScreen = () => {
       setIsSubmitting(false);
     }
   };
+  
+  
   
   
   
