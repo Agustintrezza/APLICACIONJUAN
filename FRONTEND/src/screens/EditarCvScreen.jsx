@@ -60,6 +60,7 @@ const EditarCvScreen = () => {
       originalSubrubro: data.subrubro || "",
       originalIdiomas: data.idiomas || [],
       originalImagen: data.imagen || null,
+      originalUbicacionManual: data.ubicacionManual || "", 
     });
   } catch (error) {
     console.error("Error al cargar los datos del CV:", error);
@@ -232,6 +233,7 @@ const EditarCvScreen = () => {
         originalSubrubro: formData.originalSubrubro,
         originalIdiomas: formData.originalIdiomas,
         originalImagen: formData.originalImagen,
+        originalUbicacionManual: formData.originalUbicacionManual,
       });
   
       // Verificar si la imagen cambió
@@ -254,6 +256,7 @@ const EditarCvScreen = () => {
         formData.rubro === formData.originalRubro &&
         formData.puesto === formData.originalPuesto &&
         formData.subrubro === formData.originalSubrubro &&
+        formData.ubicacionManual === formData.originalUbicacionManual && // Comparar ubicación manual
         JSON.stringify(formData.idiomas) === JSON.stringify(formData.originalIdiomas) &&
         !isImageChanged; // Imagen no cambió
   

@@ -414,6 +414,11 @@ const CvDetail = ({ cv, onToggleNoLlamar }) => {
               <p className="text-sm text-gray-600">
                 <strong>Provincia:</strong> {getValueOrDefault(cv.provincia)}
               </p>
+              {cv.provincia !== "Buenos Aires" && (
+                <p className="text-sm text-gray-600">
+                  <strong>Ubicación Manual:</strong> {getValueOrDefault(cv.ubicacionManual)}
+                </p>
+              )}
               <p className="text-sm text-gray-600">
                 <strong>Rubro:</strong> {getValueOrDefault(cv.rubro)}
               </p>
