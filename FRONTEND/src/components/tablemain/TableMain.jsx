@@ -29,7 +29,7 @@ const TableMain = () => {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1026)
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 10
+  const [itemsPerPage, setItemsPerPage] = useState(isDesktop ? 9 : 8) // Cambiar el número de items por página según el tamaño de la pantalla
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,7 +54,11 @@ const TableMain = () => {
   }, [filters])
 
   useEffect(() => {
-    const handleResize = () => setIsDesktop(window.innerWidth >= 1026)
+    const handleResize = () => {
+      const isDesktop = window.innerWidth >= 1026
+      setIsDesktop(isDesktop)
+      setItemsPerPage(isDesktop ? 9 : 8) // Cambiar el número de items por página
+    }
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
@@ -159,7 +163,7 @@ const TableMain = () => {
                 currentData.map((user) => (
                   <div
                     key={user._id}
-                    className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300 relative"
+                    className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300 relative min-h-[170px]"
                   >
                     <Link to={`/ver-cv/${user._id}`} className="block">
                       <div className="p-4">

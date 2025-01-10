@@ -89,8 +89,10 @@ const CrearCvScreen = () => {
         return result === true;
       }
     ),
+    genero: Yup.string()
+    .oneOf(["Masculino", "Femenino", ""], "Género inválido")  // No es obligatorio, así que no es necesario usar `.required()`
+    .default(''),
   email: Yup.string().email("Debe ser un email válido").nullable(true).notRequired(),
-  genero: Yup.string().oneOf(["Masculino", "Femenino", ""], "Opción inválida"),
   edad: Yup.number()
     .transform((value, originalValue) => (originalValue === "" ? null : value))
     .nullable()
