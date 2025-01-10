@@ -163,7 +163,7 @@ const TableMain = () => {
                 currentData.map((user) => (
                   <div
                     key={user._id}
-                    className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300 relative min-h-[170px]"
+                    className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300 relative min-h-[185px]"
                   >
                     <Link to={`/ver-cv/${user._id}`} className="block">
                       <div className="p-4">
