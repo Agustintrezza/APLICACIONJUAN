@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { Input, Textarea, Button, FormLabel } from "@chakra-ui/react"
 import PropTypes from "prop-types"
 import * as Yup from "yup"
+import { useToast } from "@chakra-ui/react"
 
 const FormularioListas = ({ onCreate = () => {}, listaToEdit, onUpdate }) => {
   const [formData, setFormData] = useState({
@@ -19,6 +20,8 @@ const FormularioListas = ({ onCreate = () => {}, listaToEdit, onUpdate }) => {
   const [subrubros, setSubrubros] = useState({})
 
   const colors = ["#E53E3E", "#3E8FE5", "#FFB042", "#FFF01A", "#51E302", "#8FE3FF"]
+
+  const toast = useToast()
 
   const validationSchema = Yup.object().shape({
     cliente: Yup.string().required("El campo Cliente es obligatorio"),
@@ -80,6 +83,7 @@ const FormularioListas = ({ onCreate = () => {}, listaToEdit, onUpdate }) => {
         subrubro: listaToEdit.subrubro || "",
       })
     } else {
+      // Reiniciar el formulario cuando no hay lista seleccionada para editar
       setFormData({
         cliente: "",
         comentario: "",
@@ -90,6 +94,7 @@ const FormularioListas = ({ onCreate = () => {}, listaToEdit, onUpdate }) => {
       })
     }
   }, [listaToEdit])
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -104,14 +109,49 @@ const FormularioListas = ({ onCreate = () => {}, listaToEdit, onUpdate }) => {
       if (listaToEdit && onUpdate) {
         console.log("FormularioListas: Llamando a onUpdate con:", formData)
         await onUpdate({ ...listaToEdit, ...formData })
+        // toast({
+        //   title: "Éxito",
+        //   description: "Lista actualizada correctamente.",
+        //   status: "success",
+        //   duration: 5000,
+        //   isClosable: true,
+        //   position: "bottom-right",
+        // })
       } else if (onCreate) {
         console.log("FormularioListas: Llamando a onCreate con:", formData)
         await onCreate(formData) // Esto debe llamar correctamente a createList
+        toast({
+          title: "Éxito",
+          description: "Lista creada correctamente.",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom-center",
+        })
+        // Reiniciar formulario tras crear
+        setFormData({
+          cliente: "",
+          comentario: "",
+          color: "#E53E3E",
+          rubro: "",
+          puesto: "",
+          subrubro: "",
+        })
+        setErrors({})
       }
     } catch (error) {
       console.error("FormularioListas: Error al procesar la lista:", error)
+      toast({
+        title: "Error",
+        description: "Hubo un problema al procesar la lista.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom-right",
+      })
     }
   }
+  
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
