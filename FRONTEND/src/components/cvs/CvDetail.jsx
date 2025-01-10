@@ -9,7 +9,7 @@ import {
   FaShareAlt,
   FaTrashAlt,
   FaPhoneSlash,
-  FaEdit,
+  FaPencilAlt,
 } from "react-icons/fa";
 import {
   Button,
@@ -280,7 +280,7 @@ const CvDetail = ({ cv, onToggleNoLlamar }) => {
           onClick={() => navigate(`/editar-cv/${cv._id}`)}
           className="p-2 bg-blue-500 text-white rounded-full"
         >
-          <FaEdit />
+          <FaPencilAlt />
         </button>
         <button
           onClick={() => setIsDialogOpen(true)}
