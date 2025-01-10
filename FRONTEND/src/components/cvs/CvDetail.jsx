@@ -123,6 +123,7 @@ const CvDetail = ({ cv, onToggleNoLlamar }) => {
   };
 
   const handleToggleNoLlamar = async () => {
+    if (!cv || !cv._id) return;
     setIsUpdatingNoLlamar(true);
     try {
       const updatedNoLlamar = !cvData.noLlamar;
@@ -202,6 +203,10 @@ const CvDetail = ({ cv, onToggleNoLlamar }) => {
       </div>
     </div>
   );
+
+  if (!cv) {
+    return <p>CV no encontrado.</p>; // Si no se pasa un CV, mostramos un mensaje de error.
+  }
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-4 border border-gray-300 w-5/5">
