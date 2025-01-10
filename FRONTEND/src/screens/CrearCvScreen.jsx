@@ -161,44 +161,21 @@ const CrearCvScreen = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setErrors({});
-    
+  
     try {
-      // Comprobar si no se realizaron cambios
-      const isUnchanged =
-        formData.apellido === formData.originalApellido &&
-        formData.celular === formData.originalCelular &&
-        formData.nombre === formData.originalNombre &&
-        formData.genero === formData.originalGenero &&
-        formData.edad === formData.originalEdad &&
-        formData.pais === formData.originalPais &&
-        formData.provincia === formData.originalProvincia &&
-        JSON.stringify(formData.idiomas) === JSON.stringify(formData.originalIdiomas) &&
-        !formData.imagen; // Si no se cargó una nueva imagen
+      // Validar formulario
+      await validationSchema.validate(formData, { abortEarly: false });
   
-      if (isUnchanged) {
-        toast({
-          title: "Sin cambios",
-          description: "No se realizaron cambios en el formulario.",
-          status: "info",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom-right",
-        });
-        navigate(`/ver-cv/${formData.id}`);
-        return;
-      }
-  
-      // Validar el formulario
-      await validationSchema.validate(
-        { ...formData, id: formData.id }, 
-        { abortEarly: false }
-      );
-  
-      // Preparar los datos para enviar
+      // Preparar datos para enviar
       const formDataToSend = new FormData();
-      Object.entries(formData).forEach(([key, value]) => {
-        if (key === "imagen" && typeof value === "object") {
-          formDataToSend.append(key, value);
+      const sanitizedIdiomas = Array.isArray(formData.idiomas)
+        ? formData.idiomas.filter((idioma) => typeof idioma === "string").map((idioma) => idioma.trim())
+        : [];
+      const updatedFormData = { ...formData, idiomas: sanitizedIdiomas };
+  
+      Object.entries(updatedFormData).forEach(([key, value]) => {
+        if (key === "imagen" && value instanceof File) {
+          formDataToSend.append(key, value); // Agregar solo si es un archivo nuevo
         } else if (Array.isArray(value)) {
           value.forEach((v) => formDataToSend.append(`${key}[]`, v));
         } else {
@@ -206,24 +183,34 @@ const CrearCvScreen = () => {
         }
       });
   
-      // Hacer la solicitud al backend
-      const response = await fetch(`${API_URL}/api/curriculums/${formData.id}`, {
-        method: "PUT",
+      // Enviar datos al servidor para crear el nuevo CV
+      const response = await fetch(`${API_URL}/api/curriculums`, {
+        method: "POST",
         body: formDataToSend,
       });
   
-      if (!response.ok) throw new Error("Error al actualizar el CV");
+      if (!response.ok) throw new Error("Error al crear el CV");
   
-      toast({
-        title: "Éxito",
-        description: "El CV se actualizó correctamente.",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom-right",
-      });
+      // Obtener la respuesta JSON, que debería contener el curriculum y el id
+      const result = await response.json();
   
-      navigate(`/ver-cv/${formData.id}`);
+      // Verificar que la respuesta contiene el id
+      if (result && result.curriculum && result.curriculum._id) {
+        toast({
+          title: "Éxito",
+          description: "El CV se creó correctamente.",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom-right",
+        });
+  
+        // Redirigir al usuario al CV creado utilizando el id correcto
+        navigate(`/ver-cv/${result.curriculum._id}`); // Redirigir usando el id correcto
+      } else {
+        throw new Error("El ID del CV no se ha recibido correctamente");
+      }
+  
     } catch (error) {
       console.error("Error al enviar el formulario:", error);
       if (error.name === "ValidationError") {
@@ -235,7 +222,7 @@ const CrearCvScreen = () => {
       }
       toast({
         title: "Error",
-        description: "Hubo un problema al actualizar el CV.",
+        description: "Hubo un problema al crear el CV.",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -245,7 +232,6 @@ const CrearCvScreen = () => {
       setIsSubmitting(false);
     }
   };
-  
   
   
 

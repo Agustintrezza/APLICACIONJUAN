@@ -28,6 +28,8 @@ const TableMain = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1026)
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
 
   useEffect(() => {
     const fetchData = async () => {
@@ -84,6 +86,17 @@ const TableMain = () => {
   const handleToggleCategories = () => {
     setIsCategoriesOpen((prev) => !prev)
   }
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage)
+
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber)
+  }
+
+  const currentData = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  )
 
   return (
     <div className="w-full mx-auto space-y-4 relative">
@@ -142,8 +155,8 @@ const TableMain = () => {
             </div>
           ) : (
             <div className="grid gap-2 mt-4 grid-cols-2 md:grid-cols-3">
-              {filteredData.length > 0 ? (
-                filteredData.map((user) => (
+              {currentData.length > 0 ? (
+                currentData.map((user) => (
                   <div
                     key={user._id}
                     className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300 relative"
@@ -187,6 +200,23 @@ const TableMain = () => {
               )}
             </div>
           )}
+
+          <div className="flex justify-center mt-4">
+            <nav>
+              <ul className="flex space-x-2">
+                {Array.from({ length: totalPages }).map((_, index) => (
+                  <li key={index}>
+                    <button
+                      onClick={() => paginate(index + 1)}
+                      className={`px-4 py-2 rounded-lg border ${currentPage === index + 1 ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'}`}
+                    >
+                      {index + 1}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
         </div>
 
         {isDesktop && <Categories filters={filters} setFilters={setFilters} />}
