@@ -78,10 +78,10 @@ const ListaDetail = ({ lista, onBack, onForceFetch }) => {
   return (
     <div className="border border-gray-300 bg-white rounded-lg p-4 shadow-lg">
       {/* Encabezado */}
-      <div className="flex items-center justify-start md:justify-between gap-3 mb-4">
-        <h3 className="text-2xl font-bold text-[#293e68]">
-          {isLoading ? <Skeleton width={200} /> : localLista.cliente}
-        </h3>
+      <div className="flex items-start justify-start md:justify-between gap-3 mb-4">
+      <h3 className="text-2xl font-bold text-[#293e68] max-w-[150px] break-words">
+        {isLoading ? <Skeleton width={200} /> : localLista.cliente}
+      </h3>
         <div className="flex gap-4">
           {isDesktop ? (
             <>
