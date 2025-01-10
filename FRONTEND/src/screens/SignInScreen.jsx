@@ -67,7 +67,7 @@ const SignInScreen = () => {
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-lg shadow-md w-full max-w-sm"
+        className="bg-white p-6 mb-20 rounded-lg shadow-md w-full max-w-sm"
       >
         <h2 className="text-2xl font-bold mb-4 text-center">INICIAR SESIÓN</h2>
 

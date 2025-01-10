@@ -14,10 +14,10 @@ const FloatingButtonCategories = ({ onToggle }) => {
     <strong className="clase-contraria">
     <button
       onClick={handleClick}
-      className="fixed bg-[#293e68] mt-2 top-2 right-16 text-white p-3 rounded-lg shadow-lg z-50"
+      className="fixed bg-[#337cf9] mt-2 top-2 right-16 text-white p-3 rounded-lg shadow-lg z-50"
       title="Categorías"
     >
-      <FaSearch />
+      <FaSearch size={20}/>
     </button>
     </strong>
   )

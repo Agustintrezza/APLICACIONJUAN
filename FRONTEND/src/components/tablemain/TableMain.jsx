@@ -102,10 +102,10 @@ const TableMain = () => {
           ) : (
             <Link
               to="/crear-cv"
-              className="fixed bottom-6 right-6 bg-[#293e68] text-white p-4 rounded-full shadow-lg hover:bg-blue-800 z-50"
+              className="fixed bottom-6 right-6 bg-red-600 text-white p-4 rounded-full shadow-xl hover:bg-blue-800 z-50"
               title="Ingresar Curriculum"
             >
-              <FaPlus />
+              <FaPlus size={22}/>
             </Link>
           )}
         </div>

@@ -30,9 +30,9 @@ const SidebarResponsive = ({ isAuthenticated, logout, user }) => {
       {/* Botón flotante para abrir/cerrar el Sidebar */}
       <button
         onClick={toggleSidebar}
-        className="fixed top-4 right-4 bg-[#4083f8] border border-blue-400 text-white p-3 rounded-lg z-50"
+        className="fixed top-4 right-3 bg-[#337cf9] border border-blue-400 text-white p-3 rounded-lg z-50"
       >
-        {isSidebarOpen ? <FaTimes /> : <FaBars />}
+        {isSidebarOpen ? <FaTimes size={20} /> : <FaBars size={20}/>}
       </button>
 
       {/* Overlay del Sidebar */}
