@@ -411,25 +411,29 @@ const CvDetail = ({ cv, onToggleNoLlamar }) => {
               <p className="text-sm text-gray-600">
                 <strong>País:</strong> {getValueOrDefault(cv.pais)}
               </p>
+              {cv.pais === "Argentina" && (
               <p className="text-sm text-gray-600">
                 <strong>Provincia:</strong> {getValueOrDefault(cv.provincia)}
               </p>
+               )}
               {cv.provincia !== "Buenos Aires" && (
                 <p className="text-sm text-gray-600">
                   <strong>Ubicación Manual:</strong> {getValueOrDefault(cv.ubicacionManual)}
                 </p>
               )}
-              <p className="text-sm text-gray-600">
-                <strong>Rubro:</strong> {getValueOrDefault(cv.rubro)}
-              </p>
-              {cv.rubro === "Gastronomía" && cv.subrubro && (
-                <p className="text-sm text-gray-600">
-                  <strong>Puesto:</strong> {getValueOrDefault(cv.subrubro)}
-                </p>
+              
+              {cv.pais === "Argentina" && cv.provincia === "Buenos Aires" && (
+                 <p className="text-sm text-gray-600">
+                 <strong>Localidad:</strong> {getValueOrDefault(cv.localidad)}
+               </p>
+        
               )}
-              <p className="text-sm text-gray-600">
-                <strong>Subrubro:</strong> {getValueOrDefault(cv.puesto)}
-              </p>
+              {cv.pais === "Argentina" && cv.provincia === "Buenos Aires" && (
+                <p className="text-sm text-gray-600">
+                <strong>Zona:</strong> {getValueOrDefault(cv.zona)}
+              </p>  
+              )}
+              
             </>
           )}
         </div>
@@ -439,11 +443,17 @@ const CvDetail = ({ cv, onToggleNoLlamar }) => {
           ) : (
             <>
               <p className="text-sm text-gray-600">
-                <strong>Localidad:</strong> {getValueOrDefault(cv.localidad)}
+                <strong>Rubro:</strong> {getValueOrDefault(cv.rubro)}
               </p>
               <p className="text-sm text-gray-600">
-                <strong>Zona:</strong> {getValueOrDefault(cv.zona)}
+                <strong>Subrubro:</strong> {getValueOrDefault(cv.puesto)}
               </p>
+              {cv.rubro === "Gastronomía" && cv.subrubro && (
+                <p className="text-sm text-gray-600">
+                  <strong>Puesto:</strong> {getValueOrDefault(cv.subrubro)}
+                </p>
+              )}
+                 
               <p className="text-sm text-gray-600">
                 <strong>Calificación:</strong>{" "}
                 {getValueOrDefault(cv.calificacion)}
