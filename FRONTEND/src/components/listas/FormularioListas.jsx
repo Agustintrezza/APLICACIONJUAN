@@ -94,6 +94,18 @@ const FormularioListas = ({ onCreate = () => {}, listaToEdit, onUpdate }) => {
       })
     }
   }, [listaToEdit])
+
+  const isFormChanged = () => {
+    if (!listaToEdit) return true // Siempre es un cambio al crear
+    return (
+      listaToEdit.cliente !== formData.cliente ||
+      listaToEdit.comentario !== formData.comentario ||
+      listaToEdit.color !== formData.color ||
+      listaToEdit.rubro !== formData.rubro ||
+      listaToEdit.puesto !== formData.puesto ||
+      listaToEdit.subrubro !== formData.subrubro
+    )
+  }
   
 
   const handleSubmit = async (e) => {
@@ -104,19 +116,23 @@ const FormularioListas = ({ onCreate = () => {}, listaToEdit, onUpdate }) => {
       console.log("FormularioListas: Validación fallida")
       return
     }
+
+    if (!isFormChanged()) {
+      toast({
+        title: "Sin cambios",
+        description: "No se realizaron cambios en el formulario.",
+        status: "info",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom-right",
+      })
+      return
+    }
   
     try {
       if (listaToEdit && onUpdate) {
         console.log("FormularioListas: Llamando a onUpdate con:", formData)
         await onUpdate({ ...listaToEdit, ...formData })
-        // toast({
-        //   title: "Éxito",
-        //   description: "Lista actualizada correctamente.",
-        //   status: "success",
-        //   duration: 5000,
-        //   isClosable: true,
-        //   position: "bottom-right",
-        // })
       } else if (onCreate) {
         console.log("FormularioListas: Llamando a onCreate con:", formData)
         await onCreate(formData) // Esto debe llamar correctamente a createList
