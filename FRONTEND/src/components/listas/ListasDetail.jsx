@@ -14,6 +14,8 @@ import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import "react-loading-skeleton/dist/skeleton.css"
 import { API_URL } from "../../config"
+import { useToast } from "@chakra-ui/react"
+
 
 const ListaDetail = ({ lista, onBack, onForceFetch }) => {
   const [localLista, setLocalLista] = useState({ ...lista })
@@ -21,6 +23,8 @@ const ListaDetail = ({ lista, onBack, onForceFetch }) => {
   const [isDeleting, setIsDeleting] = useState(false)
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1026)
   const [isLoading, setIsLoading] = useState(true)
+  const toast = useToast()
+
 
   useEffect(() => {
     setLocalLista({ ...lista }) // Sincroniza correctamente el estado local con las props
@@ -40,15 +44,37 @@ const ListaDetail = ({ lista, onBack, onForceFetch }) => {
         method: "DELETE",
       })
       if (!response.ok) throw new Error("Error al eliminar la lista")
+      
+      // Mostrar mensaje de éxito
+      toast({
+        title: "Éxito",
+        description: "La lista fue eliminada correctamente.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom-center",
+      })
+      
+      // Volver a la vista anterior
       onBack()
+      
+      // Refrescar las listas
       await onForceFetch()
     } catch (error) {
       console.error("Error al eliminar lista:", error)
+      toast({
+        title: "Error",
+        description: "Hubo un problema al eliminar la lista.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom-center",
+      })
     } finally {
       setIsDeleting(false)
     }
   }
-
+  
   return (
     <div className="border border-gray-300 bg-white rounded-lg p-4 shadow-lg">
       {/* Encabezado */}
