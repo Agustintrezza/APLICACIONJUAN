@@ -127,7 +127,7 @@ const TableMain = () => {
           )}
 
           {isLoading ? (
-            <div className="grid gap-4 mt-4 grid-cols-3">
+            <div className="grid gap-2 mt-4 grid-cols-3">
               {Array.from({ length: 11 }).map((_, index) => (
                 <div
                   key={index}
@@ -141,7 +141,7 @@ const TableMain = () => {
               ))}
             </div>
           ) : (
-            <div className="grid gap-4 mt-4 grid-cols-2 md:grid-cols-3">
+            <div className="grid gap-2 mt-4 grid-cols-2 md:grid-cols-3">
               {filteredData.length > 0 ? (
                 filteredData.map((user) => (
                   <div
