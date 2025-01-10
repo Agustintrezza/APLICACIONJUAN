@@ -113,14 +113,14 @@ const ListaDetail = ({ lista, onBack, onForceFetch }) => {
                 className="p-2 bg-blue-500 text-white rounded-full"
                 title="Volver"
               >
-                <FaArrowLeft />
+                <FaArrowLeft size={18} />
               </button>
               <button
                 onClick={() => setIsDialogOpen(true)}
                 className="p-2 bg-red-500 text-white rounded-full"
                 title="Eliminar"
               >
-                <FaTrash />
+                <FaTrash size={18}/>
               </button>
             </div>
           )}

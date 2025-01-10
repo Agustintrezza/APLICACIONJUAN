@@ -74,12 +74,12 @@ const FloatingButtonListas = () => {
       <button
         disabled={isLoading}
         onClick={toggleSidebar}
-        className={`fixed bg-[#293e68] mt-3 top-2 right-16 text-white p-2 rounded-md shadow-lg z-50 ${
+        className={`fixed bg-[#337cf9] me-1 mt-2 top-2 right-16 text-white p-3 rounded-md shadow-lg z-50 ${
           isLoading ? "opacity-50 cursor-not-allowed" : ""
         }`}
         title="Crear Lista"
       >
-        <FaPlus size={18} />
+        <FaPlus size={20} />
       </button>
 
       {isSidebarOpen && (

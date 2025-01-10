@@ -4,6 +4,7 @@ import * as Yup from "yup";
 import FormularioCv from "../components/formulariocv/FormularioCv";
 import { API_URL } from "../config";
 import { Spinner, useToast } from "@chakra-ui/react";
+import {FaArrowLeft} from "react-icons/fa";
 
 const CrearCvScreen = () => {
   const [formData, setFormData] = useState({
@@ -250,7 +251,17 @@ const CrearCvScreen = () => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-800 mt-1">Ingresar Curriculum</h2>
+      <div className="flex items-center mt-1 gap-3">
+      <button
+          onClick={() => navigate("/")}
+          className="text-[#293e68] hover:text-[#1c2a46] text-xl"
+        >
+          <FaArrowLeft />
+        </button>
+      <h2 className="text-2xl font-bold text-gray-800">Ingresar Curriculum</h2>
+     
+      </div>
+      
       {isSubmitting && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-25 z-50">
           <Spinner size="xl" color="blue.500" />

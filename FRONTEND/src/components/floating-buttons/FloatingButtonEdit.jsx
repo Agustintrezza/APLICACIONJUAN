@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react"
-import { FaEdit } from "react-icons/fa"
+import { FaPencilAlt } from "react-icons/fa"
 import PropTypes from "prop-types"
 import FormularioListas from "../listas/FormularioListas"
 import { AppContext } from "../../context/AppContext"
@@ -56,10 +56,10 @@ const FloatingButtonEdit = ({ listaToEdit, onForceFetch }) => {
     <>
       <button
         onClick={toggleSidebar}
-        className="fixed bg-[#293e68] mt-3 top-2 right-16 text-white p-2 rounded-md shadow-lg z-50"
+        className="fixed bg-[#337cf9] mt-2 top-2 right-16 text-white p-3 rounded-md shadow-lg z-50"
         title="Editar Lista"
       >
-        <FaEdit size={20} />
+        <FaPencilAlt size={22} />
       </button>
 
       {isSidebarOpen && (
