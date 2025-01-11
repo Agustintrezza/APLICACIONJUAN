@@ -85,7 +85,18 @@
   .card-custom-agus {
     height: 180px; /* Altura fija para las tarjetas */
   }
-  
+
+  .line-height-custom {
+    line-height: 20px;
+  }
+  .fuente-custom-rubro-card {
+    font-size: 13px!important;
+    line-height: 14px!important;
+    margin-bottom: 5px;
+  }
+  .fuente-custom-lista-card {
+    font-size: 12px;
+  }
   .container-interno-agus {
     display: grid;
     grid-template-columns: 25% 25% 25% 25%; /* Tres columnas */
