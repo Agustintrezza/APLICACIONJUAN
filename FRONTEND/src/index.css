@@ -88,8 +88,10 @@
   
   .container-interno-agus {
     display: grid;
-    grid-template-columns: 33% 33% 33%; /* Tres columnas */
-    column-gap: 10px;
+    grid-template-columns: 25% 25% 25% 25%; /* Tres columnas */
+    gap: 10px;
+    padding-left: 11px;
+    padding-right: 11px;
     justify-content: center;
     align-items: flex-start;
     row-gap: 10px;
@@ -125,11 +127,11 @@
 
   @media(max-width:1026px) {
     .container-custom-agus {
-        min-height: 755px; /* Este es el tamaño mínimo del contenedor */
+        min-height: 645px; /* Este es el tamaño mínimo del contenedor */
       }
       
       .card-custom-agus {
-        height: 180px; /* Altura fija para las tarjetas */
+        height: 150px; /* Altura fija para las tarjetas */
       }
       
       .container-interno-agus {
@@ -142,7 +144,7 @@
         height: 380px;
       }
       .salvador {
-        height: 180px;
+        height: 150px;
       }
   }
   
