@@ -193,34 +193,47 @@ const TableMain = () => {
                     <div key={user._id}>
                       <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300 card-custom-agus">
                         <Link to={`/ver-cv/${user._id}`} className="block">
-                          <div className="p-4">
-                            <h3 className="text-lg font-bold text-[#293e68]">
-                              {user.nombre} {user.apellido}
-                            </h3>
-                            <p className="text-md font-bold text-[#293e68]">
-                              {user.edad ? `${user.edad} años` : '-'}
-                            </p>
-                            <ul className="text-sm text-gray-800 list-inside list-disc">
-                              {user.listas?.length > 0 ? (
-                                user.listas.map((lista) => (
-                                  <li key={lista._id} className="flex items-center space-x-2">
-                                    <span>{lista.cliente}</span>
-                                    <span
-                                      className="inline-block w-3 h-3 rounded-full"
-                                      style={{ backgroundColor: lista.color || '#cccccc' }}
-                                    ></span>
-                                  </li>
-                                ))
-                              ) : (
-                                <li>No asociado a ningún proyecto</li>
-                              )}
-                            </ul>
-                            {user.noLlamar && (
-                              <span className="inline-block bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full mt-2">
-                                No Llamar
-                              </span>
-                            )}
-                          </div>
+                        <div className="py-2 px-2"> 
+  <p className="text-md font-bold line-height-custom text-[#293e68]">
+    {user.nombre} {user.apellido}
+  </p>
+  <p className="text-sm mb-1 font-bold text-[#293e68]">
+    {user.edad && `${user.edad} años`}
+  </p>
+  
+  {/* Mostrar rubro, subrubro y puesto siempre que existan */}
+  <p className="text-sm font-bold fuente-custom-rubro-card text-[#293e68]">
+  {user.rubro ? (
+    user.rubro === 'Gastronomía' 
+      ? `${user.rubro} ${user.puesto?`/ ${user.puesto} /` : ''}${user.subrubro}`
+      : `${user.rubro} / ${user.puesto}`
+  ) : '-'}
+</p>
+
+  <ul className="text-sm text-gray-800 list-inside list-disc">
+  {user.listas?.length > 3 ? (
+    <li>Asociado a más de 4 listas</li>
+  ) : (
+    user.listas?.map((lista) => (
+      <li key={lista._id} className="flex fuente-custom-lista-card items-center space-x-2">
+        <span
+          className="inline-block w-3 h-3 rounded-full"
+          style={{ backgroundColor: lista.color || '#cccccc' }}
+        ></span>
+        <span>{lista.cliente}</span>
+      </li>
+    ))
+  )}
+</ul>
+
+  
+  {user.noLlamar && (
+    <span className="inline-block bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full mt-2">
+      No Llamar
+    </span>
+  )}
+</div>
+
                         </Link>
                       </div>
                     </div>
