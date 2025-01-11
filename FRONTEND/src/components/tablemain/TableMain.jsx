@@ -28,9 +28,10 @@ const TableMain = () => {
   const [cvData, setCvData] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1026)
+  const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1400) // Verifica si es una pantalla grande (>1400px)
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(isDesktop ? 9 : 8) // Cambiar el número de items por página según el tamaño de la pantalla
+  const [itemsPerPage, setItemsPerPage] = useState(isLargeScreen ? 12 : isDesktop ? 9 : 8) // Ajustar el número de items por página
 
   useEffect(() => {
     const fetchData = async () => {
@@ -57,10 +58,19 @@ const TableMain = () => {
 
   useEffect(() => {
     const handleResize = () => {
-      const isDesktop = window.innerWidth >= 1026
-      setIsDesktop(isDesktop)
-      setItemsPerPage(isDesktop ? 9 : 8) // Cambiar el número de items por página
+      const width = window.innerWidth
+      setIsDesktop(width >= 1026)
+      setIsLargeScreen(width >= 1400) // Verifica si la pantalla es mayor a 1400px
+
+      if (width >= 1400) {
+        setItemsPerPage(12) // 12 items para pantallas grandes
+      } else if (width >= 1026) {
+        setItemsPerPage(9) // 9 items para pantallas de escritorio
+      } else {
+        setItemsPerPage(8) // 8 items para pantallas móviles
+      }
     }
+
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
@@ -101,7 +111,6 @@ const TableMain = () => {
       (!filters.experienciaAnios || user.experiencia === filters.experienciaAnios)
     );
   });
-  
 
   const handleToggleCategories = () => {
     setIsCategoriesOpen((prev) => !prev)
@@ -160,8 +169,8 @@ const TableMain = () => {
           )}
 
           {isLoading ? (
-            <div className="grid gap-2 mt-4 grid-cols-3">
-              {Array.from({ length: 11 }).map((_, index) => (
+            <div className={`grid gap-2 mt-4 ${isDesktop ? 'md:grid-cols-4 grid-cols-4' : 'grid-cols-2'}`}>
+              {Array.from({ length: isDesktop ? 9 : 8 }).map((_, index) => (
                 <div
                   key={index}
                   className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300 p-4"
@@ -176,53 +185,50 @@ const TableMain = () => {
           ) : (
             <div className="grid gap-2 mt-4 container-custom-agus">
               <div className="container-interno-agus">
-              {currentData.length > 0 ? (
-                
-                currentData.map((user) => (
-                  <div className="salvador" key={user._id}>
-                  <div
-                    
-                    className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300 card-custom-agus"
-                  >
-                    <Link to={`/ver-cv/${user._id}`} className="block">
-                      <div className="p-4">
-                        <h3 className="text-lg font-bold text-[#293e68]">
-                          {user.nombre} {user.apellido}
-                        </h3>
-                        <p className="text-md font-bold text-[#293e68]">
-                          {user.edad ? `${user.edad} años` : '-'}
-                        </p>
-                        <ul className="text-sm text-gray-800 list-inside list-disc">
-                          {user.listas?.length > 0 ? (
-                            user.listas.map((lista) => (
-                              <li key={lista._id} className="flex items-center space-x-2">
-                                <span>{lista.cliente}</span>
-                                <span
-                                  className="inline-block w-3 h-3 rounded-full"
-                                  style={{ backgroundColor: lista.color || '#cccccc' }}
-                                ></span>
-                              </li>
-                            ))
-                          ) : (
-                            <li>No asociado a ningún proyecto</li>
-                          )}
-                        </ul>
-                        {user.noLlamar && (
-                          <span className="inline-block bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full mt-2">
-                            No Llamar
-                          </span>
-                        )}
+                {currentData.length > 0 ? (
+                  currentData.map((user) => (
+                    <div key={user._id}>
+                      <div
+                        className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300 card-custom-agus"
+                      >
+                        <Link to={`/ver-cv/${user._id}`} className="block">
+                          <div className="p-4">
+                            <h3 className="text-lg font-bold text-[#293e68]">
+                              {user.nombre} {user.apellido}
+                            </h3>
+                            <p className="text-md font-bold text-[#293e68]">
+                              {user.edad ? `${user.edad} años` : '-'}
+                            </p>
+                            <ul className="text-sm text-gray-800 list-inside list-disc">
+                              {user.listas?.length > 0 ? (
+                                user.listas.map((lista) => (
+                                  <li key={lista._id} className="flex items-center space-x-2">
+                                    <span>{lista.cliente}</span>
+                                    <span
+                                      className="inline-block w-3 h-3 rounded-full"
+                                      style={{ backgroundColor: lista.color || '#cccccc' }}
+                                    ></span>
+                                  </li>
+                                ))
+                              ) : (
+                                <li>No asociado a ningún proyecto</li>
+                              )}
+                            </ul>
+                            {user.noLlamar && (
+                              <span className="inline-block bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full mt-2">
+                                No Llamar
+                              </span>
+                            )}
+                          </div>
+                        </Link>
                       </div>
-                    </Link>
+                    </div>
+                  ))
+                ) : (
+                  <div className="col-span-full text-center text-gray-500">
+                    No se encontraron resultados.
                   </div>
-                  </div>
-                ))
-
-              ) : (
-                <div className="col-span-full text-center text-gray-500">
-                  No se encontraron resultados.
-                </div>
-              )}
+                )}
               </div>
             </div>
           )}
@@ -254,7 +260,6 @@ const TableMain = () => {
           {isCategoriesOpen && (
             <div className="fixed inset-0 clase bg-black bg-opacity-50 flex justify-center items-center z-50">
               <div className="bg-blue-50 rounded-lg px-4 py-4 w-11/12 h-5/6 overflow-auto">
-                {/* Componente SelectFilters */}
                 <SelectFilters
                   searchTerm={searchTerm}
                   setSearchTerm={setSearchTerm}
@@ -281,4 +286,4 @@ const TableMain = () => {
   )
 }
 
-export default TableMain
+export default TableMain;
