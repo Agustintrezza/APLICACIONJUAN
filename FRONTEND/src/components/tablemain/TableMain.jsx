@@ -189,8 +189,8 @@ const TableMain = () => {
                         <h3 className="text-lg font-bold text-[#293e68]">
                           {user.nombre} {user.apellido}
                         </h3>
-                        <p className="text-lg font-bold text-[#293e68]">
-                          {user.edad ? `${user.edad} años` : 'Sin edad especificada'}
+                        <p className="text-md font-bold text-[#293e68]">
+                          {user.edad ? `${user.edad} años` : '-'}
                         </p>
                         <ul className="text-sm text-gray-800 list-inside list-disc">
                           {user.listas?.length > 0 ? (
