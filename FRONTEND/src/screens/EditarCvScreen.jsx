@@ -111,14 +111,17 @@ const EditarCvScreen = () => {
     .required("El apellido es obligatorio"),
     celular: Yup.string()
       .required("El teléfono celular es obligatorio")
+      .matches(/^\d+$/, "El teléfono celular debe contener solo números") // Validación para solo números
+      .min(6, "El teléfono celular debe tener entre 6 y 15 dígitos") // Mínimo de 6 caracteres
+      .max(15, "El teléfono celular no puede tener más de 15 dígitos") // Máximo de 15 caracteres
       .test(
         "check-duplicate",
         "Celular ya está registrado.",
         async (value, context) => {
-          const excludeId = context?.parent?.id || "";
-          const originalValue = context?.parent?.originalCelular || "";
+          const excludeId = context?.parent?.id || ""; // Extraer el ID del CV desde el formulario
+          const originalValue = context?.parent?.originalCelular || ""; // Valor original del celular
           if (value === originalValue) {
-            return true;
+            return true; // Si no se ha cambiado, pasa la validación
           }
           const result = await validateDuplicate("celular", value, excludeId);
           return result === true;
