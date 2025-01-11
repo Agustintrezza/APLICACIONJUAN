@@ -40,6 +40,9 @@ const PROVINCIAS_ARGENTINA = [
 const Categories = ({ filters, setFilters }) => {
   const [listas, setListas] = useState([])
 
+  // Estado para detectar si estamos en una pantalla de escritorio
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1026);
+
   useEffect(() => {
     const fetchListas = async () => {
       try {
@@ -55,11 +58,25 @@ const Categories = ({ filters, setFilters }) => {
     fetchListas()
   }, [])
 
+  useEffect(() => {
+    // Detectar cambios en el tamaño de la ventana para ajustar el estado de 'isDesktop'
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1026);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const handleFilterChange = (e, filterType) => {
     const value = e.target.value;
   
     setFilters((prevFilters) => {
       const newFilters = { ...prevFilters };
+
+      if (filterType === "zona") {
+        // Limpiar localidad al cambiar de zona
+        newFilters.localidad = "";
+      }
   
       if (filterType === "idiomas") {
         // Convertir siempre a un array
@@ -67,14 +84,50 @@ const Categories = ({ filters, setFilters }) => {
       } else {
         newFilters[filterType] = value;
       }
-  
+      console.log("Nuevo filtro aplicado:", newFilters);
       return newFilters;
     });
   };
 
+  const handleCountryChange = (e) => {
+    const selectedCountry = e.target.value;
+  
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      pais: selectedCountry,
+      provincia: "", // Limpiamos la provincia
+      zona: "",      // Limpiamos la zona
+      localidad: "", // Limpiamos la localidad
+      ubicacionManual: "", // Limpiamos la ubicación manual
+    }));
+  
+    console.log("País cambiado:", selectedCountry); // Log de país seleccionado
+  };
+  
+
+  const handleProvinceChange = (e) => {
+    const selectedProvince = e.target.value;
+  
+    // Limpiar zona y localidad al cambiar de provincia
+    setFilters((prevFilters) => {
+      const newFilters = {
+        ...prevFilters,
+        provincia: selectedProvince,
+        zona: "",      // Limpiamos la zona
+        localidad: "", // Limpiamos la localidad
+      };
+  
+      console.log("Provincia cambiada:", selectedProvince); // Log de la provincia seleccionada
+      console.log("Filtros después del cambio:", newFilters); // Log de los filtros después de cambiar provincia
+  
+      return newFilters;
+    });
+  };
+  
+
   return (
     <div
-      className="className={`${isDesktop ? 'w-2/5' : 'w-full'} max-h-screen overflow-y-auto`}"
+      className={`className \`${isDesktop ? 'w-2/5' : 'w-full'} max-h-screen overflow-y-auto\``}
       style={{ position: 'sticky', top: '-16px', maxHeight: '100vh', overflowY: 'auto' }}
     >
       <div
@@ -115,11 +168,11 @@ const Categories = ({ filters, setFilters }) => {
             <select
               id="pais"
               value={filters.pais}
-              onChange={(e) => handleFilterChange(e, 'pais')}
+              onChange={handleCountryChange} // Usamos handleCountryChange
               className={`form-select text-sm py-1 bg-transparent px-2 h-8 w-full border-1 rounded-md ${
                 filters.pais ? 'border-red-400 border-2' : 'border-blue-400'
               }`}
->
+            >
               <option value="">Seleccionar</option>
               <option value="Argentina">Argentina</option>
               <option value="Estados Unidos">Estados Unidos</option>
@@ -129,14 +182,14 @@ const Categories = ({ filters, setFilters }) => {
             </select>
           </div>
 
-          {/* Provincia */}
-          {filters.pais === "Argentina" && (
+         {/* Provincia */}
+         {filters.pais === "Argentina" && (
             <div>
               <label htmlFor="provincia" className="text-sm text-[#293e68] mb-1">Provincia</label>
               <select
                 id="provincia"
                 value={filters.provincia}
-                onChange={(e) => handleFilterChange(e, "provincia")}
+                onChange={handleProvinceChange} // Usamos handleProvinceChange
                 className={`form-select text-sm py-1 bg-transparent px-2 h-8 w-full border-1 rounded-md ${
                   filters.provincia ? 'border-red-400 border-2' : 'border-blue-400'
                 }`}
@@ -149,29 +202,47 @@ const Categories = ({ filters, setFilters }) => {
             </div>
           )}
 
-          {/* Localidad */}
-          {filters.pais === "Argentina" && filters.provincia === "Buenos Aires" && (
-            <div>
-              <label htmlFor="localidad" className="text-sm text-[#293e68] mb-1">Localidad</label>
-              <select
-                id="localidad"
-                value={filters.localidad}
-                onChange={(e) => handleFilterChange(e, "localidad")}
-                className={`form-select text-sm py-1 bg-transparent px-2 h-8 w-full border-1 rounded-md ${
-                  filters.localidad ? 'border-red-400 border-2' : 'border-blue-400'
-                }`}
-              >
-                <option value="">Seleccionar</option>
-                {Object.entries(ZONAS_LOCALIDADES).flatMap(([zona, localidades]) =>
-                  localidades.map(localidad => (
-                    <option key={localidad} value={localidad}>{`${zona} - ${localidad}`}</option>
-                  ))
-                )}
-              </select>
-            </div>
-          )}
-        </div>
+         {/* Zona */}
+{filters.pais === "Argentina" && filters.provincia === "Buenos Aires" && (
+  <div>
+    <label htmlFor="zona" className="text-sm text-[#293e68] mb-1">Zona</label>
+    <select
+  id="zona"
+  value={filters.zona}
+  onChange={(e) => handleFilterChange(e, "zona")}
+  className={`form-select text-sm py-1 bg-transparent px-2 h-8 w-full border-1 rounded-md ${
+    filters.zona ? 'border-red-400 border-2' : 'border-blue-400'
+  }`}
+>
+  <option value="">Seleccionar Zona</option>
+  {Object.keys(ZONAS_LOCALIDADES).map((zona) => (
+    <option key={zona} value={zona}>{zona}</option>
+  ))}
+</select>
+  </div>
+)}
 
+{/* Localidad */}
+{filters.pais === "Argentina" && filters.provincia === "Buenos Aires" && filters.zona && (
+  <div>
+    <label htmlFor="localidad" className="text-sm text-[#293e68] mb-1">Localidad</label>
+    <select
+      id="localidad"
+      value={filters.localidad}
+      onChange={(e) => handleFilterChange(e, "localidad")}
+      className={`form-select text-sm py-1 bg-transparent px-2 h-8 w-full border-1 rounded-md ${
+        filters.localidad ? 'border-red-400 border-2' : 'border-blue-400'
+      }`}
+    >
+      <option value="">Seleccionar Localidad</option>
+      {ZONAS_LOCALIDADES[filters.zona].map((localidad) => (
+        <option key={localidad} value={localidad}>{localidad}</option>
+      ))}
+    </select>
+  </div>
+)}
+
+        </div>
 
           {/* Calificación */}
           <div>
@@ -274,7 +345,7 @@ const Categories = ({ filters, setFilters }) => {
               value={filters.idiomas && filters.idiomas.length > 0 ? filters.idiomas[0] : ""}
               onChange={(e) => handleFilterChange(e, "idiomas")}
               className={`form-select text-sm py-1 bg-transparent px-2 h-8 w-full border-1 rounded-md ${
-                filters.idioma ? 'border-red-400 border-2' : 'border-blue-400'
+                filters.idiomas && filters.idiomas.length > 0 ? 'border-red-400 border-2' : 'border-blue-400'
               }`}
             >
               <option value="">Seleccionar</option>
@@ -296,4 +367,4 @@ Categories.propTypes = {
   setFilters: PropTypes.func.isRequired,
 }
 
-export default Categories
+export default Categories;

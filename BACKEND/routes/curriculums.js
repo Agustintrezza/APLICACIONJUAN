@@ -94,13 +94,10 @@ console.log('Archivo recibido:', req.file);
 
     // Validación: Duplicados por apellido o celular
     const existingCv = await Curriculum.findOne({
-      $or: [{ apellido }, { celular }],
+      $or: [{ celular }],
     });
 
     if (existingCv) {
-      if (existingCv.apellido === apellido) {
-        return res.status(400).json({ error: 'Ya existe un candidato con el mismo apellido.' });
-      }
       if (existingCv.celular === celular) {
         return res.status(400).json({ error: 'Ya existe un candidato con el mismo número de teléfono celular.' });
       }

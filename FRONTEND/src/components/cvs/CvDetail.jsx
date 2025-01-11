@@ -213,108 +213,117 @@ const CvDetail = ({ cv, onToggleNoLlamar }) => {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold text-[#293e68]">
           {isDataLoading ? (
-            <Skeleton width={150} height={40}/>
+            <Skeleton width={150} height={40} />
           ) : (
             `${getValueOrDefault(cv.nombre)} ${getValueOrDefault(cv.apellido)}`
           )}
         </h2>
         <div className="flex gap-4">
-  {isDataLoading ? (
-    isDesktop ? (
-      <>
-        <Skeleton width={100} height={40} /> {/* Botones de escritorio */}
-        <Skeleton width={100} height={40} />
-        <Skeleton width={100} height={40} />
-        <Skeleton width={100} height={40} />
-      </>
-    ) : (
-      <div className="flex gap-2 me-10">
-        <Skeleton width={40} height={40} circle={true} /> {/* Botones redondos */}
-        <Skeleton width={40} height={40} circle={true} />
-      </div>
-    )
-  ) : isDesktop ? (
-    <>
-      <Button
-        leftIcon={<FaArrowLeft />}
-        onClick={onBack}
-        bg="#293e68"
-        color="white"
-        _hover={{ bg: "#1f2d4b" }}
-      >
-        Volver
-      </Button>
-      <button
-        className="bg-[#293e68] text-white px-4 py-2 rounded-lg"
-        onClick={() => navigate(`/editar-cv/${cv._id}`)}
-      >
-        Editar
-      </button>
-      <button
-        className="bg-red-500 text-white px-4 py-2 rounded-lg"
-        onClick={() => setIsDialogOpen(true)}
-      >
-        Eliminar
-      </button>
-      <button
-        className="bg-green-500 text-white px-4 py-2 rounded-lg"
-        onClick={handleWhatsappShare}
-      >
-        WhatsApp
-      </button>
-      <button
-  onClick={onToggleNoLlamar}
-  className={`p-3 text-white rounded-full ${
-    cv.noLlamar ? "bg-red-500" : "bg-gray-500"
-  }`}
-  title={cv.noLlamar ? "Marcado como No Llamar" : "No está marcado como No Llamar"}
->
-  <FaPhoneSlash />
-</button>
-    </>
-  ) : (
-    <div className="me-8">
-      <div className="mb-2 gap-2 flex">
-        <button
-          onClick={onBack}
-          className="p-2 bg-blue-500 text-white rounded-full"
-        >
-          <FaArrowLeft />
-        </button>
-        <button
-          onClick={() => navigate(`/editar-cv/${cv._id}`)}
-          className="p-2 bg-blue-500 text-white rounded-full"
-        >
-          <FaPencilAlt />
-        </button>
-        <button
-          onClick={() => setIsDialogOpen(true)}
-          className="p-2 bg-red-500 text-white rounded-full"
-        >
-          <FaTrashAlt />
-        </button>
-      </div>
-      <div className="mb-2 gap-2 flex">
-      <button
-  onClick={onToggleNoLlamar}
-  className={`p-2 text-white rounded-full ${
-    cv.noLlamar ? "bg-red-500" : "bg-gray-500"
-  }`}
-  title={cv.noLlamar ? "Marcado como No Llamar" : "No está marcado como No Llamar"}
->
-  <FaPhoneSlash />
-</button>
-        <button
-          onClick={handleWhatsappShare}
-          className="p-2 bg-green-500 text-white rounded-full"
-        >
-          <FaShareAlt />
-        </button>
-      </div>
-    </div>
-  )}
-</div>
-
+          {isDataLoading ? (
+            isDesktop ? (
+              <>
+                <Skeleton width={100} height={40} />{" "}
+                {/* Botones de escritorio */}
+                <Skeleton width={100} height={40} />
+                <Skeleton width={100} height={40} />
+                <Skeleton width={100} height={40} />
+              </>
+            ) : (
+              <div className="flex gap-2 me-10">
+                <Skeleton width={40} height={40} circle={true} />{" "}
+                {/* Botones redondos */}
+                <Skeleton width={40} height={40} circle={true} />
+              </div>
+            )
+          ) : isDesktop ? (
+            <>
+              <Button
+                leftIcon={<FaArrowLeft />}
+                onClick={onBack}
+                bg="#293e68"
+                color="white"
+                _hover={{ bg: "#1f2d4b" }}
+              >
+                Volver
+              </Button>
+              <button
+                className="bg-[#293e68] text-white px-4 py-2 rounded-lg"
+                onClick={() => navigate(`/editar-cv/${cv._id}`)}
+              >
+                Editar
+              </button>
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded-lg"
+                onClick={() => setIsDialogOpen(true)}
+              >
+                Eliminar
+              </button>
+              <button
+                className="bg-green-500 text-white px-4 py-2 rounded-lg"
+                onClick={handleWhatsappShare}
+              >
+                WhatsApp
+              </button>
+              <button
+                onClick={onToggleNoLlamar}
+                className={`p-3 text-white rounded-full ${
+                  cv.noLlamar ? "bg-red-500" : "bg-gray-500"
+                }`}
+                title={
+                  cv.noLlamar
+                    ? "Marcado como No Llamar"
+                    : "No está marcado como No Llamar"
+                }
+              >
+                <FaPhoneSlash />
+              </button>
+            </>
+          ) : (
+            <div className="me-8">
+              <div className="mb-2 gap-2 flex">
+                <button
+                  onClick={onBack}
+                  className="p-2 bg-blue-500 text-white rounded-full"
+                >
+                  <FaArrowLeft />
+                </button>
+                <button
+                  onClick={() => navigate(`/editar-cv/${cv._id}`)}
+                  className="p-2 bg-blue-500 text-white rounded-full"
+                >
+                  <FaPencilAlt />
+                </button>
+                <button
+                  onClick={() => setIsDialogOpen(true)}
+                  className="p-2 bg-red-500 text-white rounded-full"
+                >
+                  <FaTrashAlt />
+                </button>
+              </div>
+              <div className="mb-2 gap-2 flex">
+                <button
+                  onClick={onToggleNoLlamar}
+                  className={`p-2 text-white rounded-full ${
+                    cv.noLlamar ? "bg-red-500" : "bg-gray-500"
+                  }`}
+                  title={
+                    cv.noLlamar
+                      ? "Marcado como No Llamar"
+                      : "No está marcado como No Llamar"
+                  }
+                >
+                  <FaPhoneSlash />
+                </button>
+                <button
+                  onClick={handleWhatsappShare}
+                  className="p-2 bg-green-500 text-white rounded-full"
+                >
+                  <FaShareAlt />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
       {!isDesktop && (
         <FloatingButtonCvDetail
@@ -388,9 +397,7 @@ const CvDetail = ({ cv, onToggleNoLlamar }) => {
           </AlertDialogContent>
         </AlertDialogOverlay>
       </AlertDialog>
-      <div className="mb-6">
-        {renderAssignedLists()}
-      </div>
+      <div className="mb-6">{renderAssignedLists()}</div>
       <div className="grid grid-cols-2 gap-6">
         <div>
           {isDataLoading ? (
@@ -417,28 +424,27 @@ const CvDetail = ({ cv, onToggleNoLlamar }) => {
                 <strong>País:</strong> {getValueOrDefault(cv.pais)}
               </p>
               {cv.pais === "Argentina" && (
-              <p className="text-sm text-gray-600">
-                <strong>Provincia:</strong> {getValueOrDefault(cv.provincia)}
-              </p>
-               )}
-              {cv.provincia !== "Buenos Aires" && (
                 <p className="text-sm text-gray-600">
-                  <strong>Ubicación Manual:</strong> {getValueOrDefault(cv.ubicacionManual)}
+                  <strong>Provincia:</strong> {getValueOrDefault(cv.provincia)}
                 </p>
               )}
-              
+              {cv.provincia !== "Buenos Aires" && (
+                <p className="text-sm text-gray-600">
+                  <strong>Ubicación Manual:</strong>{" "}
+                  {getValueOrDefault(cv.ubicacionManual)}
+                </p>
+              )}
+
               {cv.pais === "Argentina" && cv.provincia === "Buenos Aires" && (
-                 <p className="text-sm text-gray-600">
-                 <strong>Localidad:</strong> {getValueOrDefault(cv.localidad)}
-               </p>
-        
+                <p className="text-sm text-gray-600">
+                  <strong>Localidad:</strong> {getValueOrDefault(cv.localidad)}
+                </p>
               )}
               {cv.pais === "Argentina" && cv.provincia === "Buenos Aires" && (
                 <p className="text-sm text-gray-600">
-                <strong>Zona:</strong> {getValueOrDefault(cv.zona)}
-              </p>  
+                  <strong>Zona:</strong> {getValueOrDefault(cv.zona)}
+                </p>
               )}
-              
             </>
           )}
         </div>
@@ -458,7 +464,7 @@ const CvDetail = ({ cv, onToggleNoLlamar }) => {
                   <strong>Puesto:</strong> {getValueOrDefault(cv.subrubro)}
                 </p>
               )}
-                 
+
               <p className="text-sm text-gray-600">
                 <strong>Calificación:</strong>{" "}
                 {getValueOrDefault(cv.calificacion)}
