@@ -179,18 +179,35 @@ const TableMain = () => {
 
           {isLoading ? (
             <div className={`grid gap-2 mt-4 ${isDesktop ? 'md:grid-cols-3 grid-cols-3' : 'grid-cols-2'}`}>
-              {Array.from({ length: isDesktop ? 9 : 8 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300 p-4"
-                >
-                  <Skeleton height={20} width="80%" className="mb-2" /> {/* Nombre */}
-                  <Skeleton height={15} width="40%" className="mb-2" /> {/* Edad */}
-                  <Skeleton height={15} width="60%" className="mb-2" /> {/* Listas */}
-                  <Skeleton height={20} width="30%" className="mt-2" /> {/* No llamar */}
-                </div>
-              ))}
-            </div>
+            {Array.from({ length: isDesktop ? 9 : 8 }).map((_, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300 p-4"
+              >
+                <Skeleton
+                  height={isDesktop ? 20 : 10}  // Tamaño de 20px en escritorio, 15px en móviles
+                  width="80%" 
+                  className="mb-2" 
+                /> {/* Nombre */}
+                <Skeleton
+                  height={isDesktop ? 15 : 10}  // Tamaño de 15px en escritorio, 10px en móviles
+                  width="40%" 
+                  className="mb-2" 
+                /> {/* Edad */}
+                <Skeleton
+                  height={isDesktop ? 15 : 10}  // Tamaño de 15px en escritorio, 10px en móviles
+                  width="60%" 
+                  className="mb-2" 
+                /> {/* Listas */}
+                <Skeleton
+                  height={isDesktop ? 20 : 10}  // Tamaño de 20px en escritorio, 12px en móviles
+                  width="30%" 
+                  className="mt-2" 
+                /> {/* No llamar */}
+              </div>
+            ))}
+          </div>
+          
           ) : (
             <div className="grid gap-2 mt-4 container-custom-agus">
               <div className="container-interno-agus">
