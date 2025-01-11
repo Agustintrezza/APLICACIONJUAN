@@ -10,7 +10,7 @@ const SelectFilters = ({
   hasCategoryFilters,
 }) => {
   return (
-    <div className="space-y-2 sm:space-y-0 sm:flex sm:space-x-4 mb-3 select-filters-container-custom shadow-lg">
+    <div className="space-y-2 sm:space-y-0 sm:flex sm:space-x-4 mb-3 shadow-lg">
       {/* Contenedor del campo de búsqueda */}
       <div className="flex-1 border border-blue-300 bg-[#e9f0ff] rounded-lg p-2 shadow-md">
         <div className="flex items-center space-x-2">
