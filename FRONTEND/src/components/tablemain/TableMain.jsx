@@ -17,6 +17,7 @@ const TableMain = () => {
     edad: '',
     pais: '',
     provincia: '',
+    zona: '',
     localidad: '',
     idioma: '',
     calificacion: '',
@@ -42,6 +43,7 @@ const TableMain = () => {
         const response = await fetch(`${API_URL}/api/curriculums?${query}`)
         if (!response.ok) throw new Error('Error al obtener currículums')
         const data = await response.json()
+        console.log('Datos filtrados de la API:', data);
         setCvData(data)
       } catch (error) {
         console.error('Error al cargar currículums:', error)
@@ -70,6 +72,7 @@ const TableMain = () => {
       edad: '',
       pais: '',
       provincia: '',
+      zona: '',
       localidad: '',
       idioma: '',
       calificacion: '',
@@ -81,11 +84,21 @@ const TableMain = () => {
 
   const hasCategoryFilters = Object.values(filters).some((value) => value !== '')
 
-  const filteredData = cvData.filter((user) =>
-    removeAccents(`${user.nombre} ${user.apellido}`)
-      .toLowerCase()
-      .includes(removeAccents(searchTerm.toLowerCase()))
-  )
+  // Filtrado de los datos en función del searchTerm y los filtros aplicados
+  const filteredData = cvData.filter((user) => {
+    console.log("Filtros actuales:", filters); // Log de los filtros aplicados
+    return (
+      // Filtro por búsqueda de nombre o apellido
+      removeAccents(`${user.nombre} ${user.apellido}`).toLowerCase().includes(removeAccents(searchTerm.toLowerCase())) &&
+      // Filtro por zona
+      (filters.zona === '' || user.zona === filters.zona) &&
+      // Filtro por provincia
+      (filters.provincia === '' || user.provincia === filters.provincia) &&
+      // Filtro por país
+      (filters.pais === '' || user.pais === filters.pais)
+      // Agrega más filtros si es necesario
+    );
+  });
 
   const handleToggleCategories = () => {
     setIsCategoriesOpen((prev) => !prev)

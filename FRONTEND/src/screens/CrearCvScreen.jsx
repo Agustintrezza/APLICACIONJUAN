@@ -58,22 +58,7 @@ const CrearCvScreen = () => {
 
   const validationSchema = Yup.object().shape({
   nombre: Yup.string().min(3, "Debe tener al menos 3 caracteres").required("El nombre es obligatorio"),
-  apellido: Yup.string()
-    .min(2, "Debe tener al menos 2 caracteres")
-    .required("El apellido es obligatorio")
-    .test(
-      "check-duplicate",
-      "Apellido ya está registrado.",
-      async (value, context) => {
-        const excludeId = context?.parent?.id || ""; // Extraer el ID del CV desde el formulario
-        const originalValue = context?.parent?.originalApellido || ""; // Valor original del apellido
-        if (value === originalValue) {
-          return true; // Si no se ha cambiado, pasa la validación
-        }
-        const result = await validateDuplicate("apellido", value, excludeId);
-        return result === true;
-      }
-    ),
+  apellido: Yup.string().min(2, "Debe tener al menos 2 caracteres").required("El apellido es obligatorio"),
   celular: Yup.string()
     .required("El teléfono celular es obligatorio")
     .test(
