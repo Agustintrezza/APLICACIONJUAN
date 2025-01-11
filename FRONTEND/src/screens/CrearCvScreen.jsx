@@ -90,14 +90,12 @@ const CrearCvScreen = () => {
   calificacion: Yup.string()
     .oneOf(["1- Muy bueno", "2- Bueno", "3- Regular"], "Opción inválida")
     .required("La calificación es obligatoria"),
-  imagen: Yup.mixed()
-    .test("fileType", "El archivo debe ser una imagen JPG, JPEG, PNG o un PDF", (value) =>
-      !value || ["image/jpeg", "image/jpg", "image/png", "application/pdf"].includes(value?.type)
-    )
-    .test("required-if-no-existing", "La imagen o archivo es obligatorio", function (value) {
-      const { imagen } = this.parent; // Acceder a la imagen actual
-      return imagen || value; // Si hay una imagen existente o se carga una nueva, pasa la validación
-    }),
+    imagen: Yup.mixed()
+  .test("fileType", "El archivo debe ser una imagen JPG, JPEG, PNG o un PDF", (value) => {
+    return !value || ["image/jpeg", "image/jpg", "image/png", "application/pdf"].includes(value?.type);
+  })
+  .required("Es necesario ingresar una imagen del curriculum.")
+  .required("Es necesario ingresar una imagen del curriculum."),
   rubro: Yup.string().required("El rubro es obligatorio"),
   puesto: Yup.string().required("El puesto es obligatorio"),
   subrubro: Yup.string(),
@@ -120,20 +118,26 @@ const CrearCvScreen = () => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
+    
+    // Si no se selecciona ningún archivo, se muestra un mensaje de error
     if (!file) {
       setErrors((prevErrors) => ({ ...prevErrors, imagen: "La imagen o archivo es obligatorio." }));
       return;
     }
-
+  
+    // Si el tipo de archivo no es válido, mostramos un error
     const allowedFormats = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
     if (!allowedFormats.includes(file.type)) {
       setErrors((prevErrors) => ({ ...prevErrors, imagen: "Formato de archivo no permitido." }));
       return;
     }
-
+  
+    // Si es válido, actualizamos el estado y eliminamos el mensaje de error
     setFormData((prevData) => ({ ...prevData, imagen: file }));
     setErrors((prevErrors) => ({ ...prevErrors, imagen: "" }));
   };
+  
+  
 
   const handleCheckboxChange = (language) => {
     setFormData((prevData) => {
@@ -145,44 +149,39 @@ const CrearCvScreen = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setErrors({});
+    e.preventDefault(); // Previene el comportamiento por defecto del formulario
+    setIsSubmitting(true); // Indica que se está enviando el formulario
+    setErrors({}); // Limpia los errores anteriores
   
     try {
-      // Validar formulario
-      await validationSchema.validate(formData, { abortEarly: false });
+      // Validar el formulario completo usando Yup
+      await validationSchema.validate(formData, { abortEarly: false }); // abortEarly: false asegura que todos los errores se devuelvan
   
-      // Preparar datos para enviar
+      // Si el formulario pasa la validación, preparar el FormData para enviarlo
       const formDataToSend = new FormData();
-      const sanitizedIdiomas = Array.isArray(formData.idiomas)
-        ? formData.idiomas.filter((idioma) => typeof idioma === "string").map((idioma) => idioma.trim())
-        : [];
-      const updatedFormData = { ...formData, idiomas: sanitizedIdiomas };
   
-      Object.entries(updatedFormData).forEach(([key, value]) => {
+      // Procesar y preparar los datos para ser enviados
+      Object.entries(formData).forEach(([key, value]) => {
         if (key === "imagen" && value instanceof File) {
-          formDataToSend.append(key, value); // Agregar solo si es un archivo nuevo
+          formDataToSend.append(key, value); // Solo agregamos la imagen si es un archivo válido
         } else if (Array.isArray(value)) {
-          value.forEach((v) => formDataToSend.append(`${key}[]`, v));
+          value.forEach((v) => formDataToSend.append(`${key}[]`, v)); // Si es un array (ej. idiomas), agregamos cada valor individualmente
         } else {
-          formDataToSend.append(key, value || "");
+          formDataToSend.append(key, value || ""); // Si el valor es vacío, lo pasamos como cadena vacía
         }
       });
   
-      // Enviar datos al servidor para crear el nuevo CV
+      // Enviar los datos al servidor
       const response = await fetch(`${API_URL}/api/curriculums`, {
         method: "POST",
         body: formDataToSend,
       });
   
-      if (!response.ok) throw new Error("Error al crear el CV");
+      if (!response.ok) throw new Error("Error al crear el CV"); // Si la respuesta no es OK, lanzamos un error
   
-      // Obtener la respuesta JSON, que debería contener el curriculum y el id
-      const result = await response.json();
-  
-      // Verificar que la respuesta contiene el id
+      const result = await response.json(); // Obtenemos la respuesta JSON
       if (result && result.curriculum && result.curriculum._id) {
+        // Si el servidor respondió correctamente
         toast({
           title: "Éxito",
           description: "El CV se creó correctamente.",
@@ -192,20 +191,21 @@ const CrearCvScreen = () => {
           position: "bottom-right",
         });
   
-        // Redirigir al usuario al CV creado utilizando el id correcto
-        navigate(`/ver-cv/${result.curriculum._id}`); // Redirigir usando el id correcto
+        // Redirigimos al usuario al CV recién creado usando su ID
+        navigate(`/ver-cv/${result.curriculum._id}`);
       } else {
-        throw new Error("El ID del CV no se ha recibido correctamente");
+        throw new Error("El ID del CV no se ha recibido correctamente"); // Si no se recibe el ID, lanzamos un error
       }
   
     } catch (error) {
       console.error("Error al enviar el formulario:", error);
       if (error.name === "ValidationError") {
+        // Si la validación falla, procesamos los errores y los mostramos
         const validationErrors = {};
         error.inner.forEach((err) => {
           validationErrors[err.path] = err.message;
         });
-        setErrors(validationErrors);
+        setErrors(validationErrors); // Actualizamos el estado de errores
       }
       toast({
         title: "Error",
@@ -216,9 +216,11 @@ const CrearCvScreen = () => {
         position: "bottom-right",
       });
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false); // Indicamos que hemos terminado de procesar
     }
   };
+  
+  
   
   
 

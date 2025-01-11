@@ -72,7 +72,7 @@ const Categories = ({ filters, setFilters }) => {
   
     setFilters((prevFilters) => {
       const newFilters = { ...prevFilters };
-
+  
       if (filterType === "zona") {
         // Limpiar localidad al cambiar de zona
         newFilters.localidad = "";
@@ -82,12 +82,15 @@ const Categories = ({ filters, setFilters }) => {
         // Convertir siempre a un array
         newFilters[filterType] = value ? [value] : [];
       } else {
-        newFilters[filterType] = value;
+        // Evitar que un filtro con valor vacío afecte la búsqueda
+        newFilters[filterType] = value === '' ? undefined : value;
       }
+  
       console.log("Nuevo filtro aplicado:", newFilters);
       return newFilters;
     });
   };
+  
 
   const handleCountryChange = (e) => {
     const selectedCountry = e.target.value;

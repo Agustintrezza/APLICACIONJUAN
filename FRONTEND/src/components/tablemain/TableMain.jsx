@@ -91,14 +91,17 @@ const TableMain = () => {
       // Filtro por búsqueda de nombre o apellido
       removeAccents(`${user.nombre} ${user.apellido}`).toLowerCase().includes(removeAccents(searchTerm.toLowerCase())) &&
       // Filtro por zona
-      (filters.zona === '' || user.zona === filters.zona) &&
+      (!filters.zona || user.zona === filters.zona) &&
       // Filtro por provincia
-      (filters.provincia === '' || user.provincia === filters.provincia) &&
+      (!filters.provincia || user.provincia === filters.provincia) &&
       // Filtro por país
-      (filters.pais === '' || user.pais === filters.pais)
-      // Agrega más filtros si es necesario
+      (!filters.pais || user.pais === filters.pais) &&
+      // Agregar más filtros según sea necesario (nivelEducacion, experienciaAnios, etc.)
+      (!filters.nivelEducacion || user.nivelEstudios === filters.nivelEducacion) &&
+      (!filters.experienciaAnios || user.experiencia === filters.experienciaAnios)
     );
   });
+  
 
   const handleToggleCategories = () => {
     setIsCategoriesOpen((prev) => !prev)
