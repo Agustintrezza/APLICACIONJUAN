@@ -45,7 +45,10 @@ const TableMain = () => {
         if (!response.ok) throw new Error('Error al obtener currículums')
         const data = await response.json()
         console.log('Datos filtrados de la API:', data);
-        setCvData(data)
+        
+        // Ordena los datos por fecha (creación) antes de almacenarlos
+        const sortedData = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setCvData(sortedData);
       } catch (error) {
         console.error('Error al cargar currículums:', error)
       } finally {
@@ -169,7 +172,7 @@ const TableMain = () => {
           )}
 
           {isLoading ? (
-            <div className={`grid gap-2 mt-4 ${isDesktop ? 'md:grid-cols-4 grid-cols-4' : 'grid-cols-2'}`}>
+            <div className={`grid gap-2 mt-4 ${isDesktop ? 'md:grid-cols-3 grid-cols-3' : 'grid-cols-2'}`}>
               {Array.from({ length: isDesktop ? 9 : 8 }).map((_, index) => (
                 <div
                   key={index}
@@ -188,9 +191,7 @@ const TableMain = () => {
                 {currentData.length > 0 ? (
                   currentData.map((user) => (
                     <div key={user._id}>
-                      <div
-                        className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300 card-custom-agus"
-                      >
+                      <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300 card-custom-agus">
                         <Link to={`/ver-cv/${user._id}`} className="block">
                           <div className="p-4">
                             <h3 className="text-lg font-bold text-[#293e68]">
