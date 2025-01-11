@@ -60,20 +60,23 @@ const CrearCvScreen = () => {
   nombre: Yup.string().min(3, "Debe tener al menos 3 caracteres").required("El nombre es obligatorio"),
   apellido: Yup.string().min(2, "Debe tener al menos 2 caracteres").required("El apellido es obligatorio"),
   celular: Yup.string()
-    .required("El teléfono celular es obligatorio")
-    .test(
-      "check-duplicate",
-      "Celular ya está registrado.",
-      async (value, context) => {
-        const excludeId = context?.parent?.id || ""; // Extraer el ID del CV desde el formulario
-        const originalValue = context?.parent?.originalCelular || ""; // Valor original del celular
-        if (value === originalValue) {
-          return true; // Si no se ha cambiado, pasa la validación
-        }
-        const result = await validateDuplicate("celular", value, excludeId);
-        return result === true;
+  .required("El teléfono celular es obligatorio")
+  .matches(/^\d+$/, "El teléfono celular debe contener solo números") // Validación para solo números
+  .min(6, "El teléfono celular debe tener entre 6 y 15 dígitos") // Mínimo de 6 caracteres
+  .max(15, "El teléfono celular no puede tener más de 15 dígitos") // Máximo de 15 caracteres
+  .test(
+    "check-duplicate",
+    "Celular ya está registrado.",
+    async (value, context) => {
+      const excludeId = context?.parent?.id || ""; // Extraer el ID del CV desde el formulario
+      const originalValue = context?.parent?.originalCelular || ""; // Valor original del celular
+      if (value === originalValue) {
+        return true; // Si no se ha cambiado, pasa la validación
       }
-    ),
+      const result = await validateDuplicate("celular", value, excludeId);
+      return result === true;
+    }
+  ),
     genero: Yup.string()
     .oneOf(["Masculino", "Femenino", ""], "Género inválido")  // No es obligatorio, así que no es necesario usar `.required()`
     .default(''),

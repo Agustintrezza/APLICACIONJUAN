@@ -134,9 +134,15 @@ const TableMain = () => {
     <div className="w-full mx-auto space-y-4 relative">
       <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-gray-800">
-            Curriculums ({filteredData.length})
-          </h2>
+          <div className="flex flex-col"> 
+            <h2 className="text-2xl font-bold text-gray-800">
+              Curriculums ({filteredData.length})
+            </h2>
+            {(Object.values(filters).some(value => value !== '') && !isDesktop) && (
+              <p className="text-md font-bold text-red-500">* Tienes filtros activos</p>
+            )}
+          </div>
+          
           {isDesktop ? (
             <Link
               to="/crear-cv"

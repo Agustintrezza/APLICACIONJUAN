@@ -192,6 +192,7 @@ const FormularioCv = ({
                   name="celular"
                   value={formData.celular}
                   onChange={handleChange}
+                  maxLength={15}
                   className={`w-full p-2 border text-sm rounded-lg ${
                     errors.celular ? "border-red-500" : "border-gray-300"
                   }`}

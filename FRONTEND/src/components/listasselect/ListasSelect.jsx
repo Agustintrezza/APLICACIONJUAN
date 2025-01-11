@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import { API_URL } from "../../config";
 
 const ListasSelect = ({ selectedLista, setSelectedLista }) => {
   const [listas, setListas] = useState([]);
@@ -10,7 +11,7 @@ const ListasSelect = ({ selectedLista, setSelectedLista }) => {
   useEffect(() => {
     const fetchListas = async () => {
       try {
-        const response = await fetch("/api/listas"); // Ruta para obtener todas las listas
+        const response = await fetch(`${API_URL}/api/listas`); // Ruta para obtener todas las listas
         const data = await response.json();
         setListas(data);
       } catch (error) {
