@@ -76,3 +76,73 @@
   input[type="checkbox"] {
     transform: scale(0.9); /* Esto achica el checkbox al 80% de su tamaño original */
   }
+
+  
+  .container-custom-agus {
+    min-height: 620px; /* Este es el tamaño mínimo del contenedor */
+  }
+  
+  .card-custom-agus {
+    height: 180px; /* Altura fija para las tarjetas */
+  }
+  
+  .container-interno-agus {
+    display: grid;
+    grid-template-columns: 33% 33% 33%; /* Tres columnas */
+    column-gap: 10px;
+    justify-content: center;
+    align-items: flex-start;
+    row-gap: 10px;
+    height: 380px;
+  }
+  .salvador {
+    height: 180px;
+  }
+
+  @media(max-width:1480px) {
+    .container-custom-agus {
+        min-height: 470px; /* Este es el tamaño mínimo del contenedor */
+      }
+      
+      .card-custom-agus {
+        height: 150px; /* Altura fija para las tarjetas */
+      }
+      
+      .container-interno-agus {
+        display: grid;
+        grid-template-columns: 33% 33% 33%; /* Tres columnas */
+        column-gap: 10px;
+        justify-content: center;
+        align-items: flex-start;
+        row-gap: 10px;
+        height: 300px;
+      }
+      .salvador {
+        height: 150px;
+      }
+  }
+
+
+  @media(max-width:1026px) {
+    .container-custom-agus {
+        min-height: 755px; /* Este es el tamaño mínimo del contenedor */
+      }
+      
+      .card-custom-agus {
+        height: 180px; /* Altura fija para las tarjetas */
+      }
+      
+      .container-interno-agus {
+        display: grid;
+        grid-template-columns: 50% 50%; /* Tres columnas */
+        column-gap: 10px;
+        justify-content: center;
+        align-items: flex-start;
+        row-gap: 10px;
+        height: 380px;
+      }
+      .salvador {
+        height: 180px;
+      }
+  }
+  

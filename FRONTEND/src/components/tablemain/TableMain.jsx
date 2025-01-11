@@ -174,12 +174,15 @@ const TableMain = () => {
               ))}
             </div>
           ) : (
-            <div className="grid gap-2 mt-4 grid-cols-2 md:grid-cols-3">
+            <div className="grid gap-2 mt-4 container-custom-agus">
+              <div className="container-interno-agus">
               {currentData.length > 0 ? (
+                
                 currentData.map((user) => (
+                  <div className="salvador" key={user._id}>
                   <div
-                    key={user._id}
-                    className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300 relative min-h-[185px]"
+                    
+                    className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300 card-custom-agus"
                   >
                     <Link to={`/ver-cv/${user._id}`} className="block">
                       <div className="p-4">
@@ -212,12 +215,15 @@ const TableMain = () => {
                       </div>
                     </Link>
                   </div>
+                  </div>
                 ))
+
               ) : (
                 <div className="col-span-full text-center text-gray-500">
                   No se encontraron resultados.
                 </div>
               )}
+              </div>
             </div>
           )}
 
