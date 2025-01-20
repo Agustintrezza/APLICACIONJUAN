@@ -98,22 +98,22 @@ const TableMain = () => {
   const hasCategoryFilters = Object.values(filters).some((value) => value !== '')
 
   // Filtrado de los datos en función del searchTerm y los filtros aplicados
-  const filteredData = cvData.filter((user) => {
-    console.log("Filtros actuales:", filters); // Log de los filtros aplicados
-    return (
-      // Filtro por búsqueda de nombre o apellido
-      removeAccents(`${user.nombre} ${user.apellido}`).toLowerCase().includes(removeAccents(searchTerm.toLowerCase())) &&
-      // Filtro por zona
-      (!filters.zona || user.zona === filters.zona) &&
-      // Filtro por provincia
-      (!filters.provincia || user.provincia === filters.provincia) &&
-      // Filtro por país
-      (!filters.pais || user.pais === filters.pais) &&
-      // Agregar más filtros según sea necesario (nivelEducacion, experienciaAnios, etc.)
-      (!filters.nivelEducacion || user.nivelEstudios === filters.nivelEducacion) &&
-      (!filters.experienciaAnios || user.experiencia === filters.experienciaAnios)
-    );
-  });
+  const filteredData = cvData.filter((user) =>
+    removeAccents(`${user.nombre} ${user.apellido}`)
+      .toLowerCase()
+      .includes(removeAccents(searchTerm.toLowerCase())) &&
+    
+    (!filters.rubro || user.rubro === filters.rubro) &&
+    (!filters.puesto || user.puesto === filters.puesto) &&
+    (!filters.subrubro || user.subrubro === filters.subrubro) &&
+    
+    (!filters.zona || user.zona === filters.zona) &&
+    (!filters.provincia || user.provincia === filters.provincia) &&
+    (!filters.pais || user.pais === filters.pais) &&
+    (!filters.nivelEducacion || user.nivelEstudios === filters.nivelEducacion) &&
+    (!filters.experienciaAnios || user.experiencia === filters.experienciaAnios)
+  );
+  
 
   const handleToggleCategories = () => {
     setIsCategoriesOpen((prev) => !prev)
