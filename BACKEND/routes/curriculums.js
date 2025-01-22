@@ -38,9 +38,14 @@ router.get('/', async (req, res) => {
       edad,
       idiomas,
       lista,
+      rubro,
+      subrubro,
+      puesto,
+      noLlamar,
+      page = 1,      // Página por defecto = 1
+      limit = 10,    // Registros por página (puedes cambiarlo)
     } = req.query;
 
-    // Construir la consulta dinámica
     const query = {};
 
     if (pais) query.pais = pais;
@@ -50,13 +55,17 @@ router.get('/', async (req, res) => {
     if (nivelEstudios) query.nivelEstudios = nivelEstudios;
     if (experiencia) query.experiencia = experiencia;
     if (genero) query.genero = genero;
-    if (edad) query.edad = { $gte: parseInt(edad, 10) }; // Edad mínima
+    if (edad) query.edad = { $gte: parseInt(edad, 10) };
+    if (rubro) query.rubro = rubro;
+    if (subrubro) query.subrubro = subrubro;
+    if (puesto) query.puesto = puesto;
+    if (noLlamar) query.noLlamar = noLlamar === 'true';
+
     if (idiomas) {
       const idiomasArray = Array.isArray(idiomas) ? idiomas : idiomas.split(',');
-      query.idiomas = { $in: idiomasArray }; // Filtro por coincidencia en el array
+      query.idiomas = { $in: idiomasArray };
     }
 
-    // Filtro por lista
     if (lista) {
       const listasArray = lista.split(',').filter((id) => mongoose.Types.ObjectId.isValid(id));
       if (listasArray.length > 0) {
@@ -64,19 +73,26 @@ router.get('/', async (req, res) => {
       }
     }
 
-    if (idiomas) {
-      const idiomasArray = Array.isArray(idiomas) ? idiomas : [idiomas];
-      query.idiomas = { $in: idiomasArray }; // Buscar currículums que contengan cualquiera de los idiomas
-    }
+    const totalDocuments = await Curriculum.countDocuments(query); // Total de registros
+    const curriculums = await Curriculum.find(query)
+      .populate('listas')
+      .sort({ createdAt: -1 }) // Ordenar por fecha de creación
+      .skip((parseInt(page) - 1) * parseInt(limit)) // Saltar los registros anteriores
+      .limit(parseInt(limit)); // Tomar solo los registros necesarios
 
-    // Ejecutar la consulta
-    const curriculums = await Curriculum.find(query).populate('listas');
-    res.status(200).json(curriculums);
+    res.status(200).json({
+      totalPages: Math.ceil(totalDocuments / parseInt(limit)), // Total de páginas
+      currentPage: parseInt(page),
+      pageSize: parseInt(limit),
+      totalRecords: totalDocuments,
+      data: curriculums,
+    });
   } catch (error) {
     console.error('Error al obtener currículums:', error);
     res.status(500).json({ error: 'Error al obtener currículums.' });
   }
 });
+
 
 // Crear un nuevo curriculum
 router.post('/', upload.single('imagen'), async (req, res) => {
