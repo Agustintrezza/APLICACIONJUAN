@@ -44,36 +44,45 @@ const TableMain = () => {
       try {
         const query = new URLSearchParams({
           ...filters,
-          page: currentPage,
-          limit: itemsPerPage,
+          page: currentPage,  // Asegurar que la paginación es correcta
+          limit: itemsPerPage
         }).toString()
-
+  
         const response = await fetch(`${API_URL}/api/curriculums?${query}`)
         if (!response.ok) throw new Error('Error al obtener currículums')
-
+  
         const result = await response.json()
-        console.log('Respuesta de la API:', result)
-
-        if (Array.isArray(result)) {
-          setCvData(result)
-          setTotalPages(Math.ceil(result.length / itemsPerPage))
-        } else if (result.data && Array.isArray(result.data)) {
-          setCvData(result.data)
-          setTotalPages(result.totalPages || 1)
-        } else {
-          console.error('Error: Estructura inesperada en la respuesta de la API', result)
+        console.log(`📌 Respuesta de la API (Página ${currentPage}):`, result)
+  
+        if (!result || typeof result !== 'object' || !Array.isArray(result.data)) {
+          console.error('⚠️ Respuesta inesperada de la API:', result)
           setCvData([])
           setTotalPages(1)
+          return
+        }
+  
+        setCvData(result.data) // ✅ Usar directamente la data sin filtros adicionales
+        setTotalPages(result.totalPages || 1)
+  
+        if (result.data.length === 0 && currentPage > 1) {
+          console.warn(`⚠️ Página vacía (${currentPage}), retrocediendo a la anterior...`)
+          setCurrentPage(prev => Math.max(1, prev - 1))
         }
       } catch (error) {
-        console.error('Error al cargar currículums:', error)
+        console.error('❌ Error al cargar currículums:', error)
       } finally {
         setIsLoading(false)
       }
     }
-
+  
     fetchData()
   }, [filters, currentPage, itemsPerPage])
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(1) // ✅ Solo resetea si la página actual es inválida
+    }
+  }, [currentPage, totalPages])
 
   useEffect(() => {
     const handleResize = () => {
@@ -113,10 +122,12 @@ const TableMain = () => {
       puesto: '',
       noLlamar: '',
     })
+    setCurrentPage(1)
   }
 
   const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= totalPages) {
+    if (newPage !== currentPage && newPage >= 1 && newPage <= totalPages) {
+      console.log("Cambiando a página:", newPage) // ✅ Depuración
       setCurrentPage(newPage)
     }
   }
@@ -140,21 +151,11 @@ const TableMain = () => {
       )
     : []
 
-  useEffect(() => {
-    setTotalPages(Math.ceil(filteredData.length / itemsPerPage))
-    if (currentPage > Math.ceil(filteredData.length / itemsPerPage)) {
-      setCurrentPage(1)
-    }
-  }, [filteredData, itemsPerPage])
-
   const handleToggleCategories = () => {
     setIsCategoriesOpen((prev) => !prev)
   }
 
-  const currentData = filteredData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  )
+  const currentData = cvData
 
   return (
     <div className="w-full mx-auto space-y-4 relative">
