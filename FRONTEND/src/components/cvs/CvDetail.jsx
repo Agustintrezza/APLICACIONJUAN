@@ -497,7 +497,7 @@ const CvDetail = ({ cv, onToggleNoLlamar }) => {
         ) : (
           <>
             {isImage(cv.imagen) && (
-              <div className="w-10/12">
+              <div className="w-4/12">
                 <a href={cv.imagen} target="_blank" rel="noopener noreferrer">
                   <img
                     src={cv.imagen}
@@ -510,16 +510,16 @@ const CvDetail = ({ cv, onToggleNoLlamar }) => {
               </div>
             )}
             {isPDF(cv.imagen) && (
-              <a href={cv.imagen} target="_blank" rel="noopener noreferrer">
+            <div className="flex justify-start">
+              <a href={cv.imagen} target="_blank" rel="noopener noreferrer" className="inline-block">
                 <img
                   src={getPDFThumbnail(cv.imagen)}
                   alt="Archivo PDF del CV"
-                  className={`rounded-md shadow-md transition-transform transform hover:scale-105 cursor-pointer ${
-                    isDesktop ? "w-60 h-60 object-cover" : "w-full h-auto"
-                  }`}
+                  className="rounded-md shadow-md transition-transform transform hover:scale-105 cursor-pointer w-60 h-60 object-cover"
                 />
               </a>
-            )}
+            </div>
+          )}
           </>
         )}
       </div>

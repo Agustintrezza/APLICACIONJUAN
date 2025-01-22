@@ -60,6 +60,10 @@ const EditarCvScreen = () => {
           originalIdiomas: data.idiomas || [],
           originalImagen: data.imagen || null,
           originalUbicacionManual: data.ubicacionManual || "",
+          originalComentarios: data.comentarios || "", // Agregado
+          originalTelefonoFijo: data.telefonoFijo || "", // Agregado
+          originalExperiencia: data.experiencia || "", // Agregado
+          originalNivelEstudios: data.nivelEstudios || "", // Agregado
         });
       } catch (error) {
         console.error("Error al cargar los datos del CV:", error);
@@ -111,7 +115,7 @@ const EditarCvScreen = () => {
     .required("El apellido es obligatorio"),
     celular: Yup.string()
       .required("El teléfono celular es obligatorio")
-      .matches(/^\d+$/, "El teléfono celular debe contener solo números") // Validación para solo números
+      .matches(/^\d+$/, "El teléfono celular debe contener solo números") // Validación  para solo números
       .min(6, "El teléfono celular debe tener entre 6 y 15 dígitos") // Mínimo de 6 caracteres
       .max(15, "El teléfono celular no puede tener más de 15 dígitos") // Máximo de 15 caracteres
       .test(
@@ -244,22 +248,24 @@ const EditarCvScreen = () => {
 
       // Verificar si el formulario cambió
       const isUnchanged =
-        formData.apellido === formData.originalApellido &&
-        formData.celular === formData.originalCelular &&
-        formData.nombre === formData.originalNombre &&
-        (formData.genero === formData.originalGenero ||
-          formData.genero === "") && // Asegúrate de comparar vacío correctamente
-        (formData.edad === formData.originalEdad || formData.edad === null) && // Compara adecuadamente la edad nula
-        formData.pais === formData.originalPais &&
-        formData.provincia === formData.originalProvincia &&
-        formData.calificacion === formData.originalCalificacion &&
-        formData.rubro === formData.originalRubro &&
-        formData.puesto === formData.originalPuesto &&
-        formData.subrubro === formData.originalSubrubro &&
-        formData.ubicacionManual === formData.originalUbicacionManual && // Comparar ubicación manual
-        JSON.stringify(formData.idiomas) ===
-          JSON.stringify(formData.originalIdiomas) &&
-        !isImageChanged; // Imagen no cambió
+      formData.apellido === formData.originalApellido &&
+      formData.celular === formData.originalCelular &&
+      formData.nombre === formData.originalNombre &&
+      (formData.genero === formData.originalGenero || formData.genero === "") &&
+      (formData.edad === formData.originalEdad || formData.edad === null) &&
+      formData.pais === formData.originalPais &&
+      formData.provincia === formData.originalProvincia &&
+      formData.calificacion === formData.originalCalificacion &&
+      formData.rubro === formData.originalRubro &&
+      formData.puesto === formData.originalPuesto &&
+      formData.subrubro === formData.originalSubrubro &&
+      formData.ubicacionManual === formData.originalUbicacionManual &&
+      JSON.stringify(formData.idiomas) === JSON.stringify(formData.originalIdiomas) &&
+      formData.comentarios === formData.originalComentarios && // Agregado
+      formData.telefonoFijo === formData.originalTelefonoFijo && // Agregado
+      formData.experiencia === formData.originalExperiencia && // Agregado
+      formData.nivelEstudios === formData.originalNivelEstudios && // Agregado
+      !isImageChanged;
 
       console.log("Resultado de isUnchanged:", isUnchanged);
 
