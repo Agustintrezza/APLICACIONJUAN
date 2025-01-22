@@ -27,71 +27,85 @@ const upload = multer({ storage })
 // Obtener todos los curriculums
 router.get('/', async (req, res) => {
   try {
-    const {
-      pais,
-      provincia,
-      localidad,
-      calificacion,
-      nivelEstudios,
-      experiencia,
-      genero,
-      edad,
-      idiomas,
-      lista,
-      rubro,
-      subrubro,
-      puesto,
-      noLlamar,
-      page = 1,      // Página por defecto = 1
-      limit = 10,    // Registros por página (puedes cambiarlo)
-    } = req.query;
+    let {
+      page = 1,
+      limit = 10,
+      searchTerm,
+      ...filters
+    } = req.query
 
-    const query = {};
+    page = parseInt(page, 10) || 1
+    limit = parseInt(limit, 10) || 10
 
-    if (pais) query.pais = pais;
-    if (provincia) query.provincia = provincia;
-    if (localidad) query.localidad = localidad;
-    if (calificacion) query.calificacion = calificacion;
-    if (nivelEstudios) query.nivelEstudios = nivelEstudios;
-    if (experiencia) query.experiencia = experiencia;
-    if (genero) query.genero = genero;
-    if (edad) query.edad = { $gte: parseInt(edad, 10) };
-    if (rubro) query.rubro = rubro;
-    if (subrubro) query.subrubro = subrubro;
-    if (puesto) query.puesto = puesto;
-    if (noLlamar) query.noLlamar = noLlamar === 'true';
+    const query = {}
 
-    if (idiomas) {
-      const idiomasArray = Array.isArray(idiomas) ? idiomas : idiomas.split(',');
-      query.idiomas = { $in: idiomasArray };
-    }
-
-    if (lista) {
-      const listasArray = lista.split(',').filter((id) => mongoose.Types.ObjectId.isValid(id));
-      if (listasArray.length > 0) {
-        query.listas = { $in: listasArray };
+    // 🔹 Aplicar filtros dinámicamente
+    Object.keys(filters).forEach((key) => {
+      if (filters[key]) {
+        if (key === 'edad') {
+          query.edad = { $gte: parseInt(filters[key], 10) }
+        } else if (key === 'noLlamar') {
+          query.noLlamar = filters[key] === 'true'
+        } else if (key === 'idiomas') {
+          const idiomasArray = filters[key].split(',')
+          query.idiomas = { $in: idiomasArray }
+        } else if (key === 'lista') {
+          const listasArray = filters[key].split(',').filter(id => mongoose.Types.ObjectId.isValid(id))
+          if (listasArray.length > 0) {
+            query.listas = { $in: listasArray }
+          }
+        } else {
+          query[key] = filters[key]
+        }
       }
+    })
+
+    console.log(`📌 Filtros aplicados:`, query)
+
+    // 🔹 Si hay un término de búsqueda, filtrar por nombre/apellido
+    if (searchTerm) {
+      query.$or = [
+        { nombre: { $regex: searchTerm, $options: 'i' } },
+        { apellido: { $regex: searchTerm, $options: 'i' } }
+      ]
     }
 
-    const totalDocuments = await Curriculum.countDocuments(query); // Total de registros
+    // 📊 Obtener el total de registros que cumplen la consulta
+    const totalDocuments = await Curriculum.countDocuments(query)
+
+    // 🗂 Obtener registros paginados
     const curriculums = await Curriculum.find(query)
       .populate('listas')
       .sort({ createdAt: -1 }) // Ordenar por fecha de creación
-      .skip((parseInt(page) - 1) * parseInt(limit)) // Saltar los registros anteriores
-      .limit(parseInt(limit)); // Tomar solo los registros necesarios
+      .skip((page - 1) * limit) // 🔥 Asegurar que cambia de página
+      .limit(limit) // 🔥 Limitar a los registros por página
+
+    console.log(`📌 Página ${page}: Registros obtenidos ->`, curriculums.length)
+
+    // 🔹 Si no hay registros en la página actual pero existen más registros, devolver página anterior
+    const totalPages = Math.ceil(totalDocuments / limit)
+    if (curriculums.length === 0 && page > 1) {
+      return res.status(200).json({
+        totalPages,
+        currentPage: Math.max(1, page - 1),
+        pageSize: limit,
+        totalRecords: totalDocuments,
+        data: []
+      })
+    }
 
     res.status(200).json({
-      totalPages: Math.ceil(totalDocuments / parseInt(limit)), // Total de páginas
-      currentPage: parseInt(page),
-      pageSize: parseInt(limit),
+      totalPages,
+      currentPage: page,
+      pageSize: limit,
       totalRecords: totalDocuments,
-      data: curriculums,
-    });
+      data: curriculums
+    })
   } catch (error) {
-    console.error('Error al obtener currículums:', error);
-    res.status(500).json({ error: 'Error al obtener currículums.' });
+    console.error('❌ Error al obtener currículums:', error)
+    res.status(500).json({ error: 'Error al obtener currículums.' })
   }
-});
+})
 
 
 // Crear un nuevo curriculum
