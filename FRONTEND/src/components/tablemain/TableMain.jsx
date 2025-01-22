@@ -32,26 +32,39 @@ const TableMain = () => {
   const [cvData, setCvData] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1026)
-  const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1400) // Verifica si es una pantalla grande (>1400px)
+  const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1400)
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(isLargeScreen ? 12 : isDesktop ? 9 : 8) // Ajustar el número de items por página
+  const [itemsPerPage, setItemsPerPage] = useState(isLargeScreen ? 12 : isDesktop ? 9 : 8)
+  const [totalPages, setTotalPages] = useState(1)
 
   useEffect(() => {
     const fetchData = async () => {
-      const sanitizedFilters = Object.fromEntries(
-        Object.entries(filters).filter(([value]) => value !== '')
-      )
-      const query = new URLSearchParams(sanitizedFilters).toString()
-
+      setIsLoading(true)
       try {
+        const query = new URLSearchParams({
+          ...filters,
+          page: currentPage,
+          limit: itemsPerPage,
+        }).toString()
+
         const response = await fetch(`${API_URL}/api/curriculums?${query}`)
         if (!response.ok) throw new Error('Error al obtener currículums')
-        const data = await response.json()
 
-        // Ordena los datos por fecha (creación) antes de almacenarlos
-        const sortedData = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        setCvData(sortedData)
+        const result = await response.json()
+        console.log('Respuesta de la API:', result)
+
+        if (Array.isArray(result)) {
+          setCvData(result)
+          setTotalPages(Math.ceil(result.length / itemsPerPage))
+        } else if (result.data && Array.isArray(result.data)) {
+          setCvData(result.data)
+          setTotalPages(result.totalPages || 1)
+        } else {
+          console.error('Error: Estructura inesperada en la respuesta de la API', result)
+          setCvData([])
+          setTotalPages(1)
+        }
       } catch (error) {
         console.error('Error al cargar currículums:', error)
       } finally {
@@ -60,20 +73,20 @@ const TableMain = () => {
     }
 
     fetchData()
-  }, [filters])
+  }, [filters, currentPage, itemsPerPage])
 
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth
       setIsDesktop(width >= 1026)
-      setIsLargeScreen(width >= 1400) // Verifica si la pantalla es mayor a 1400px
+      setIsLargeScreen(width >= 1400)
 
       if (width >= 1400) {
-        setItemsPerPage(12) // 12 items para pantallas grandes
+        setItemsPerPage(12)
       } else if (width >= 1026) {
-        setItemsPerPage(9) // 9 items para pantallas de escritorio
+        setItemsPerPage(9)
       } else {
-        setItemsPerPage(8) // 8 items para pantallas móviles
+        setItemsPerPage(8)
       }
     }
 
@@ -102,40 +115,47 @@ const TableMain = () => {
     })
   }
 
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage)
+    }
+  }
+
   const hasCategoryFilters = Object.values(filters).some((value) => value !== '')
 
-  // Filtrado de los datos en función del searchTerm y los filtros aplicados
-  const filteredData = cvData.filter((user) =>
-    removeAccents(`${user.nombre} ${user.apellido}`)
-      .toLowerCase()
-      .includes(removeAccents(searchTerm.toLowerCase())) &&
-    
-    (!filters.rubro || user.rubro === filters.rubro) &&
-    (!filters.puesto || user.puesto === filters.puesto) &&
-    (!filters.subrubro || user.subrubro === filters.subrubro) &&
-    (!filters.noLlamar || (filters.noLlamar === 'true' ? user.noLlamar : !user.noLlamar)) &&
+  const filteredData = Array.isArray(cvData)
+    ? cvData.filter((user) =>
+        removeAccents(`${user.nombre} ${user.apellido}`)
+          .toLowerCase()
+          .includes(removeAccents(searchTerm.toLowerCase())) &&
+        (!filters.rubro || user.rubro === filters.rubro) &&
+        (!filters.puesto || user.puesto === filters.puesto) &&
+        (!filters.subrubro || user.subrubro === filters.subrubro) &&
+        (!filters.noLlamar || (filters.noLlamar === 'true' ? user.noLlamar : !user.noLlamar)) &&
+        (!filters.zona || user.zona === filters.zona) &&
+        (!filters.provincia || user.provincia === filters.provincia) &&
+        (!filters.pais || user.pais === filters.pais) &&
+        (!filters.nivelEducacion || user.nivelEstudios === filters.nivelEducacion) &&
+        (!filters.experienciaAnios || user.experiencia === filters.experienciaAnios)
+      )
+    : []
 
-    (!filters.zona || user.zona === filters.zona) &&
-    (!filters.provincia || user.provincia === filters.provincia) &&
-    (!filters.pais || user.pais === filters.pais) &&
-    (!filters.nivelEducacion || user.nivelEstudios === filters.nivelEducacion) &&
-    (!filters.experienciaAnios || user.experiencia === filters.experienciaAnios)
-  )
+  useEffect(() => {
+    setTotalPages(Math.ceil(filteredData.length / itemsPerPage))
+    if (currentPage > Math.ceil(filteredData.length / itemsPerPage)) {
+      setCurrentPage(1)
+    }
+  }, [filteredData, itemsPerPage])
 
   const handleToggleCategories = () => {
     setIsCategoriesOpen((prev) => !prev)
-  }
-
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage)
-
-  const paginate = (pageNumber) => {
-    setCurrentPage(pageNumber)
   }
 
   const currentData = filteredData.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   )
+
   return (
     <div className="w-full mx-auto space-y-4 relative">
       <div className="space-y-4">
@@ -213,7 +233,6 @@ const TableMain = () => {
                               {user.edad && `${user.edad} años`}
                             </p>
 
-                            {/* Mostrar rubro, subrubro y puesto siempre que existan */}
                             <p className="text-sm font-bold fuente-custom-rubro-card text-[#293e68]">
                               {user.rubro ? (
                                 user.rubro === 'Gastronomía'
@@ -256,20 +275,23 @@ const TableMain = () => {
           )}
 
           <div className="flex justify-center mt-4">
-            <nav>
-              <ul className="flex space-x-2">
-                {Array.from({ length: totalPages }).map((_, index) => (
-                  <li key={index}>
-                    <button
-                      onClick={() => paginate(index + 1)}
-                      className={`px-4 py-2 rounded-lg border ${currentPage === index + 1 ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'}`}
-                    >
-                      {index + 1}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </nav>
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-4 py-2 rounded-lg border bg-white text-blue-500"
+            >
+              Anterior
+            </button>
+
+            <span className="px-4 py-2">{currentPage} de {totalPages}</span>
+
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages || totalPages === 0}
+              className="px-4 py-2 rounded-lg border bg-white text-blue-500"
+            >
+              Siguiente
+            </button>
           </div>
         </div>
 
@@ -309,3 +331,4 @@ const TableMain = () => {
 }
 
 export default TableMain
+
