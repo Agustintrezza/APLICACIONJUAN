@@ -80,6 +80,17 @@ const Categories = ({ filters, setFilters }) => {
             </select>
           </div>
 
+          {/* No Llamar */}
+          <div>
+            <label className="text-sm text-[#293e68] mb-1">No Llamar</label>
+            <select value={filters.noLlamar || ""} onChange={(e) => handleFilterChange(e, "noLlamar")}
+              className={`form-select text-sm py-1 px-2 h-8 w-full border-1 rounded-md ${filters.noLlamar ? 'border-red-400 border-2' : 'border-blue-400'}`}>
+              <option value="">Seleccionar</option>
+              <option value="true">Sí</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+
           {/* Rubro */}
           <div>
             <label className="text-sm text-[#293e68] mb-1">Rubro</label>
@@ -101,7 +112,6 @@ const Categories = ({ filters, setFilters }) => {
               </select>
             </div>
           )}
-
           {/* Subrubro */}
           {filters.puesto && PUESTOS[filters.puesto] && (
             <div>
@@ -113,6 +123,7 @@ const Categories = ({ filters, setFilters }) => {
               </select>
             </div>
           )}
+
           {/* País */}
           <div>
             <label className="text-sm text-[#293e68] mb-1">País</label>
@@ -224,20 +235,6 @@ const Categories = ({ filters, setFilters }) => {
               <option value="40">Más de 40</option>
               <option value="50">Más de 50</option>
             </select>
-          </div>      
-
-          {/* Idiomas */}
-          <div>
-            <label className="text-sm text-[#293e68] mb-1">Idioma</label>
-            <select value={filters.idiomas?.[0] || ""} onChange={(e) => handleFilterChange(e, "idiomas")}
-              className={`form-select text-sm py-1 px-2 h-8 w-full border-1 rounded-md ${filters.idiomas?.length ? 'border-red-400 border-2' : 'border-blue-400'}`}>
-              <option value="">Seleccionar</option>
-              <option value="Español">Español</option>
-              <option value="Inglés">Inglés</option>
-              <option value="Francés">Francés</option>
-              <option value="Portugués">Portugués</option>
-              <option value="Italiano">Italiano</option>
-            </select>
           </div>
 
         </div>
@@ -252,4 +249,3 @@ Categories.propTypes = {
 }
 
 export default Categories
-

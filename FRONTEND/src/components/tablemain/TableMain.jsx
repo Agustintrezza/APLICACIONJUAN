@@ -24,6 +24,10 @@ const TableMain = () => {
     nivelEducacion: '',
     experienciaAnios: '',
     lista: '',
+    rubro: '',
+    subrubro: '',
+    puesto: '',
+    noLlamar: '',
   })
   const [cvData, setCvData] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -44,11 +48,10 @@ const TableMain = () => {
         const response = await fetch(`${API_URL}/api/curriculums?${query}`)
         if (!response.ok) throw new Error('Error al obtener currículums')
         const data = await response.json()
-        console.log('Datos filtrados de la API:', data);
-        
+
         // Ordena los datos por fecha (creación) antes de almacenarlos
-        const sortedData = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        setCvData(sortedData);
+        const sortedData = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        setCvData(sortedData)
       } catch (error) {
         console.error('Error al cargar currículums:', error)
       } finally {
@@ -92,6 +95,10 @@ const TableMain = () => {
       nivelEducacion: '',
       experienciaAnios: '',
       lista: '',
+      rubro: '',
+      subrubro: '',
+      puesto: '',
+      noLlamar: '',
     })
   }
 
@@ -106,14 +113,14 @@ const TableMain = () => {
     (!filters.rubro || user.rubro === filters.rubro) &&
     (!filters.puesto || user.puesto === filters.puesto) &&
     (!filters.subrubro || user.subrubro === filters.subrubro) &&
-    
+    (!filters.noLlamar || (filters.noLlamar === 'true' ? user.noLlamar : !user.noLlamar)) &&
+
     (!filters.zona || user.zona === filters.zona) &&
     (!filters.provincia || user.provincia === filters.provincia) &&
     (!filters.pais || user.pais === filters.pais) &&
     (!filters.nivelEducacion || user.nivelEstudios === filters.nivelEducacion) &&
     (!filters.experienciaAnios || user.experiencia === filters.experienciaAnios)
-  );
-  
+  )
 
   const handleToggleCategories = () => {
     setIsCategoriesOpen((prev) => !prev)
@@ -129,12 +136,11 @@ const TableMain = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   )
-
   return (
     <div className="w-full mx-auto space-y-4 relative">
       <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <div className="flex flex-col"> 
+          <div className="flex flex-col">
             <h2 className="text-2xl font-bold text-gray-800">
               Curriculums ({filteredData.length})
             </h2>
@@ -142,7 +148,7 @@ const TableMain = () => {
               <p className="text-md font-bold text-red-500">* Tienes filtros activos</p>
             )}
           </div>
-          
+
           {isDesktop ? (
             <Link
               to="/crear-cv"
@@ -156,7 +162,7 @@ const TableMain = () => {
               className="fixed bottom-6 right-6 bg-red-600 text-white p-4 rounded-full shadow-xl hover:bg-blue-800 z-50"
               title="Ingresar Curriculum"
             >
-              <FaPlus size={22}/>
+              <FaPlus size={22} />
             </Link>
           )}
         </div>
@@ -179,35 +185,18 @@ const TableMain = () => {
 
           {isLoading ? (
             <div className={`grid gap-2 mt-4 ${isDesktop ? 'md:grid-cols-3 grid-cols-3' : 'grid-cols-2'}`}>
-            {Array.from({ length: isDesktop ? 9 : 8 }).map((_, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300 p-4"
-              >
-                <Skeleton
-                  height={isDesktop ? 20 : 10}  // Tamaño de 20px en escritorio, 15px en móviles
-                  width="80%" 
-                  className="mb-2" 
-                /> {/* Nombre */}
-                <Skeleton
-                  height={isDesktop ? 15 : 10}  // Tamaño de 15px en escritorio, 10px en móviles
-                  width="40%" 
-                  className="mb-2" 
-                /> {/* Edad */}
-                <Skeleton
-                  height={isDesktop ? 15 : 10}  // Tamaño de 15px en escritorio, 10px en móviles
-                  width="60%" 
-                  className="mb-2" 
-                /> {/* Listas */}
-                <Skeleton
-                  height={isDesktop ? 20 : 10}  // Tamaño de 20px en escritorio, 12px en móviles
-                  width="30%" 
-                  className="mt-2" 
-                /> {/* No llamar */}
-              </div>
-            ))}
-          </div>
-          
+              {Array.from({ length: isDesktop ? 9 : 8 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300 p-4"
+                >
+                  <Skeleton height={isDesktop ? 20 : 10} width="80%" className="mb-2" />
+                  <Skeleton height={isDesktop ? 15 : 10} width="40%" className="mb-2" />
+                  <Skeleton height={isDesktop ? 15 : 10} width="60%" className="mb-2" />
+                  <Skeleton height={isDesktop ? 20 : 10} width="30%" className="mt-2" />
+                </div>
+              ))}
+            </div>
           ) : (
             <div className="grid gap-2 mt-4 container-custom-agus">
               <div className="container-interno-agus">
@@ -216,55 +205,51 @@ const TableMain = () => {
                     <div key={user._id}>
                       <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300 card-custom-agus">
                         <Link to={`/ver-cv/${user._id}`} className="block">
-                        <div className="py-2 px-2"> 
-  <p className="text-md font-bold line-height-custom text-[#293e68]">
-    {user.nombre} {user.apellido}
-  </p>
-  <p className="text-sm mb-1 font-bold text-[#293e68]">
-    {user.edad && `${user.edad} años`}
-  </p>
-  
-  {/* Mostrar rubro, subrubro y puesto siempre que existan */}
-  <p className="text-sm font-bold fuente-custom-rubro-card text-[#293e68]">
-  {user.rubro ? (
-    user.rubro === 'Gastronomía' 
-      ? `${user.rubro} ${user.puesto?`/ ${user.puesto} /` : ''}${user.subrubro}`
-      : `${user.rubro} / ${user.puesto}`
-  ) : '-'}
-</p>
+                          <div className="py-2 px-2">
+                            <p className="text-md font-bold line-height-custom text-[#293e68]">
+                              {user.nombre} {user.apellido}
+                            </p>
+                            <p className="text-sm mb-1 font-bold text-[#293e68]">
+                              {user.edad && `${user.edad} años`}
+                            </p>
 
-  <ul className="text-sm text-gray-800 list-inside list-disc">
-  {user.listas?.length > 3 ? (
-    <li>Asociado a más de 4 listas</li>
-  ) : (
-    user.listas?.map((lista) => (
-      <li key={lista._id} className="flex fuente-custom-lista-card items-center space-x-2">
-        <span
-          className="inline-block w-3 h-3 rounded-full"
-          style={{ backgroundColor: lista.color || '#cccccc' }}
-        ></span>
-        <span>{lista.cliente}</span>
-      </li>
-    ))
-  )}
-</ul>
+                            {/* Mostrar rubro, subrubro y puesto siempre que existan */}
+                            <p className="text-sm font-bold fuente-custom-rubro-card text-[#293e68]">
+                              {user.rubro ? (
+                                user.rubro === 'Gastronomía'
+                                  ? `${user.rubro} ${user.puesto ? `/ ${user.puesto} /` : ''}${user.subrubro}`
+                                  : `${user.rubro} / ${user.puesto}`
+                              ) : '-'}
+                            </p>
 
-  
-  {user.noLlamar && (
-    <span className="inline-block bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full mt-2">
-      No Llamar
-    </span>
-  )}
-</div>
+                            <ul className="text-sm text-gray-800 list-inside list-disc">
+                              {user.listas?.length > 3 ? (
+                                <li>Asociado a más de 4 listas</li>
+                              ) : (
+                                user.listas?.map((lista) => (
+                                  <li key={lista._id} className="flex fuente-custom-lista-card items-center space-x-2">
+                                    <span
+                                      className="inline-block w-3 h-3 rounded-full"
+                                      style={{ backgroundColor: lista.color || '#cccccc' }}
+                                    ></span>
+                                    <span>{lista.cliente}</span>
+                                  </li>
+                                ))
+                              )}
+                            </ul>
 
+                            {user.noLlamar && (
+                              <span className="inline-block bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full mt-2">
+                                No Llamar
+                              </span>
+                            )}
+                          </div>
                         </Link>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="col-span-full text-center text-gray-500">
-                    No se encontraron resultados.
-                  </div>
+                  <div className="col-span-full text-center text-gray-500">No se encontraron resultados.</div>
                 )}
               </div>
             </div>
@@ -295,7 +280,7 @@ const TableMain = () => {
         <>
           <FloatingButtonCategories onToggle={handleToggleCategories} />
           {isCategoriesOpen && (
-            <div className="fixed inset-0 clase bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
               <div className="bg-blue-50 rounded-lg px-4 py-4 w-11/12 h-5/6 overflow-auto">
                 <SelectFilters
                   searchTerm={searchTerm}
@@ -323,4 +308,4 @@ const TableMain = () => {
   )
 }
 
-export default TableMain;
+export default TableMain
