@@ -51,7 +51,7 @@ const Listas = ({ listas, isLoading }) => {
               )}
               <p><strong>Fecha de creación:</strong> {new Date(lista.fechaDeCreacion).toLocaleDateString()}</p>
               <p><strong>Postulantes:</strong> {lista.curriculums.length}</p>
-              <p><strong>Comentario:</strong> {lista.comentario || "Sin comentario"}</p>
+              {/* <p><strong>Comentario:</strong> {lista.comentario || "Sin comentario"}</p> */}
             </div>
           </div>
         ))}

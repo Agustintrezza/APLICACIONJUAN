@@ -8,7 +8,7 @@ import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 import { API_URL } from '../../config'
 
-const removeAccents = (text) => text.normalize('NFD').replace(/[̀-ͯ]/g, '')
+// const removeAccents = (text) => text.normalize('NFD').replace(/[̀-ͯ]/g, '')
 
 const TableMain = () => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -37,6 +37,8 @@ const TableMain = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(isLargeScreen ? 12 : isDesktop ? 9 : 8)
   const [totalPages, setTotalPages] = useState(1)
+  const [totalRecords, setTotalRecords] = useState(0)
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,26 +46,30 @@ const TableMain = () => {
       try {
         const query = new URLSearchParams({
           ...filters,
-          page: currentPage,  // Asegurar que la paginación es correcta
+          page: currentPage,  
           limit: itemsPerPage
         }).toString()
-  
+    
+        console.log("🔍 Consulta enviada a la API:", query); // DEBUG
+    
         const response = await fetch(`${API_URL}/api/curriculums?${query}`)
         if (!response.ok) throw new Error('Error al obtener currículums')
-  
+    
         const result = await response.json()
         console.log(`📌 Respuesta de la API (Página ${currentPage}):`, result)
-  
+    
         if (!result || typeof result !== 'object' || !Array.isArray(result.data)) {
           console.error('⚠️ Respuesta inesperada de la API:', result)
           setCvData([])
           setTotalPages(1)
+          setTotalRecords(0) 
           return
         }
-  
-        setCvData(result.data) // ✅ Usar directamente la data sin filtros adicionales
+    
+        setCvData(result.data) 
         setTotalPages(result.totalPages || 1)
-  
+        setTotalRecords(result.totalRecords || 0) 
+    
         if (result.data.length === 0 && currentPage > 1) {
           console.warn(`⚠️ Página vacía (${currentPage}), retrocediendo a la anterior...`)
           setCurrentPage(prev => Math.max(1, prev - 1))
@@ -74,6 +80,7 @@ const TableMain = () => {
         setIsLoading(false)
       }
     }
+    
   
     fetchData()
   }, [filters, currentPage, itemsPerPage])
@@ -134,22 +141,22 @@ const TableMain = () => {
 
   const hasCategoryFilters = Object.values(filters).some((value) => value !== '')
 
-  const filteredData = Array.isArray(cvData)
-    ? cvData.filter((user) =>
-        removeAccents(`${user.nombre} ${user.apellido}`)
-          .toLowerCase()
-          .includes(removeAccents(searchTerm.toLowerCase())) &&
-        (!filters.rubro || user.rubro === filters.rubro) &&
-        (!filters.puesto || user.puesto === filters.puesto) &&
-        (!filters.subrubro || user.subrubro === filters.subrubro) &&
-        (!filters.noLlamar || (filters.noLlamar === 'true' ? user.noLlamar : !user.noLlamar)) &&
-        (!filters.zona || user.zona === filters.zona) &&
-        (!filters.provincia || user.provincia === filters.provincia) &&
-        (!filters.pais || user.pais === filters.pais) &&
-        (!filters.nivelEducacion || user.nivelEstudios === filters.nivelEducacion) &&
-        (!filters.experienciaAnios || user.experiencia === filters.experienciaAnios)
-      )
-    : []
+  // const filteredData = Array.isArray(cvData)
+  //   ? cvData.filter((user) =>
+  //       removeAccents(`${user.nombre} ${user.apellido}`)
+  //         .toLowerCase()
+  //         .includes(removeAccents(searchTerm.toLowerCase())) &&
+  //       (!filters.rubro || user.rubro === filters.rubro) &&
+  //       (!filters.puesto || user.puesto === filters.puesto) &&
+  //       (!filters.subrubro || user.subrubro === filters.subrubro) &&
+  //       (!filters.noLlamar || (filters.noLlamar === 'true' ? user.noLlamar : !user.noLlamar)) &&
+  //       (!filters.zona || user.zona === filters.zona) &&
+  //       (!filters.provincia || user.provincia === filters.provincia) &&
+  //       (!filters.pais || user.pais === filters.pais) &&
+  //       (!filters.nivelEducacion || user.nivelEstudios === filters.nivelEducacion) &&
+  //       (!filters.experienciaAnios || user.experiencia === filters.experienciaAnios)
+  //     )
+  //   : []
 
   const handleToggleCategories = () => {
     setIsCategoriesOpen((prev) => !prev)
@@ -157,13 +164,18 @@ const TableMain = () => {
 
   const currentData = cvData
 
+  const truncateText = (text, maxLength) => {
+    if (!text) return '' // Manejo seguro si el texto es undefined o null
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text
+  }
+
   return (
     <div className="w-full mx-auto space-y-4 relative">
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <div className="flex flex-col">
             <h2 className="text-2xl font-bold text-gray-800">
-              Curriculums ({filteredData.length})
+              Curriculums ({totalRecords})
             </h2>
             {(Object.values(filters).some(value => value !== '') && !isDesktop) && (
               <p className="text-md font-bold text-red-500">* Tienes filtros activos</p>
@@ -230,7 +242,7 @@ const TableMain = () => {
                             <p className="text-md font-bold line-height-custom text-[#293e68]">
                               {user.nombre} {user.apellido}
                             </p>
-                            <p className="text-sm mb-1 font-bold text-[#293e68]">
+                            <p className="edad-custom mb-1 font-bold text-[#293e68]">
                               {user.edad && `${user.edad} años`}
                             </p>
 
@@ -243,18 +255,22 @@ const TableMain = () => {
                             </p>
 
                             <ul className="text-sm text-gray-800 list-inside list-disc">
-                              {user.listas?.length > 3 ? (
-                                <li>Asociado a más de 4 listas</li>
-                              ) : (
-                                user.listas?.map((lista) => (
+                              {user.listas?.length > 2 ? (
+                                <li>Asociado a más de 2 listas</li>
+                              ) : user.listas?.length > 0 ? (
+                                user.listas.map((lista) => (
                                   <li key={lista._id} className="flex fuente-custom-lista-card items-center space-x-2">
                                     <span
                                       className="inline-block w-3 h-3 rounded-full"
                                       style={{ backgroundColor: lista.color || '#cccccc' }}
                                     ></span>
-                                    <span>{lista.cliente}</span>
+                                    <span title={lista.cliente}>
+                                      {truncateText(lista.cliente, 20)}
+                                    </span>
                                   </li>
                                 ))
+                              ) : (
+                                <li className="text-gray-500 italic">Aún no asociado a ninguna lista</li>
                               )}
                             </ul>
 
