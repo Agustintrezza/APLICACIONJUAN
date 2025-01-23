@@ -25,44 +25,52 @@ const PUESTOS = {
 }
 
 const Categories = ({ filters, setFilters }) => {
-  const [listas, setListas] = useState([])
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1026)
+  const [listas, setListas] = useState([]);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1026);
 
   useEffect(() => {
     const fetchListas = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/listas`)
-        if (!response.ok) throw new Error('Error al obtener listas')
-        const data = await response.json()
-        setListas(data)
+        const response = await fetch(`${API_URL}/api/listas`);
+        if (!response.ok) throw new Error("Error al obtener listas");
+        const data = await response.json();
+        setListas(data);
       } catch (error) {
-        console.error('Error al obtener listas:', error)
+        console.error("Error al obtener listas:", error);
       }
-    }
-    fetchListas()
-  }, [])
+    };
+    fetchListas();
+  }, []);
 
   useEffect(() => {
-    const handleResize = () => setIsDesktop(window.innerWidth >= 1026)
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
-  }, [])
+    const handleResize = () => setIsDesktop(window.innerWidth >= 1026);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleFilterChange = (e, filterType) => {
     const value = e.target.value
+  
     setFilters((prevFilters) => {
-      const newFilters = { ...prevFilters, [filterType]: value === '' ? undefined : value }
-
-      if (filterType === "rubro") {
-        newFilters.puesto = ""
-        newFilters.subrubro = ""
-      } else if (filterType === "puesto") {
-        newFilters.subrubro = ""
+      const newFilters = { ...prevFilters, [filterType]: value === "" ? "" : value }
+  
+      // 🔹 Si se selecciona "Seleccionar" (valor vacío), se elimina el filtro
+      if (value === "") {
+        delete newFilters[filterType]
       }
-
+  
+      // 🔹 Resetear dependencias cuando cambia rubro o puesto
+      if (filterType === "rubro") {
+        delete newFilters.puesto
+        delete newFilters.subrubro
+      } else if (filterType === "puesto") {
+        delete newFilters.subrubro
+      }
+  
       return newFilters
     })
   }
+  
 
   return (
     <div className={`${isDesktop ? 'w-1.5/5' : 'w-full'} max-h-screen overflow-y-auto`} style={{ position: 'sticky', top: '-16px' }}>
