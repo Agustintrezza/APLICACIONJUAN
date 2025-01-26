@@ -46,30 +46,31 @@ const TableMain = () => {
       try {
         const query = new URLSearchParams({
           ...filters,
-          page: currentPage,  
+          searchTerm,  // <-- Asegúrate de incluir esto
+          page: currentPage,
           limit: itemsPerPage
         }).toString()
-    
-        console.log("🔍 Consulta enviada a la API:", query); // DEBUG
-    
+  
+        console.log("🔍 Consulta enviada a la API:", query) // DEBUG
+  
         const response = await fetch(`${API_URL}/api/curriculums?${query}`)
         if (!response.ok) throw new Error('Error al obtener currículums')
-    
+  
         const result = await response.json()
         console.log(`📌 Respuesta de la API (Página ${currentPage}):`, result)
-    
+  
         if (!result || typeof result !== 'object' || !Array.isArray(result.data)) {
           console.error('⚠️ Respuesta inesperada de la API:', result)
           setCvData([])
           setTotalPages(1)
-          setTotalRecords(0) 
+          setTotalRecords(0)
           return
         }
-    
-        setCvData(result.data) 
+  
+        setCvData(result.data)
         setTotalPages(result.totalPages || 1)
-        setTotalRecords(result.totalRecords || 0) 
-    
+        setTotalRecords(result.totalRecords || 0)
+  
         if (result.data.length === 0 && currentPage > 1) {
           console.warn(`⚠️ Página vacía (${currentPage}), retrocediendo a la anterior...`)
           setCurrentPage(prev => Math.max(1, prev - 1))
@@ -80,10 +81,10 @@ const TableMain = () => {
         setIsLoading(false)
       }
     }
-    
   
     fetchData()
-  }, [filters, currentPage, itemsPerPage])
+  }, [filters, searchTerm, currentPage, itemsPerPage]) // 🔹 Agrega `searchTerm` como dependencia
+  
 
   useEffect(() => {
     if (currentPage > totalPages) {
@@ -110,7 +111,14 @@ const TableMain = () => {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  const handleResetSearch = () => setSearchTerm('')
+  const handleResetSearch = () => {
+    setSearchTerm("") // ✅ Limpia el estado
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      searchTerm: undefined // ✅ Asegura que se elimine de la consulta
+    }))
+    setCurrentPage(1)
+  }
   const handleResetFilters = () => {
     setFilters({
       genero: '',
@@ -140,7 +148,7 @@ const TableMain = () => {
   }
 
   const hasCategoryFilters = Object.values(filters).some((value) => value !== '')
-
+  
   // const filteredData = Array.isArray(cvData)
   //   ? cvData.filter((user) =>
   //       removeAccents(`${user.nombre} ${user.apellido}`)
@@ -177,7 +185,7 @@ const TableMain = () => {
             <h2 className="text-2xl font-bold text-gray-800">
               Curriculums ({totalRecords})
             </h2>
-            {(Object.values(filters).some(value => value !== '') && !isDesktop) && (
+            {(Object.values(filters).some(value => value !== '')) && (
               <p className="text-md font-bold text-red-500">* Tienes filtros activos</p>
             )}
           </div>
@@ -291,7 +299,7 @@ const TableMain = () => {
             </div>
           )}
 
-          <div className="flex justify-center mt-4">
+          <div className="flex justify-center mt-4 paginacion-custom">
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}

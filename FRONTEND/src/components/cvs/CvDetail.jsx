@@ -183,6 +183,7 @@ const CvDetail = ({ cv, onToggleNoLlamar }) => {
       <h3 className="text-lg font-bold text-[#293e68] mb-2">
         Listas Asignadas
       </h3>
+      {/* Mensaje de No Llamar en rojo si está marcado */}
       <div className="flex flex-wrap gap-2">
         {cvData.listas.length > 0 ? (
           cvData.listas.map((list) => (
@@ -211,6 +212,7 @@ const CvDetail = ({ cv, onToggleNoLlamar }) => {
   return (
     <div className="bg-white rounded-lg shadow-lg p-4 border border-gray-300 w-5/5">
       <div className="flex justify-between items-center mb-4">
+        <div>
         <h2 className="text-2xl font-bold text-[#293e68]">
           {isDataLoading ? (
             <Skeleton width={150} height={40} />
@@ -218,6 +220,13 @@ const CvDetail = ({ cv, onToggleNoLlamar }) => {
             `${getValueOrDefault(cv.nombre)} ${getValueOrDefault(cv.apellido)}`
           )}
         </h2>
+        {cv.noLlamar && (
+        <p className="text-red-500 font-bold text-sm">
+          No Llamar
+        </p>
+      )}
+        </div>
+       
         <div className="flex gap-4">
           {isDataLoading ? (
             isDesktop ? (
