@@ -19,7 +19,7 @@ const FormularioListas = ({ onCreate = () => {}, listaToEdit, onUpdate }) => {
   const [puestos, setPuestos] = useState({})
   const [subrubros, setSubrubros] = useState({})
 
-  const colors = ["#E53E3E", "#3E8FE5", "#FFB042", "#FFF01A", "#51E302", "#8FE3FF"]
+  const colors = ["#E53E3E", "#1181f7", "#953ee5", "#FFB042", "#f3e404", "#4acb04", "#61d3ff", ]
 
   const toast = useToast()
 
@@ -173,8 +173,11 @@ const FormularioListas = ({ onCreate = () => {}, listaToEdit, onUpdate }) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
+      ...(field === "rubro" ? { puesto: "", subrubro: "" } : {}), // Si cambia el rubro, limpia puesto y subrubro
+      ...(field === "puesto" ? { subrubro: "" } : {}), // Si cambia el puesto, limpia subrubro
     }))
   }
+  
 
   const inputStyle =
     "p-3 bg-[#e9f0ff] border text-sm border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
@@ -199,54 +202,55 @@ const FormularioListas = ({ onCreate = () => {}, listaToEdit, onUpdate }) => {
             {errors.cliente && <p className="text-red-500 text-sm">{errors.cliente}</p>}
           </div>
           <div>
-            <FormLabel className="text-sm text-[#293e68]">Rubro</FormLabel>
-            <select
-              value={formData.rubro}
-              onChange={(e) => handleInputChange("rubro", e.target.value)}
-              className={inputStyle}
-            >
-              <option value="">Selecciona un rubro</option>
-              {rubros.map((rubro) => (
-                <option key={rubro} value={rubro}>
-                  {rubro}
-                </option>
-              ))}
-            </select>
-          </div>
-          {formData.rubro && (
-            <div>
-              <FormLabel className="text-sm text-[#293e68]">Subrubro</FormLabel>
-              <select
-                value={formData.puesto}
-                onChange={(e) => handleInputChange("puesto", e.target.value)}
-                className={inputStyle}
-              >
-                <option value="">Selecciona un subrubro</option>
-                {puestos[formData.rubro]?.map((puesto) => (
-                  <option key={puesto} value={puesto}>
-                    {puesto}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-          {formData.rubro === "Gastronomía" && formData.puesto && (
-            <div>
-              <FormLabel className="text-sm text-[#293e68]">Puesto</FormLabel>
-              <select
-                value={formData.subrubro}
-                onChange={(e) => handleInputChange("subrubro", e.target.value)}
-                className={inputStyle}
-              >
-                <option value="">Selecciona un puesto</option>
-                {subrubros[formData.puesto]?.map((subrubro) => (
-                  <option key={subrubro} value={subrubro}>
-                    {subrubro}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
+  <FormLabel className="text-sm text-[#293e68]">Rubro</FormLabel>
+  <select
+    value={formData.rubro}
+    onChange={(e) => handleInputChange("rubro", e.target.value)}
+    className={inputStyle}
+  >
+    <option value="">Selecciona un rubro</option>
+    {rubros.map((rubro) => (
+      <option key={rubro} value={rubro}>
+        {rubro}
+      </option>
+    ))}
+  </select>
+</div>
+{formData.rubro && (
+  <div>
+    <FormLabel className="text-sm text-[#293e68]">Subrubro</FormLabel>
+    <select
+      value={formData.puesto}
+      onChange={(e) => handleInputChange("puesto", e.target.value)}
+      className={inputStyle}
+    >
+      <option value="">Selecciona un subrubro</option>
+      {puestos[formData.rubro]?.map((puesto) => (
+        <option key={puesto} value={puesto}>
+          {puesto}
+        </option>
+      ))}
+    </select>
+  </div>
+)}
+{formData.rubro === "Gastronomía" && formData.puesto && (
+  <div>
+    <FormLabel className="text-sm text-[#293e68]">Puesto</FormLabel>
+    <select
+      value={formData.subrubro}
+      onChange={(e) => handleInputChange("subrubro", e.target.value)}
+      className={inputStyle}
+    >
+      <option value="">Selecciona un puesto</option>
+      {subrubros[formData.puesto]?.map((subrubro) => (
+        <option key={subrubro} value={subrubro}>
+          {subrubro}
+        </option>
+      ))}
+    </select>
+  </div>
+)}
+
           <div>
             <FormLabel className="text-sm text-[#293e68]">Comentario</FormLabel>
             <Textarea

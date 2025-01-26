@@ -16,7 +16,6 @@ import "react-loading-skeleton/dist/skeleton.css"
 import { API_URL } from "../../config"
 import { useToast } from "@chakra-ui/react"
 
-
 const ListaDetail = ({ lista, onBack, onForceFetch }) => {
   const [localLista, setLocalLista] = useState({ ...lista })
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -24,7 +23,6 @@ const ListaDetail = ({ lista, onBack, onForceFetch }) => {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1026)
   const [isLoading, setIsLoading] = useState(true)
   const toast = useToast()
-
 
   useEffect(() => {
     setLocalLista({ ...lista }) // Sincroniza correctamente el estado local con las props
@@ -45,7 +43,6 @@ const ListaDetail = ({ lista, onBack, onForceFetch }) => {
       })
       if (!response.ok) throw new Error("Error al eliminar la lista")
       
-      // Mostrar mensaje de éxito
       toast({
         title: "Éxito",
         description: "La lista fue eliminada correctamente.",
@@ -55,10 +52,7 @@ const ListaDetail = ({ lista, onBack, onForceFetch }) => {
         position: "bottom-center",
       })
       
-      // Volver a la vista anterior
       onBack()
-      
-      // Refrescar las listas
       await onForceFetch()
     } catch (error) {
       console.error("Error al eliminar lista:", error)
@@ -79,9 +73,9 @@ const ListaDetail = ({ lista, onBack, onForceFetch }) => {
     <div className="border border-gray-300 bg-white rounded-lg p-4 shadow-lg">
       {/* Encabezado */}
       <div className="flex items-start justify-start md:justify-between gap-3 mb-4">
-      <h3 className="text-2xl font-bold text-[#293e68] max-w-[150px] break-words">
-        {isLoading ? <Skeleton width={200} /> : localLista.cliente}
-      </h3>
+        <h3 className="text-2xl font-bold text-[#293e68] max-w-[150px] break-words">
+          {isLoading ? <Skeleton width={200} /> : localLista.cliente}
+        </h3>
         <div className="flex gap-4">
           {isDesktop ? (
             <>
@@ -131,9 +125,9 @@ const ListaDetail = ({ lista, onBack, onForceFetch }) => {
       <div className="space-y-4">
         {/* Color */}
         <div className="flex items-center space-x-2">
-          <span className="text-sm font-semibold text-gray-600">Color:</span>
+          <span className="text-sm font-semibold text-gray-600"></span>
           {isLoading ? (
-            <Skeleton circle={true} height={20} width={20} />
+            <Skeleton circle={true} height={40} width={40} />
           ) : (
             <div
               style={{
@@ -146,43 +140,61 @@ const ListaDetail = ({ lista, onBack, onForceFetch }) => {
           )}
         </div>
 
-        {/* Comentario */}
-        <div>
-          <span className="text-sm font-semibold text-gray-600">Comentario:</span>
-          <p className="text-md text-gray-800">
-            {isLoading ? <Skeleton width={300} /> : localLista.comentario || "Sin comentario"}
-          </p>
-        </div>
+        {/* Rubro, Subrubro y Puesto de la Lista */}
+       {/* Rubro, Subrubro y Puesto de la Lista */}
+<div className="flex flex-wrap items-center gap-x-4 text-md text-gray-800">
+{(localLista.rubro || localLista.subrubro || localLista.puesto) ? (
+  <div className="flex flex-wrap items-center gap-x-4 text-md text-gray-800">
+    {localLista.rubro && (
+      <>
+        <span className="text-sm font-semibold text-gray-600">Rubro:</span>
+        <p className="font-bold text-gray-600">{localLista.rubro}</p>
+      </>
+    )}
 
-        {/* Fecha de creación */}
-        <div>
-          <span className="text-sm font-semibold text-gray-600">Fecha de creación:</span>
-          <p className="text-md text-gray-800">
-            {isLoading ? (
-              <Skeleton width={150} />
-            ) : (
-              new Date(localLista.fechaDeCreacion).toLocaleDateString()
-            )}
-          </p>
-        </div>
+    {localLista.subrubro && localLista.subrubro !== "" && (
+      <>
+        <span className="text-sm font-semibold text-gray-600">Subrubro:</span>
+        <p className="font-bold text-gray-600">{localLista.subrubro}</p>
+      </>
+    )}
+
+    {localLista.puesto && (
+      <>
+        <span className="text-sm font-semibold text-gray-600">Puesto:</span>
+        <p className="font-bold text-gray-600">{localLista.puesto}</p>
+      </>
+    )}
+  </div>
+) : (
+  <p className="text-gray-600 italic">La lista no tiene asignado un rubro.</p>
+)}
+</div>
+
 
         {/* Currículums asociados */}
         <div>
-          <h4 className="text-lg font-semibold text-gray-700">Currículums asociados:</h4>
-          {isLoading ? (
-            <Skeleton count={3} />
-          ) : localLista.curriculums && localLista.curriculums.length > 0 ? (
-            <ul className="list-disc pl-5">
-              {localLista.curriculums.map((curriculum) => (
-                <li key={curriculum._id} className="text-blue-500 underline">
-                  <Link to={`/ver-cv/${curriculum._id}`}>{`${curriculum.nombre} ${curriculum.apellido}`}</Link>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-600">No hay currículums asociados a esta lista.</p>
-          )}
-        </div>
+  <h4 className="text-lg font-semibold text-gray-700">Currículums asociados:</h4>
+  {isLoading ? (
+    <Skeleton count={3} />
+  ) : localLista.curriculums && localLista.curriculums.length > 0 ? (
+    <ul className="list-none pl-0">
+      {localLista.curriculums.map((curriculum) => (
+        <li key={curriculum._id} className="text-blue-500">
+          <Link to={`/ver-cv/${curriculum._id}`} className="flex flex-wrap items-center gap-x-2 text-gray-800">
+            <span className="font-semibold text-blue-500">{`${curriculum.nombre} ${curriculum.apellido}`}</span>
+            {curriculum.rubro && <span className=" text-sm font-semibold text-gray-600 italic">- {curriculum.rubro}</span>}
+            {curriculum.subrubro && <span className=" text-sm font-semibold text-gray-600 italic">- {curriculum.subrubro}</span>}
+            {curriculum.puesto && <span className=" text-sm font-semibold text-gray-600 italic">- {curriculum.puesto}</span>}
+          </Link>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p className="text-gray-600 italic">No hay currículums asociados a esta lista.</p>
+  )}
+</div>
+
       </div>
 
       {/* Diálogo de Confirmación */}
@@ -219,16 +231,23 @@ ListaDetail.propTypes = {
     comentario: PropTypes.string,
     color: PropTypes.string,
     fechaDeCreacion: PropTypes.string.isRequired,
+    rubro: PropTypes.string.isRequired,
+    subrubro: PropTypes.string,
+    puesto: PropTypes.string.isRequired,
     curriculums: PropTypes.arrayOf(
       PropTypes.shape({
         _id: PropTypes.string.isRequired,
         nombre: PropTypes.string.isRequired,
         apellido: PropTypes.string.isRequired,
+        rubro: PropTypes.string.isRequired,
+        subrubro: PropTypes.string,
+        puesto: PropTypes.string.isRequired,
       })
     ),
   }).isRequired,
   onBack: PropTypes.func.isRequired,
   onForceFetch: PropTypes.func.isRequired,
 }
+
 
 export default ListaDetail

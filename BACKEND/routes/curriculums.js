@@ -27,63 +27,63 @@ const upload = multer({ storage })
 // Obtener todos los curriculums
 router.get('/', async (req, res) => {
   try {
-    let { page = 1, limit = 10, searchTerm, ...filters } = req.query;
+    let { page = 1, limit = 10, searchTerm, ...filters } = req.query
 
-    page = parseInt(page, 10) || 1;
-    limit = parseInt(limit, 10) || 10;
+    page = parseInt(page, 10) || 1
+    limit = parseInt(limit, 10) || 10
 
-    const query = {};
+    const query = {}
 
+    // 🔹 Aplicar filtros dinámicamente
     Object.keys(filters).forEach((key) => {
       if (filters[key] !== undefined && filters[key] !== "") {
         switch (key) {
           case 'edad':
-            query.edad = { $gte: parseInt(filters[key], 10) };
-            break;
+            query.edad = { $gte: parseInt(filters[key], 10) }
+            break
           case 'noLlamar':
-            query.noLlamar = filters[key] === 'true';
-            break;
+            query.noLlamar = filters[key] === 'true'
+            break
           case 'idiomas':
-            query.idiomas = { $in: filters[key].split(',') };
-            break;
+            query.idiomas = { $in: filters[key].split(',') }
+            break
           case 'lista':
-            const listasArray = filters[key].split(',').filter(id => mongoose.Types.ObjectId.isValid(id));
+            const listasArray = filters[key].split(',').filter(id => mongoose.Types.ObjectId.isValid(id))
             if (listasArray.length > 0) {
-              query.listas = { $in: listasArray };
+              query.listas = { $in: listasArray }
             }
-            break;
-          case 'nivelEducacion': // 🔥 CAMBIO
-            query.nivelEstudios = { $regex: new RegExp(`^${filters[key]}$`, 'i') }; // Coincide con el campo correcto en la BD
-            break;
-          case 'experienciaAnios': // 🔥 CAMBIO
-            query.experiencia = { $regex: new RegExp(`^${filters[key]}$`, 'i') }; // Coincide con el campo correcto en la BD
-            break;
+            break
+          case 'nivelEducacion':
+          case 'experienciaAnios':
+            query[key] = filters[key] // ✅ Aplicando correctamente el filtro
+            break
           default:
-            query[key] = filters[key];
+            query[key] = filters[key]
         }
       }
-    });
+    })
 
-    console.log(`📌 Filtros aplicados:`, query);
-
-    if (searchTerm) {
+    // ✅ Aplicar búsqueda por nombre, apellido o zona
+    if (searchTerm && searchTerm.trim() !== "") {
       query.$or = [
         { nombre: { $regex: searchTerm, $options: 'i' } },
-        { apellido: { $regex: searchTerm, $options: 'i' } }
-      ];
+        { apellido: { $regex: searchTerm, $options: 'i' } },
+        { zona: { $regex: searchTerm, $options: 'i' } } // 🔥 Permite buscar por zona
+      ]
     }
 
-    const totalDocuments = await Curriculum.countDocuments(query);
+    console.log(`📌 Filtros aplicados:`, query)
 
+    const totalDocuments = await Curriculum.countDocuments(query)
     const curriculums = await Curriculum.find(query)
       .populate('listas')
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
-      .limit(limit);
+      .limit(limit)
 
-    console.log(`📌 Página ${page}: Registros obtenidos ->`, curriculums.length);
+    console.log(`📌 Página ${page}: Registros obtenidos ->`, curriculums.length)
 
-    const totalPages = Math.ceil(totalDocuments / limit);
+    const totalPages = Math.ceil(totalDocuments / limit)
     if (curriculums.length === 0 && page > 1) {
       return res.status(200).json({
         totalPages,
@@ -91,7 +91,7 @@ router.get('/', async (req, res) => {
         pageSize: limit,
         totalRecords: totalDocuments,
         data: []
-      });
+      })
     }
 
     res.status(200).json({
@@ -100,12 +100,13 @@ router.get('/', async (req, res) => {
       pageSize: limit,
       totalRecords: totalDocuments,
       data: curriculums
-    });
+    })
   } catch (error) {
-    console.error('❌ Error al obtener currículums:', error);
-    res.status(500).json({ error: 'Error al obtener currículums.' });
+    console.error('❌ Error al obtener currículums:', error)
+    res.status(500).json({ error: 'Error al obtener currículums.' })
   }
-});
+})
+
 
 
 // Crear un nuevo curriculum
