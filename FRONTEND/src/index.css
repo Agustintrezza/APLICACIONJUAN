@@ -79,12 +79,13 @@
 
   
   .container-custom-agus {
-    min-height: 620px; /* Este es el tamaño mínimo del contenedor */
+    min-height: 520px; /* Este es el tamaño mínimo del contenedor */
   }
   
   .card-custom-agus {
-    height: 180px; /* Altura fija para las tarjetas */
+    height: 160px; /* Altura fija para las tarjetas */
   }
+
 
   .line-height-custom {
     line-height: 20px;
@@ -100,6 +101,22 @@
     row-gap: 10px;
     height: 380px;
   }
+
+  .card-listas-custom-agus {
+    height: 150px; /* Altura fija para las tarjetas */
+  }
+  .container-listas-custom-agus {
+    min-height: 500px; 
+  }
+  .container-listas-interno-agus {
+    display: grid;
+    grid-template-columns: 33% 33% 33%; /* Tres columnas */
+    column-gap: 10px;
+    justify-content: center;
+    align-items: flex-start;
+    row-gap: 10px;
+    height: 300px;
+  }
   .salvador {
     height: 180px;
   }
@@ -108,7 +125,7 @@
     .container-custom-agus {
         min-height: 470px; /* Este es el tamaño mínimo del contenedor */
       }
-      
+
       .card-custom-agus {
         height: 150px; /* Altura fija para las tarjetas */
       }
@@ -120,7 +137,22 @@
         justify-content: center;
         align-items: flex-start;
         row-gap: 10px;
-        height: 300px;
+        height: 350px;
+      }
+      .card-listas-custom-agus {
+        height: 150px; /* Altura fija para las tarjetas */
+      }
+      .container-listas-custom-agus {
+        min-height: 500px; 
+      }
+      .container-listas-interno-agus {
+        display: grid;
+        grid-template-columns: 33% 33% 33%; /* Tres columnas */
+        column-gap: 10px;
+        justify-content: center;
+        align-items: flex-start;
+        row-gap: 10px;
+        height: 350px;
       }
       .salvador {
         height: 150px;
@@ -130,14 +162,27 @@
 
   @media(max-width:1026px) {
     .container-custom-agus {
-        min-height: 645px; /* Este es el tamaño mínimo del contenedor */
-      }
-      
+        min-height: 675px; /* Este es el tamaño mínimo del contenedor */
+      } 
       .card-custom-agus {
-        height: 150px; /* Altura fija para las tarjetas */
+        height: 160px; /* Altura fija para las tarjetas */
       }
-      
       .container-interno-agus {
+        display: grid;
+        grid-template-columns: 50% 50%; /* Tres columnas */
+        column-gap: 10px;
+        justify-content: center;
+        align-items: flex-start;
+        row-gap: 10px;
+        height: 380px;
+      }
+      .card-listas-custom-agus {
+        height: 140px; /* Altura fija para las tarjetas */
+      }
+      .container-listas-custom-agus {
+        min-height: 450px; 
+      }
+      .container-listas-interno-agus {
         display: grid;
         grid-template-columns: 50% 50%; /* Tres columnas */
         column-gap: 10px;
@@ -149,6 +194,10 @@
       .salvador {
         height: 150px;
       }
+      .listas-card-titulo {
+        font-size: 15px;
+        line-height: 20px!important;
+    }
   }
   
 
@@ -167,4 +216,7 @@
 }
 .fuente-custom-lista-card {
   font-size: 12px;
+}
+.listas-card-titulo {
+  line-height: 22px!important;
 }
