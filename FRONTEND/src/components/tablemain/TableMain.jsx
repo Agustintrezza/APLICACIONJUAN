@@ -138,6 +138,7 @@ const TableMain = () => {
       noLlamar: '',
     })
     setCurrentPage(1)
+    localStorage.removeItem("userFilters")
   }
 
   const handlePageChange = (newPage) => {

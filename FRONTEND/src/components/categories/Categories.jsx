@@ -43,6 +43,14 @@ const Categories = ({ filters, setFilters }) => {
   }, []);
 
   useEffect(() => {
+    // 🔹 Recuperar filtros desde localStorage al cargar el componente
+    const storedFilters = JSON.parse(localStorage.getItem("userFilters"))
+    if (storedFilters) {
+      setFilters(storedFilters)
+    }
+  }, [])
+
+  useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 1026);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -50,15 +58,15 @@ const Categories = ({ filters, setFilters }) => {
 
   const handleFilterChange = (e, filterType) => {
     const value = e.target.value
-  
+
     setFilters((prevFilters) => {
       const newFilters = { ...prevFilters, [filterType]: value === "" ? "" : value }
-  
+
       // 🔹 Si se selecciona "Seleccionar" (valor vacío), se elimina el filtro
       if (value === "") {
         delete newFilters[filterType]
       }
-  
+
       // 🔹 Resetear dependencias cuando cambia rubro o puesto
       if (filterType === "rubro") {
         delete newFilters.puesto
@@ -66,7 +74,10 @@ const Categories = ({ filters, setFilters }) => {
       } else if (filterType === "puesto") {
         delete newFilters.subrubro
       }
-  
+
+      // 🔹 Guardar en localStorage
+      localStorage.setItem("userFilters", JSON.stringify(newFilters))
+
       return newFilters
     })
   }

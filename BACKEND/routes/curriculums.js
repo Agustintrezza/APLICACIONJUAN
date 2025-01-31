@@ -53,10 +53,12 @@ router.get('/', async (req, res) => {
               query.listas = { $in: listasArray }
             }
             break
-          case 'nivelEducacion':
-          case 'experienciaAnios':
-            query[key] = filters[key] // ✅ Aplicando correctamente el filtro
-            break
+            case 'nivelEducacion':
+              query.nivelEstudios = filters[key] // ✅ Coincide con el esquema de la base de datos
+              break
+            case 'experienciaAnios':
+              query.experiencia = filters[key] // ✅ Coincide con el esquema de la base de datos
+              break
           default:
             query[key] = filters[key]
         }
