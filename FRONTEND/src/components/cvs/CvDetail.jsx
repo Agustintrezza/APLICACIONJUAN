@@ -6,10 +6,10 @@ import "react-loading-skeleton/dist/skeleton.css";
 import Asignaciones from "./Asignaciones";
 import {
   FaArrowLeft,
-  FaShareAlt,
   FaTrashAlt,
   FaPhoneSlash,
   FaPencilAlt,
+  FaWhatsapp
 } from "react-icons/fa";
 import {
   Button,
@@ -162,21 +162,23 @@ const CvDetail = ({ cv, onToggleNoLlamar }) => {
     }
   };
 
-  const formatWhatsappMessage = () => {
-    const message = `
-      🚀 *Curriculum Vitae* 🚀
-      ${getValueOrDefault(cv.nombre)}
-      ${getValueOrDefault(cv.apellido)}
-      ${getValueOrDefault(cv.imagen)}
-          `;
-    return encodeURIComponent(message.trim());
-  };
+  const formatWhatsappMessageCV = () => {
+  if (!cv) return "";
 
-  const handleWhatsappShare = () => {
-    const message = formatWhatsappMessage();
-    const whatsappUrl = `https://wa.me/1132368312?text=${message}`;
-    window.open(whatsappUrl, "_blank");
-  };
+  let message = `*Curriculum Vitae*\n\n`;
+  message += `*Nombre Completo:* ${getValueOrDefault(cv.nombre)} ${getValueOrDefault(cv.apellido)}\n`;
+  message += `*Curriculum:* ${getValueOrDefault(cv.imagen)}\n`;
+
+  return encodeURIComponent(message.trim()); // 🔥 Codificar para URL
+};
+
+const handleWhatsappShareCV = () => {
+  const message = formatWhatsappMessageCV();
+  if (!message) return;
+
+  const whatsappUrl = `https://wa.me/?text=${message}`;
+  window.open(whatsappUrl, "_blank");
+};
 
   const renderAssignedLists = () => (
     <div className="mb-6">
@@ -267,25 +269,14 @@ const CvDetail = ({ cv, onToggleNoLlamar }) => {
               >
                 Eliminar
               </button>
-              <button
-                className="bg-green-500 text-white px-4 py-2 rounded-lg"
-                onClick={handleWhatsappShare}
-              >
-                WhatsApp
-              </button>
-              <button
-                onClick={onToggleNoLlamar}
-                className={`p-3 text-white rounded-full ${
-                  cv.noLlamar ? "bg-red-500" : "bg-gray-500"
-                }`}
-                title={
-                  cv.noLlamar
-                    ? "Marcado como No Llamar"
-                    : "No está marcado como No Llamar"
-                }
-              >
-                <FaPhoneSlash />
-              </button>
+              <Button
+  colorScheme="green"
+  onClick={handleWhatsappShareCV}
+  className="flex justify-center items-center"
+  rightIcon={<FaWhatsapp className="w-6 h-6 m-0" />} // Mismo icono que las listas
+>
+  Compartir
+</Button>
             </>
           ) : (
             <div className="me-8">
@@ -323,12 +314,13 @@ const CvDetail = ({ cv, onToggleNoLlamar }) => {
                 >
                   <FaPhoneSlash />
                 </button>
-                <button
-                  onClick={handleWhatsappShare}
-                  className="p-2 bg-green-500 text-white rounded-full"
-                >
-                  <FaShareAlt />
-                </button>
+                <Button
+  colorScheme="green"
+  onClick={handleWhatsappShareCV}
+  className="flex justify-center items-center px-4 py-2 rounded-full"
+>
+  <FaWhatsapp className="w-5 h-5" />
+</Button>
               </div>
             </div>
           )}

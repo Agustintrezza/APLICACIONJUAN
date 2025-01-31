@@ -8,7 +8,7 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
 } from "@chakra-ui/react"
-import { FaArrowLeft, FaTrash } from "react-icons/fa"
+import { FaArrowLeft, FaTrash, FaWhatsapp } from "react-icons/fa"
 import Skeleton from "react-loading-skeleton"
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
@@ -68,6 +68,31 @@ const ListaDetail = ({ lista, onBack, onForceFetch }) => {
       setIsDeleting(false)
     }
   }
+
+  const formatWhatsappMessage = () => {
+    if (!localLista) return "";
+  
+    let message = `*Lista: ${localLista.cliente}*\n\n`;
+    
+    if (localLista.curriculums && localLista.curriculums.length > 0) {
+      message += "*Postulantes:*\n";
+      localLista.curriculums.forEach((curriculum, index) => {
+        message += `${index + 1}. ${curriculum.nombre} ${curriculum.apellido}\n`;
+      });
+    } else {
+      message += "❌ No hay postulantes en esta lista.";
+    }
+  
+    return encodeURIComponent(message); // 🔥 Codificar para URL
+  };
+
+  const handleWhatsappShare = () => {
+    const message = formatWhatsappMessage();
+    if (!message) return;
+  
+    const whatsappUrl = `https://wa.me/?text=${message}`;
+    window.open(whatsappUrl, "_blank");
+  };
   
   return (
     <div className="border border-gray-300 bg-white rounded-lg p-4 shadow-lg">
@@ -90,7 +115,7 @@ const ListaDetail = ({ lista, onBack, onForceFetch }) => {
                 Volver
               </Button>
               <Button
-                leftIcon={<FaTrash />}
+                rightIcon={<FaTrash />}
                 onClick={() => setIsDialogOpen(true)}
                 bg="red.500"
                 color="white"
@@ -98,6 +123,14 @@ const ListaDetail = ({ lista, onBack, onForceFetch }) => {
                 fontSize={15}
               >
                 Eliminar Lista
+              </Button>
+              <Button
+                colorScheme="green"
+                onClick={handleWhatsappShare}
+                className="flex justify-center items-center"
+                rightIcon={<FaWhatsapp className="w-6 h-6 m-0" />} // Si usas FontAwesome, sino usa otro icono
+              >
+                Compartir
               </Button>
             </>
           ) : (
@@ -116,6 +149,13 @@ const ListaDetail = ({ lista, onBack, onForceFetch }) => {
               >
                 <FaTrash size={18}/>
               </button>
+              <Button
+  colorScheme="green"
+  onClick={handleWhatsappShare}
+  className="flex justify-center items-center p-3 rounded-full"
+>
+  <FaWhatsapp className="w-6 h-6 flex-shrink-0" />
+</Button>
             </div>
           )}
         </div>
@@ -179,17 +219,17 @@ const ListaDetail = ({ lista, onBack, onForceFetch }) => {
     <Skeleton count={3} />
   ) : localLista.curriculums && localLista.curriculums.length > 0 ? (
     <ul className="list-none pl-0">
-      {localLista.curriculums.map((curriculum) => (
-        <li key={curriculum._id} className="text-blue-500">
-          <Link to={`/ver-cv/${curriculum._id}`} className="flex flex-wrap items-center gap-x-2 text-gray-800">
-            <span className="font-semibold text-blue-500">{`${curriculum.nombre} ${curriculum.apellido}`}</span>
-            {curriculum.rubro && <span className=" text-sm font-semibold text-gray-600 italic">- {curriculum.rubro}</span>}
-            {curriculum.subrubro && <span className=" text-sm font-semibold text-gray-600 italic">- {curriculum.subrubro}</span>}
-            {curriculum.puesto && <span className=" text-sm font-semibold text-gray-600 italic">- {curriculum.puesto}</span>}
-          </Link>
-        </li>
-      ))}
-    </ul>
+  {localLista.curriculums.map((curriculum) => (
+    <li key={curriculum._id} className="text-gray-800 flex flex-wrap items-center gap-x-2">
+      <Link to={`/ver-cv/${curriculum._id}`} className="font-semibold text-blue-500 hover:underline">
+        {`${curriculum.nombre} ${curriculum.apellido}`}
+      </Link>
+      {curriculum.rubro && <span className="text-sm font-semibold text-gray-600 italic">- {curriculum.rubro}</span>}
+      {curriculum.subrubro && <span className="text-sm font-semibold text-gray-600 italic">- {curriculum.subrubro}</span>}
+      {curriculum.puesto && <span className="text-sm font-semibold text-gray-600 italic">- {curriculum.puesto}</span>}
+    </li>
+  ))}
+</ul>
   ) : (
     <p className="text-gray-600 italic">No hay currículums asociados a esta lista.</p>
   )}
