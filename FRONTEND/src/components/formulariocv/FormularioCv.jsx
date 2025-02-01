@@ -48,49 +48,50 @@ const FormularioCv = ({
         {/* Columna 1 */}
         <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="nombre" className="block mb-2 text-sm font-medium text-gray-900">
-              Nombre
-            </label>
-            {isLoading ? (
-              <Skeleton height={40} />
-            ) : (
-              <input
-                type="text"
-                id="nombre"
-                name="nombre"
-                value={formData.nombre}
-                onChange={handleChange}
-                className={`w-full p-2 border text-sm rounded-lg ${
-                  errors.nombre ? "border-red-500" : "border-gray-300"
-                }`}
-              />
-            )}
-            {errors.nombre && <p className="text-red-500 text-sm mt-1">{errors.nombre}</p>}
-          </div>
+  {/* Campo Nombre */}
+  <div>
+    <label htmlFor="nombre" className="block mb-2 text-sm font-medium text-gray-900">
+      Nombre
+    </label>
+    {isLoading ? (
+      <Skeleton height={40} />
+    ) : (
+      <input
+        type="text"
+        id="nombre"
+        name="nombre"
+        value={formData.nombre}
+        onChange={handleChange}
+        className={`w-full p-2 border text-sm rounded-lg ${
+          errors.nombre ? "border-yellow-500" : "border-gray-300"
+        }`}
+      />
+    )}
+    {errors.nombre && <p className="text-yellow-500 text-sm mt-1">{errors.nombre}</p>}
+  </div>
 
-          <div>
-            <label htmlFor="apellido" className="block mb-2 text-sm font-medium text-gray-900">
-              Apellido
-            </label>
-            {isLoading ? (
-              <Skeleton height={40} />
-            ) : (
-              <input
-                type="text"
-                id="apellido"
-                name="apellido"
-                value={formData.apellido}
-                onChange={handleChange}
-                className={`w-full p-2 border text-sm rounded-lg ${
-                  errors.apellido ? "border-red-500" : "border-gray-300"
-                }`}
-              />
-            )}
-            {errors.apellido && <p className="text-red-500 text-sm mt-1">{errors.apellido}</p>}
-          </div>
-          </div>
-
+  {/* Campo Apellido */}
+  <div>
+    <label htmlFor="apellido" className="block mb-2 text-sm font-medium text-gray-900">
+      Apellido
+    </label>
+    {isLoading ? (
+      <Skeleton height={40} />
+    ) : (
+      <input
+        type="text"
+        id="apellido"
+        name="apellido"
+        value={formData.apellido}
+        onChange={handleChange}
+        className={`w-full p-2 border text-sm rounded-lg ${
+          errors.apellido ? "border-yellow-500" : "border-gray-300"
+        }`}
+      />
+    )}
+    {errors.apellido && <p className="text-yellow-500 text-sm mt-1">{errors.apellido}</p>}
+  </div>
+</div>
           <div>
             <label className="block mb-2 text-sm font-medium text-gray-900">Género</label>
             <div className="flex space-x-4">

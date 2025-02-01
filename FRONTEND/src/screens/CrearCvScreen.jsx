@@ -1,10 +1,19 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import FormularioCv from "../components/formulariocv/FormularioCv";
 import { API_URL } from "../config";
 import { Spinner, useToast } from "@chakra-ui/react";
 import {FaArrowLeft} from "react-icons/fa";
+import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+  Button,
+} from "@chakra-ui/react";
 
 const CrearCvScreen = () => {
   const [formData, setFormData] = useState({
@@ -34,6 +43,10 @@ const CrearCvScreen = () => {
   const fileInputRef = useRef(null);
   const toast = useToast();
   const navigate = useNavigate();
+  
+  // const [isDuplicate, setIsDuplicate] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false); // Para mostrar el AlertDialog
+  // const [isCheckingDuplicate, setIsCheckingDuplicate] = useState(false);
 
   const validateDuplicate = async (field, value) => {
     try {
@@ -104,20 +117,6 @@ const CrearCvScreen = () => {
   subrubro: Yup.string(),
 });
 
-  const handleChange = async (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value || "",
-    }));
-
-    try {
-      await validationSchema.validateAt(name, { ...formData, [name]: value });
-      setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
-    } catch (error) {
-      setErrors((prevErrors) => ({ ...prevErrors, [name]: error.message }));
-    }
-  };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -151,64 +150,87 @@ const CrearCvScreen = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault(); // Previene el comportamiento por defecto del formulario
-    setIsSubmitting(true); // Indica que se está enviando el formulario
-    setErrors({}); // Limpia los errores anteriores
-  
-    try {
-      // Validar el formulario completo usando Yup
-      await validationSchema.validate(formData, { abortEarly: false }); // abortEarly: false asegura que todos los errores se devuelvan
-  
-      // Si el formulario pasa la validación, preparar el FormData para enviarlo
-      const formDataToSend = new FormData();
-  
-      // Procesar y preparar los datos para ser enviados
-      Object.entries(formData).forEach(([key, value]) => {
-        if (key === "imagen" && value instanceof File) {
-          formDataToSend.append(key, value); // Solo agregamos la imagen si es un archivo válido
-        } else if (Array.isArray(value)) {
-          value.forEach((v) => formDataToSend.append(`${key}[]`, v)); // Si es un array (ej. idiomas), agregamos cada valor individualmente
-        } else {
-          formDataToSend.append(key, value || ""); // Si el valor es vacío, lo pasamos como cadena vacía
+  useEffect(() => {
+    if (formData.nombre && formData.apellido) {
+      const timeout = setTimeout(async () => {
+        try {
+          const response = await fetch(`${API_URL}/api/curriculums/validate`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ nombre: formData.nombre, apellido: formData.apellido }),
+          });
+
+          const result = await response.json();
+
+          if (result.error === "Duplicado" && result.duplicadoEn === "nombre-apellido") {
+            setErrors((prevErrors) => ({
+              ...prevErrors,
+              nombre: "⚠️ Este nombre y apellido ya están registrados.",
+              apellido: "⚠️ Este nombre y apellido ya están registrados.",
+            }));
+          } else {
+            setErrors((prevErrors) => ({
+              ...prevErrors,
+              nombre: "",
+              apellido: "",
+            }));
+          }
+        } catch (error) {
+          console.error("Error al validar duplicado:", error);
         }
-      });
-  
-      // Enviar los datos al servidor
-      const response = await fetch(`${API_URL}/api/curriculums`, {
+      }, 800);
+
+      return () => clearTimeout(timeout); // 🔹 Limpia el timeout si el usuario sigue escribiendo
+    }
+  }, [formData.nombre, formData.apellido]);
+
+  const handleChange = async (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value || "",
+    }));
+
+    try {
+      await validationSchema.validateAt(name, { ...formData, [name]: value });
+      setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+    } catch (error) {
+      setErrors((prevErrors) => ({ ...prevErrors, [name]: error.message }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setErrors({});
+
+    try {
+      await validationSchema.validate(formData, { abortEarly: false });
+
+      // 🔹 Validar duplicados antes de enviar
+      const duplicateResponse = await fetch(`${API_URL}/api/curriculums/validate`, {
         method: "POST",
-        body: formDataToSend,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nombre: formData.nombre, apellido: formData.apellido, celular: formData.celular }),
       });
-  
-      if (!response.ok) throw new Error("Error al crear el CV"); // Si la respuesta no es OK, lanzamos un error
-  
-      const result = await response.json(); // Obtenemos la respuesta JSON
-      if (result && result.curriculum && result.curriculum._id) {
-        // Si el servidor respondió correctamente
-        toast({
-          title: "Éxito",
-          description: "El CV se creó correctamente.",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom-right",
-        });
-  
-        // Redirigimos al usuario al CV recién creado usando su ID
-        navigate(`/ver-cv/${result.curriculum._id}`);
-      } else {
-        throw new Error("El ID del CV no se ha recibido correctamente"); // Si no se recibe el ID, lanzamos un error
+
+      const duplicateResult = await duplicateResponse.json();
+      if (duplicateResult.error === "Duplicado" && duplicateResult.duplicadoEn === "nombre-apellido") {
+        setShowConfirmDialog(true);
+        setIsSubmitting(false);
+        return;
       }
-  
+
+      // 🔹 Si no hay duplicados, proceder a enviar el formulario
+      submitForm();
     } catch (error) {
       console.error("Error al enviar el formulario:", error);
       if (error.name === "ValidationError") {
-        // Si la validación falla, procesamos los errores y los mostramos
         const validationErrors = {};
         error.inner.forEach((err) => {
           validationErrors[err.path] = err.message;
         });
-        setErrors(validationErrors); // Actualizamos el estado de errores
+        setErrors(validationErrors);
       }
       toast({
         title: "Error",
@@ -219,9 +241,58 @@ const CrearCvScreen = () => {
         position: "bottom-right",
       });
     } finally {
-      setIsSubmitting(false); // Indicamos que hemos terminado de procesar
+      setIsSubmitting(false);
     }
   };
+
+  const submitForm = async () => {
+    setIsSubmitting(true);
+    try {
+      const formDataToSend = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key === "imagen" && value instanceof File) {
+          formDataToSend.append(key, value);
+        } else if (Array.isArray(value)) {
+          value.forEach((v) => formDataToSend.append(`${key}[]`, v));
+        } else {
+          formDataToSend.append(key, value || "");
+        }
+      });
+
+      const response = await fetch(`${API_URL}/api/curriculums`, {
+        method: "POST",
+        body: formDataToSend,
+      });
+
+      if (!response.ok) throw new Error("Error al crear el CV");
+
+      const result = await response.json();
+      toast({
+        title: "Éxito",
+        description: "El CV se creó correctamente.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom-right",
+      });
+
+      navigate(`/ver-cv/${result.curriculum._id}`);
+    } catch (error) {
+      console.error("Error al enviar el formulario:", error);
+      toast({
+        title: "Error",
+        description: "Hubo un problema al crear el CV.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom-right",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  
   
   
   
@@ -257,6 +328,32 @@ const CrearCvScreen = () => {
           fileInputRef={fileInputRef}
         />
       </div>
+       {/* 🔹 Confirmación si el nombre y apellido ya están registrados */}
+    <AlertDialog
+      isOpen={showConfirmDialog}
+      leastDestructiveRef={null}
+      onClose={() => setShowConfirmDialog(false)}
+    >
+      <AlertDialogOverlay>
+        <AlertDialogContent>
+          <AlertDialogHeader fontSize="lg" fontWeight="bold">
+            Nombre y Apellido ya registrados
+          </AlertDialogHeader>
+          <AlertDialogBody>
+            Ya hay un registro con este Nombre y Apellido. ¿Deseas continuar de todas formas?
+          </AlertDialogBody>
+          <AlertDialogFooter>
+            <Button onClick={() => setShowConfirmDialog(false)}>Cancelar</Button>
+            <Button colorScheme="red" onClick={() => {
+              setShowConfirmDialog(false);
+              submitForm();
+            }} ml={3}>
+              Sí, continuar
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialogOverlay>
+    </AlertDialog>
     </div>
   );
 };
