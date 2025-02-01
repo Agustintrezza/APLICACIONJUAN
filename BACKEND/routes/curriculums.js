@@ -203,34 +203,43 @@ console.log('Archivo recibido:', req.file);
 
 // Validar duplicados (con exclusión de ID actual en edición)
 router.post('/validate', async (req, res) => {
-  const { apellido, celular, excludeId } = req.body;
+  const { nombre, apellido, celular, excludeId } = req.body;
 
   try {
-    const query = {};
-    if (apellido) {
-      query.apellido = apellido;
+    const query = { $or: [] };
+
+    if (nombre && apellido) {
+      query.$or.push({ nombre, apellido });
     }
     if (celular) {
-      query.celular = celular;
+      query.$or.push({ celular });
+    }
+
+    if (query.$or.length === 0) {
+      return res.status(400).json({ error: "Debe proporcionar al menos un campo para validar." });
     }
 
     if (excludeId) {
-      query._id = { $ne: excludeId }; // Excluir el ID actual
+      query._id = { $ne: excludeId }; // Excluir el ID actual en edición
     }
 
     const duplicate = await Curriculum.findOne(query);
 
     if (duplicate) {
-      const duplicadoEn = duplicate.apellido === apellido ? 'apellido' : 'celular';
-      return res.status(400).json({ error: 'Duplicado', duplicadoEn });
+      let duplicadoEn = "nombre-apellido";
+      if (duplicate.celular === celular) {
+        duplicadoEn = "celular";
+      }
+      return res.status(400).json({ error: "Duplicado", duplicadoEn });
     }
 
-    res.status(200).json({ message: 'No hay duplicados.' });
+    res.status(200).json({ message: "No hay duplicados." });
   } catch (error) {
-    console.error('Error al validar duplicados:', error);
-    res.status(500).json({ error: 'Error al validar duplicados.' });
+    console.error("Error al validar duplicados:", error);
+    res.status(500).json({ error: "Error al validar duplicados." });
   }
 });
+
 
 
 // Obtener un curriculum por ID
