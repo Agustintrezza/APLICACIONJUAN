@@ -19,9 +19,9 @@ const RUBROS = {
 }
 
 const PUESTOS = {
-  "Cocina": ["Chef", "Jefe de cocina", "Cocinero", "Pizzero", "Sushiman", "Pastelero", "Panadero"],
-  "Salón": ["Jefe de sala", "Camarero", "Mozo", "Runner"],
-  "Barra": ["Bartender", "Barista", "Cajero", "Encargado"],
+  "Cocina": ["Chef", "Fast Food", "Jefe de cocina", "Cocinero", "Pizzero", "Sushiman", "Ayudante de cocina", "Pastelero", "Panadero", "Laminadores", "Horneros", "Facturistas"],
+  "Salón": ["Jefe de sala", "Camarero", "Mozo", "Comis", "Runner"],
+  "Barra": ["Bartender", "Barista", "Cajero", "Encargado", "Gerente de local", "Gerente de operaciones"],
 }
 
 const Categories = ({ filters, setFilters }) => {
@@ -58,29 +58,45 @@ const Categories = ({ filters, setFilters }) => {
 
   const handleFilterChange = (e, filterType) => {
     const value = e.target.value
-
+  
     setFilters((prevFilters) => {
       const newFilters = { ...prevFilters, [filterType]: value === "" ? "" : value }
-
+  
       // 🔹 Si se selecciona "Seleccionar" (valor vacío), se elimina el filtro
       if (value === "") {
         delete newFilters[filterType]
       }
-
-      // 🔹 Resetear dependencias cuando cambia rubro o puesto
+  
+      // 🔹 Resetear dependencias cuando cambian otros filtros
       if (filterType === "rubro") {
         delete newFilters.puesto
         delete newFilters.subrubro
       } else if (filterType === "puesto") {
         delete newFilters.subrubro
+      } else if (filterType === "zona") {
+        delete newFilters.localidad
+      } else if (filterType === "provincia") {
+        delete newFilters.zona // ✅ Si cambia Provincia, también resetear Zona y Localidad
+        delete newFilters.localidad
+      } else if (filterType === "pais") {
+        delete newFilters.zona
+        delete newFilters.localidad
+        delete newFilters.provincia
+      } else if (filterType === "idiomas") {
+        if (value === "") {
+          delete newFilters.idiomas // ✅ Eliminar si se selecciona "Seleccionar"
+        } else {
+          newFilters[filterType] = value.split(",") // ✅ Convertir a array para manejar múltiples idiomas
+        }
       }
-
+  
       // 🔹 Guardar en localStorage
       localStorage.setItem("userFilters", JSON.stringify(newFilters))
-
+  
       return newFilters
     })
   }
+  
   
 
   return (
@@ -217,7 +233,24 @@ const Categories = ({ filters, setFilters }) => {
               <option value="Universitario">Universitario</option>
             </select>
           </div>
-
+          {/* Idiomas */}
+<div>
+  <label className="text-sm text-[#293e68] mb-1">Idiomas</label>
+  <select
+    value={filters.idiomas?.[0] || ""} // ✅ Si no hay idiomas seleccionados, mostrar vacío
+    onChange={(e) => handleFilterChange(e, "idiomas")}
+    className={`form-select text-sm py-1 px-2 h-8 w-full border-1 rounded-md ${
+      filters.idiomas ? "border-red-400 border-2" : "border-blue-400"
+    }`}
+  >
+    <option value="">Seleccionar</option>
+    <option value="Inglés">Inglés</option>
+    <option value="Español">Español</option>
+    <option value="Portugués">Portugués</option>
+    <option value="Italiano">Italiano</option>
+    <option value="Francés">Francés</option>
+  </select>
+</div>
           {/* Años de Experiencia */}
           <div>
             <label className="text-sm text-[#293e68] mb-1">Años de Experiencia</label>

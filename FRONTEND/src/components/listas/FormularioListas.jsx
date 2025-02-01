@@ -41,7 +41,7 @@ const FormularioListas = ({ onCreate = () => {}, listaToEdit, onUpdate }) => {
       Administración: ["Recursos Humanos", "Administrativo de Compras", "Administrativo de Ventas", "Marketing", "Contable", "Legales"],
     })
     setSubrubros({
-      Cocina: ["Chef", "Fast Food", "Jefe de cocina", "Cocinero", "Pizzero", "Sushiman", "Ayudante de cocina", "Pastelero", "Panadero"],
+      Cocina: ["Chef", "Fast Food", "Jefe de cocina", "Cocinero", "Pizzero", "Sushiman", "Ayudante de cocina", "Pastelero", "Panadero", "Laminadores", "Horneros", "Facturistas"],
       Salón: ["Jefe de sala", "Camarero", "Mozo", "Comis", "Runner"],
       Barra: ["Bartender", "Barista", "Cajero", "Encargado", "Gerente de local", "Gerente de operaciones"],
     })
