@@ -53,6 +53,7 @@ const EditarCvScreen = () => {
           originalEdad: data.edad || "",
           originalPais: data.pais || "",
           originalProvincia: data.provincia || "",
+          originalZona: data.zona || "",
           originalCalificacion: data.calificacion || "",
           originalRubro: data.rubro || "",
           originalPuesto: data.puesto || "",
@@ -220,25 +221,6 @@ const EditarCvScreen = () => {
     setErrors({});
 
     try {
-      // Validar formulario
-      console.log("Valores actuales del formulario:", formData);
-      console.log("Valores originales:", {
-        originalApellido: formData.originalApellido,
-        originalCelular: formData.originalCelular,
-        originalNombre: formData.originalNombre,
-        originalGenero: formData.originalGenero,
-        originalEdad: formData.originalEdad,
-        originalPais: formData.originalPais,
-        originalProvincia: formData.originalProvincia,
-        originalCalificacion: formData.originalCalificacion,
-        originalRubro: formData.originalRubro,
-        originalPuesto: formData.originalPuesto,
-        originalSubrubro: formData.originalSubrubro,
-        originalIdiomas: formData.originalIdiomas,
-        originalImagen: formData.originalImagen,
-        originalUbicacionManual: formData.originalUbicacionManual,
-      });
-
       // Verificar si la imagen cambió
       const isImageChanged =
         (formData.imagen && formData.imagen instanceof File) || // Nueva imagen cargada
@@ -255,6 +237,7 @@ const EditarCvScreen = () => {
       (formData.edad === formData.originalEdad || formData.edad === null) &&
       formData.pais === formData.originalPais &&
       formData.provincia === formData.originalProvincia &&
+      formData.zona === formData.originalZona &&
       formData.calificacion === formData.originalCalificacion &&
       formData.rubro === formData.originalRubro &&
       formData.puesto === formData.originalPuesto &&

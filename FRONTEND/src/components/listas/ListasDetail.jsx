@@ -180,36 +180,47 @@ const ListaDetail = ({ lista, onBack, onForceFetch }) => {
           )}
         </div>
 
-        {/* Rubro, Subrubro y Puesto de la Lista */}
        {/* Rubro, Subrubro y Puesto de la Lista */}
-<div className="flex flex-wrap items-center gap-x-4 text-md text-gray-800">
-{(localLista.rubro || localLista.subrubro || localLista.puesto) ? (
-  <div className="flex flex-wrap items-center gap-x-4 text-md text-gray-800">
-    {localLista.rubro && (
-      <>
-        <span className="text-sm font-semibold text-gray-600">Rubro:</span>
-        <p className="font-bold text-gray-600">{localLista.rubro}</p>
-      </>
-    )}
+{/* Rubro, Subrubro y Puesto de la Lista */}
+<div className="flex flex-col items-start gap-x-4 text-md text-gray-800">
+  {(localLista.rubro || localLista.subrubro || localLista.puesto) ? (
+    <div className="flex flex-wrap items-center gap-3">
+      {localLista.rubro && (
+        <>
+          <span className="text-sm font-semibold text-gray-600">Rubro:</span>
+          <p className="font-bold text-gray-600">{localLista.rubro}</p>
+        </>
+      )}
 
-    {localLista.subrubro && localLista.subrubro !== "" && (
-      <>
-        <span className="text-sm font-semibold text-gray-600">Subrubro:</span>
-        <p className="font-bold text-gray-600">{localLista.subrubro}</p>
-      </>
-    )}
+      {localLista.subrubro && (
+        <>
+          <span className="text-sm font-semibold text-gray-600">Subrubro:</span>
+          <p className="font-bold text-gray-600">{localLista.subrubro}</p>
+        </>
+      )}
 
-    {localLista.puesto && (
-      <>
-        <span className="text-sm font-semibold text-gray-600">Puesto:</span>
-        <p className="font-bold text-gray-600">{localLista.puesto}</p>
-      </>
-    )}
-  </div>
-) : (
-  <p className="text-gray-600 italic">La lista no tiene asignado un rubro.</p>
-)}
+      {localLista.puesto && (
+        <>
+          <span className="text-sm font-semibold text-gray-600">Puesto:</span>
+          <p className="font-bold text-gray-600">{localLista.puesto}</p>
+        </>
+      )}
+    </div>
+  ) : (
+    <p className="text-gray-600 italic text-sm">La lista no tiene asignado un rubro.</p>
+  )}
+
+  {/* 🔹 Comentario ahora está separado y siempre se mostrará si existe */}
+  {localLista.comentario ? (
+    <div className="flex flex-wrap items-center gap-3 mt-2">
+      <span className="text-sm font-semibold text-gray-600">Comentario:</span>
+      <p className="font-bold text-gray-600">{localLista.comentario}</p>
+    </div>
+  ) : (
+    <p className="text-gray-600 italic text-sm">La lista no tiene asignado un comentario.</p>
+  )}
 </div>
+
 
 
         {/* Currículums asociados */}
