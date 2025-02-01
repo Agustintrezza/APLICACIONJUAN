@@ -51,10 +51,11 @@ const PaisSelect = ({ formData, setFormData }) => {
 
   const handleCountryChange = (e) => {
     const selectedCountry = e.target.value;
+  
     setFormData((prevData) => ({
       ...prevData,
       pais: selectedCountry,
-      provincia: selectedCountry === "Argentina" ? prevData.provincia : "",
+      provincia: selectedCountry === "Argentina" ? "Buenos Aires" : "", // 🔹 Se asigna Buenos Aires por defecto
       zona: "",
       localidad: "",
       ubicacionManual: "",
@@ -121,7 +122,7 @@ const PaisSelect = ({ formData, setFormData }) => {
           onChange={handleCountryChange}
           className="w-full p-2 border text-sm rounded-lg focus:ring-[#293e68] focus:border-[#293e68]"
         >
-          <option value="">Seleccione un país</option>
+          {/* <option value="">Seleccione un país</option> */}
           <option value="Argentina">Argentina</option>
           <option value="Estados Unidos">Estados Unidos</option>
           <option value="Chile">Chile</option>
@@ -143,7 +144,7 @@ const PaisSelect = ({ formData, setFormData }) => {
             onChange={handleProvinceChange}
             className="w-full p-2 border text-sm rounded-lg focus:ring-[#293e68] focus:border-[#293e68]"
           >
-            <option value="">Seleccione una provincia</option>
+            {/* <option value="">Seleccione una provincia</option> */}
             {PROVINCIAS_ARGENTINA.map((provincia) => (
               <option key={provincia} value={provincia}>
                 {provincia}
