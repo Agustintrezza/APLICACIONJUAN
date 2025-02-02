@@ -10,7 +10,7 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:5173', // Dominio para desarrollo
   'https://aplicacionjuan-1-o797.onrender.com', // Dominio para desarrollo
-   // 'https://aplicacionjuan-1.onrender.com', Dominio del frontend en producción
+  'https://aplicacionjuan-1.onrender.com',  // Dominio del frontend en producción
 ];
 
 const corsOptions = {
