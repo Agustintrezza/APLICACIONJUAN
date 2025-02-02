@@ -27,7 +27,7 @@ function AppContent() {
         }
       />
       
-      {/* Rutas protegidas dentro del Layout - PRUEBA INTEGRACION ---*/}
+      {/* Rutas protegidas dentro del Layout - PRUEBA*/}
       <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         <Route path="/" element={<Home />} />
         <Route path="/crear-cv" element={<CrearCvScreen/>} />
