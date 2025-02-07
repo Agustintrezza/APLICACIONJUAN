@@ -241,63 +241,62 @@ const TableMain = () => {
             </div>
           ) : (
             <div className="grid gap-2 mt-4 container-custom-agus">
-              <div className="container-interno-agus">
-                {currentData.length > 0 ? (
-                  currentData.map((user) => (
-                    <div key={user._id}>
-                      <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300 card-custom-agus">
-                        <Link to={`/ver-cv/${user._id}`} className="block">
-                          <div className="py-2 px-2">
-                            <p className="text-md font-bold line-height-custom text-[#293e68]">
-                              {user.nombre} {user.apellido}
-                            </p>
-                            <p className="edad-custom mb-1 font-bold text-[#293e68]">
-                              {user.edad && `${user.edad} años`}
-                            </p>
-
-                            <p className="text-sm font-bold fuente-custom-rubro-card text-[#293e68]">
-                              {user.rubro ? (
-                                user.rubro === 'Gastronomía'
-                                  ? `${user.rubro} ${user.puesto ? `/ ${user.puesto} /` : ''}${user.subrubro}`
-                                  : `${user.rubro} / ${user.puesto}`
-                              ) : '-'}
-                            </p>
-
-                            <ul className="text-sm text-gray-800 list-inside list-disc">
-                              {user.listas?.length > 2 ? (
-                                <li>Asociado a más de 2 listas</li>
-                              ) : user.listas?.length > 0 ? (
-                                user.listas.map((lista) => (
-                                  <li key={lista._id} className="flex fuente-custom-lista-card items-center space-x-2">
-                                    <span
-                                      className="inline-block w-3 h-3 rounded-full"
-                                      style={{ backgroundColor: lista.color || '#cccccc' }}
-                                    ></span>
-                                    <span title={lista.cliente}>
-                                      {truncateText(lista.cliente, 20)}
-                                    </span>
-                                  </li>
-                                ))
-                              ) : (
-                                <li className="text-gray-500 italic">Aún no asociado a ninguna lista</li>
-                              )}
-                            </ul>
-
-                            {user.noLlamar && (
-                              <span className="inline-block bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full mt-2">
-                                No Llamar
-                              </span>
-                            )}
-                          </div>
-                        </Link>
+            <div className="container-interno-agus">
+              {currentData.length > 0 ? (
+                currentData.map((user) => (
+                  <Link to={`/ver-cv/${user._id}`} key={user._id} className="block">
+                    <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 card-custom-agus cursor-pointer transform transition-transform duration-200 hover:shadow-xl hover:scale-100">
+                      <div className="py-2 px-2">
+                        <p className="text-md font-bold line-height-custom text-[#293e68]">
+                          {user.nombre} {user.apellido}
+                        </p>
+                        <p className="edad-custom mb-1 font-bold text-[#293e68]">
+                          {user.edad && `${user.edad} años`}
+                        </p>
+          
+                        <p className="text-sm font-bold fuente-custom-rubro-card text-[#293e68]">
+                          {user.rubro ? (
+                            user.rubro === 'Gastronomía'
+                              ? `${user.rubro} ${user.puesto ? `/ ${user.puesto} /` : ''}${user.subrubro}`
+                              : `${user.rubro} / ${user.puesto}`
+                          ) : '-'}
+                        </p>
+          
+                        <ul className="text-sm text-gray-800 list-inside list-disc">
+                          {user.listas?.length > 2 ? (
+                            <li>Asociado a más de 2 listas</li>
+                          ) : user.listas?.length > 0 ? (
+                            user.listas.map((lista) => (
+                              <li key={lista._id} className="flex fuente-custom-lista-card items-center space-x-2">
+                                <span
+                                  className="inline-block w-3 h-3 rounded-full"
+                                  style={{ backgroundColor: lista.color || '#cccccc' }}
+                                ></span>
+                                <span title={lista.cliente}>
+                                  {truncateText(lista.cliente, 20)}
+                                </span>
+                              </li>
+                            ))
+                          ) : (
+                            <li className="text-gray-500 italic">Aún no asociado a ninguna lista</li>
+                          )}
+                        </ul>
+          
+                        {user.noLlamar && (
+                          <span className="inline-block bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full mt-2">
+                            No Llamar
+                          </span>
+                        )}
                       </div>
                     </div>
-                  ))
-                ) : (
-                  <div className="col-span-full text-center text-gray-500">No se encontraron resultados.</div>
-                )}
-              </div>
+                  </Link>
+                ))
+              ) : (
+                <div className="col-span-full text-center text-gray-500">No se encontraron resultados.</div>
+              )}
             </div>
+          </div>
+          
           )}
 
           <div className="flex justify-center mt-4 paginacion-custom">
