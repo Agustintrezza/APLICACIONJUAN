@@ -53,7 +53,7 @@ const Listas = ({ listas, isLoading }) => {
             currentListas.map((lista) => (
               <div
                 key={lista._id}
-                className="bg-white rounded-lg shadow-lg p-2 flex flex-col items-start cursor-pointer card-listas-custom-agus"
+                className="bg-white rounded-lg shadow-md p-2 flex flex-col items-start cursor-pointer hover:shadow-xl card-listas-custom-agus"
                 onClick={() => navigate(`/listas/${lista._id}`)}
               >
                 <div className="px-2">
